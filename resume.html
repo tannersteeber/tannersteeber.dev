@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Resume — Tanner Steeber</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Site header (shared) -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">tannersteeber.dev</a>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/projects.html">Projects</a>
+      </nav>
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
+        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Resume main: education, coursework, skills, profile -->
+  <main class="container resume-page">
+    <h1>Resume</h1>
+    <section class="resume-section">
+      <h2>Education</h2>
+      <p><strong>Robert Morris University</strong><br> Bachelor of Science – Computer Science<br> Expected Graduation: 2027</p>
+    </section>
+
+    <section class="resume-section">
+      <h2>Relevant Coursework</h2>
+      <ul>
+        <li>Data Structures and Algorithms</li>
+        <li>Networking</li>
+        <li>Compiler Design</li>
+        <li>Software Development</li>
+        <li>Calculus</li>
+      </ul>
+    </section>
+
+    <section class="resume-section">
+      <h2>Skills</h2>
+      <ul>
+        <li>Git, GitHub</li>
+        <li>VS Code</li>
+        <li>Unreal Engine 5</li>
+      </ul>
+    </section>
+
+    <section class="resume-section">
+      <h2>Profile</h2>
+      <p>I am a Computer Science student at Robert Morris University with a strong interest in software development and game design. My goal is to pursue a career as a software developer while continuing to develop my skills in programming and interactive system design.</p>
+    </section>
+  </main>
+
+  <!-- Navigation Overlay System -->
+  <div id="nav-overlay" class="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <nav class="overlay-nav" aria-label="Overlay Navigation"></nav>
+    </div>
+    <button id="overlay-close" class="overlay-close" aria-label="Close navigation">✕</button>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">© Tanner Steeber <span data-year></span></div>
+      <div class="footer-right">
+        <a href="mailto:hello@tannersteeber.dev">hello@tannersteeber.dev</a>
+        <a href="/resume.html">Resume</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

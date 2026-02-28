@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>About — Tanner Steeber</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Header (shared) -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">tannersteeber.dev</a>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/resume.html">Resume</a>
+      </nav>
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
+        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main: About page content (profile, background, interests, skills) -->
+  <main class="container about-page">
+    <h1>About Me</h1>
+    <p class="lead">I am a Computer Science student at Robert Morris University with a strong interest in software development and game design. I enjoy building applications, learning new technologies, and exploring how complex systems are designed and implemented. My goal is to continue developing my programming skills while gaining experience creating software and interactive systems.</p>
+
+    <h2>Background</h2>
+    <p>I am currently pursuing a Bachelor’s degree in Computer Science at Robert Morris University. My primary interests are software development and game design, where I enjoy solving problems through programming and building systems that people can interact with.</p>
+
+    <h2>Interests</h2>
+    <p>Outside of coursework, I enjoy exploring different areas of technology and development. My main interests include software development, game development, and learning how complex systems are built and optimized. Game design is particularly interesting to me because it combines technical programming challenges with creativity and system design.</p>
+
+    <h2>Skills</h2>
+    <ul>
+      <li>Git &amp; GitHub</li>
+      <li>VS Code</li>
+      <li>Unreal Engine 5</li>
+    </ul>
+  </main>
+
+  <!-- Navigation Overlay System (same as index) -->
+  <div id="nav-overlay" class="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+  <nav class="overlay-nav" aria-label="Overlay Navigation"></nav>
+    </div>
+    <button id="overlay-close" class="overlay-close" aria-label="Close navigation">✕</button>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">© Tanner Steeber <span data-year></span>
+        <p class="muted small">Robert Morris University — Computer Science</p>
+      </div>
+      <div class="footer-right">
+        <a href="mailto:hello@tannersteeber.dev">hello@tannersteeber.dev</a>
+        <a href="/resume.html">Resume</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

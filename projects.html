@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Projects — Tanner Steeber</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Site header (shared) -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">tannersteeber.dev</a>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/resume.html">Resume</a>
+      </nav>
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
+        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Projects main: list/grid of project cards
+       - Each project card represents a project object (title, description, meta)
+       - Add real project entries by replacing placeholder articles
+  -->
+  <main class="container projects-page">
+    <h1>Projects</h1>
+    <p class="lead">A selection of projects and experiments I've worked on. Click any project to view details or a repo link.</p>
+
+    <section class="projects-grid">
+      <article class="project">
+        <h3>Example Project 1</h3>
+        <p>Brief description of the project, tech used, and purpose.</p>
+        <p class="meta">Tech: JavaScript, HTML, CSS</p>
+      </article>
+
+      <article class="project">
+        <h3>Example Game Prototype</h3>
+        <p>Prototype built in Unreal Engine 5 focusing on mechanics and player interaction.</p>
+        <p class="meta">Tech: Unreal Engine 5, C++/Blueprints</p>
+      </article>
+
+      <article class="project">
+        <h3>Tooling / Utility</h3>
+        <p>Small tools to help with development workflows.</p>
+        <p class="meta">Tech: Python / Node</p>
+      </article>
+    </section>
+  </main>
+
+  <!-- Navigation Overlay System -->
+  <div id="nav-overlay" class="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <nav class="overlay-nav" aria-label="Overlay Navigation"></nav>
+    </div>
+    <button id="overlay-close" class="overlay-close" aria-label="Close navigation">✕</button>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <div class="footer-left">© Tanner Steeber <span data-year></span></div>
+        <p class="muted small">Projects, prototypes, and tooling</p>
+      </div>
+      <div class="footer-right">
+        <a href="/">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/resume.html">Resume</a>
+        <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

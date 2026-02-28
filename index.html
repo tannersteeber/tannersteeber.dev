@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- File metadata and resources
+       - Purpose: Main landing page for tannersteeber.dev
+       - Systems: CSS styling is loaded from /css/styles.css
+       - Script: main behavior loaded at bottom from /js/main.js
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tanner Steeber — tannersteeber.dev</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Header: global site header/navigation system -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <!-- Brand: site identity / home link -->
+      <a class="brand" href="/">tannersteeber.dev</a>
+
+      <!-- Primary navigation: links to main pages (About, Projects, Resume) -->
+      <nav class="nav">
+        <a href="/about.html">About</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/resume.html">Resume</a>
+      </nav>
+
+      <!-- Header actions: theme toggle and mobile nav toggle
+           - Theme toggle (id=theme-toggle) controls light/dark theme system
+           - Nav toggle controls mobile navigation visibility
+      -->
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
+        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Overlay System
+       - Fullscreen frosted glass overlay that displays navigation links centered vertically
+       - Filled dynamically by cloning the header .nav content at runtime
+  -->
+  <div id="nav-overlay" class="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay-inner">
+      <nav class="overlay-nav" aria-label="Overlay Navigation"></nav>
+    </div>
+    <button id="overlay-close" class="overlay-close" aria-label="Close navigation">✕</button>
+  </div>
+
+  <!-- Main content: hero, features, skills
+       - Hero is the primary visual area; includes a decorative background (.hero-bg)
+       - Aside feature-card highlights a single featured item
+  -->
+  <main>
+    <section class="hero hero--large">
+      <!-- Decorative SVG background for the hero (non-interactive) -->
+      <div class="hero-bg" aria-hidden="true"></div>
+
+      <!-- Hero inner layout: main content and side feature card -->
+      <div class="container hero-inner">
+        <!-- Hero content: headline, subtitle, CTA buttons -->
+        <div class="hero-content">
+          <h1 class="display-title">Tanner
+            <span class="accent">Steeber</span>
+          </h1>
+          <p class="subtitle">Computer Science Student — Software Development &amp; Game Design</p>
+          <p class="lead">I build applications, explore systems design, and create interactive experiences — with a focus on game systems and clean engineering.</p>
+
+          <!-- Calls to action: entry points to Projects & Resume systems -->
+          <div class="cta">
+            <a class="btn btn-primary" href="/projects.html">Explore Projects</a>
+            <a class="btn btn-outline" href="/resume.html">Resume</a>
+          </div>
+        </div>
+
+        <!-- Hero side: small card for highlighting an important project or demo -->
+        <aside class="hero-side">
+          <div class="feature-card">
+            <h4>Featured</h4>
+            <p class="muted">Game Prototype — Unreal Engine 5</p>
+            <p class="small">Prototype exploring player movement, physics interactions, and core mechanics.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Intro cards: short summaries of focus areas (Development, Game Design, Learning) -->
+    <section class="container intro-cards">
+      <article class="card glass">
+        <h3>Development</h3>
+        <p>Web apps, tooling, and systems design — clean, maintainable code and modern practices.</p>
+      </article>
+      <article class="card glass">
+        <h3>Game Design</h3>
+        <p>Mechanics, physics systems, and interactive experience design in Unreal Engine 5.</p>
+      </article>
+      <article class="card glass">
+        <h3>Learning</h3>
+        <p>Continuous study of algorithms, compilers, networking, and system design.</p>
+      </article>
+    </section>
+
+    <!-- Skills system: simple list of core tools and technologies -->
+    <section class="container" id="skills">
+      <h2>Skills &amp; Tools</h2>
+      <ul class="skills-list">
+        <li>Git</li>
+        <li>GitHub</li>
+        <li>VS Code</li>
+        <li>Unreal Engine 5</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer: global footer with copyright and quick links -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">© Tanner Steeber <span data-year></span>
+        <p class="muted small">Computer Science Student — Robert Morris University</p>
+      </div>
+      <div class="footer-right">
+        <a href="mailto:hello@tannersteeber.dev">hello@tannersteeber.dev</a>
+        <a href="/resume.html">Resume</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Client script: main behavior (theme system, nav toggle, year injection) -->
+  <script src="/js/main.js"></script>
+</body>
+</html>
