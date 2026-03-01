@@ -68,12 +68,26 @@ document.addEventListener('DOMContentLoaded', () => {
   qsa('.nav-toggle').forEach(b => b.addEventListener('click', openNav));
   overlayClose && overlayClose.addEventListener('click', closeNav);
 
-  // clicking overlay backdrop or a link closes it
+  // clicking overlay backdrop or any area outside the centered nav closes it
   overlay && overlay.addEventListener('click', (e) => {
-    if(e.target === overlay) return closeNav();
+    if(!overlayNav) return;
+    // if the click is anywhere that is not inside the overlayNav, close
+    if(!overlayNav.contains(e.target)) closeNav();
+    // if the click was on a link inside the overlayNav, allow navigation but still close
     const a = e.target.closest && e.target.closest('a');
-    if(a) closeNav();
+    if(a && overlayNav.contains(a)) closeNav();
   });
+
+  // In some environments a global click is more reliable; close overlay when it's open
+  // and the user clicks anywhere outside the overlay nav (ignores clicks on nav-toggle).
+  document.addEventListener('click', (e) => {
+    if(!overlay || !overlay.classList.contains('open')) return;
+    const target = e.target;
+    if(!overlayNav) return closeNav();
+    // ignore clicks inside the overlay nav or on the nav toggle buttons
+    if(overlayNav.contains(target) || target.closest('.nav-toggle')) return;
+    closeNav();
+  }, true);
 
   /* ---------------- Header scrolled state (rAF) ---------------- */
   (function(){
