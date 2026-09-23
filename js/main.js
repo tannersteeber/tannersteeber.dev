@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openProject() {
       // if we're already on the projects page, just expand the project
-  if (location.pathname.endsWith('projects.html')) {
+      if (location.pathname.endsWith('projects.html')) {
         if (!id) return;
         const target = document.getElementById(id);
         if (!target) return;
@@ -210,8 +210,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // otherwise, navigate to projects page with hash and let projects page handle expansion on load
-  if (!id) return location.assign('projects.html');
-  location.assign(`projects.html#${id}`);
+      // Build a base-path-aware URL so navigation works when the site is served from a subpath
+      const pathBase = (function () {
+        // If the pathname ends with a slash, use it directly; otherwise strip the last path segment (file) to get the base folder
+        if (location.pathname.endsWith('/')) return location.pathname;
+        return location.pathname.replace(/\/[^/]*$/, '/');
+      })();
+
+      const dest = pathBase + 'projects.html' + (id ? `#${id}` : '');
+      return location.assign(location.origin + dest);
     }
 
     featured.addEventListener('click', openProject);

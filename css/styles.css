@@ -10,6 +10,9 @@
   --accent: #0a84ff;
   --accent-2: #51b977;
   --overlay-frost: rgba(255,255,255,0.55);
+  /* Background used for overlay navigation links (theme-aware) */
+  --overlay-link-bg: rgba(255,255,255,0.02);
+  --overlay-link-bg-hover: rgba(255,255,255,0.04);
   --glass-blur: 8px;
   --radius: 12px;
   --max: 1200px;
@@ -40,6 +43,9 @@
   --accent: #9ca3af;
   --accent-2: #d1d5db;
   --overlay-frost: rgba(8,8,10,0.6);
+  /* Stronger translucent backgrounds for overlay links in dark mode so the frosted panels are visible */
+  --overlay-link-bg: rgba(255,255,255,0.08);
+  --overlay-link-bg-hover: rgba(255,255,255,0.12);
   /* Darker thumbnail background in dark mode */
   --thumb-bg: linear-gradient(180deg,#0a0a0a,#0b0b0b);
   --header-frost: rgba(10,10,12,0.6);
@@ -104,8 +110,8 @@ main{flex:1}
 .nav-overlay::before{content:'';position:absolute;inset:0;background:var(--overlay-frost);backdrop-filter:blur(10px)}
 .nav-overlay-inner{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%}
 .overlay-nav{display:flex;flex-direction:column;gap:1.25rem;align-items:center}
-.overlay-nav a{font-size:1.5rem;color:var(--text);text-decoration:none;padding:.75rem 1.25rem;border-radius:10px;background:rgba(255,255,255,0.02)}
-.overlay-nav a:hover{background:rgba(255,255,255,0.04)}
+.overlay-nav a{font-size:1.5rem;color:var(--text);text-decoration:none;padding:.75rem 1.25rem;border-radius:10px;background:var(--overlay-link-bg)}
+.overlay-nav a:hover{background:var(--overlay-link-bg-hover)}
 .overlay-close{position:fixed;top:18px;right:18px;z-index:1700;background:transparent;border:0;color:var(--muted);font-size:1.5rem}
 
 
