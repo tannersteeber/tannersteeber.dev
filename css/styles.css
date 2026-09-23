@@ -112,7 +112,7 @@ main{flex:1}
 /* -----------------------------
    Hero / Intro
   .hero--large{position:relative;padding:6rem 0 4rem;overflow:hidden}
-  .hero-bg{position:absolute;inset:0;background-image:url('/assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
+  .hero-bg{position:absolute;inset:0;background-image:url('../assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
   .hero-inner{display:flex;gap:2rem;align-items:stretch}
   .hero-content{flex:1;max-width:720px}
   .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
@@ -122,7 +122,7 @@ main{flex:1}
   .lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
   /* ------------------ Hero / Intro ------------------ */
   .hero--large{position:relative;padding:6rem 0 4rem;overflow:hidden}
-  .hero-bg{position:absolute;inset:0;background-image:url('/assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
+  .hero-bg{position:absolute;inset:0;background-image:url('../assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
   .hero-inner{display:flex;gap:2rem;align-items:stretch}
   .hero-content{flex:1;max-width:720px}
   .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}

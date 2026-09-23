@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openProject() {
       // if we're already on the projects page, just expand the project
-      if (location.pathname.endsWith('/projects.html') || location.pathname.endsWith('projects.html')) {
+  if (location.pathname.endsWith('projects.html')) {
         if (!id) return;
         const target = document.getElementById(id);
         if (!target) return;
@@ -210,8 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // otherwise, navigate to projects page with hash and let projects page handle expansion on load
-      if (!id) return location.assign('/projects.html');
-      location.assign(`/projects.html#${id}`);
+  if (!id) return location.assign('projects.html');
+  location.assign(`projects.html#${id}`);
     }
 
     featured.addEventListener('click', openProject);
