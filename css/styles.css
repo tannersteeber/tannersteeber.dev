@@ -1,117 +1,93 @@
-
+/* ------------------ styles.css — Design tokens & site styles ------------------ */
 :root{
-  /*
-    Design tokens and theme variables
-    - Keep light theme values here; dark theme overrides are below in .theme-dark
-  */
+  /* Design tokens */
   --bg-solid: #f7f7f8; /* light fallback */
   --bg: var(--bg-solid);
   --surface: #ffffff;
+  --text: #0f1724;
   --muted: #374151;
   --muted2: #6b7280;
   --accent: #0a84ff;
   --accent-2: #51b977;
+  --overlay-frost: rgba(255,255,255,0.55);
   --glass-blur: 8px;
   --radius: 12px;
   --max: 1200px;
-  --text: #0f1724;
-  --overlay-frost: rgba(255,255,255,0.55);
 
-  /* Motion tokens */
+  /* Motion */
   --motion-fast: 180ms;
   --motion-medium: 280ms;
   --elevation-shadow: 0 10px 30px rgba(2,6,23,0.08);
 
-  /* Header frosted defaults (light) */
   --header-frost: rgba(255,255,255,0.85);
   --header-border: rgba(0,0,0,0.06);
 
   transition: background .32s ease, color .32s ease;
+  --link: #0a84ff;
+  --link-hover: #065fd6;
 }
 
-/* Dark theme overrides */
+/* ------------------ Dark theme overrides ------------------ */
 :root.theme-dark{
   --bg: linear-gradient(180deg,#0b0b0b 0%, #0f0f11 48%, #121213 100%);
   --surface: rgba(255,255,255,0.03);
+  --text: #f8fafc;
   --muted: rgba(255,255,255,0.88);
   --muted2: rgba(255,255,255,0.65);
   --accent: #9ca3af;
   --accent-2: #d1d5db;
-  --text: #f8fafc;
   --overlay-frost: rgba(8,8,10,0.6);
-
   --header-frost: rgba(10,10,12,0.6);
   --header-border: rgba(255,255,255,0.04);
+  --link: #7bd4ff;
+  --link-hover: #5bd4ff;
+  /* Footer surface used for footer band (keeps consistent across pages) */
+  --footer-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  /* Stronger solid footer color in dark mode for consistent band (no gradient artifacts) */
+  --footer-solid: #0b0b0b;
 }
-*{box-sizing:border-box}
-.theme-root, body{
-  margin:0;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing:antialiased;
-  /* Layout: keep footer at bottom by using column flex on body */
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+
+/* Light theme footer bg (subtle frosted band) */
+:root{
+  --footer-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  --footer-solid: rgba(255,255,255,0.02);
 }
-.container{max-width:var(--max);margin:0 auto;padding:2rem}
 
-/* Ensure the main content grows to push footer to page bottom */
-main{flex:1}
-.site-header{position:sticky;top:0;backdrop-filter:blur(6px);background:linear-gradient(180deg, rgba(0,0,0,0.01), transparent);padding:.75rem 0;z-index:1500}
-.header-inner{display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:700;color:var(--text);text-decoration:none;letter-spacing:0.4px}
-.nav{display:flex;gap:1rem;align-items:center}
-.nav a{color:var(--muted);text-decoration:none;padding:.4rem .6rem;border-radius:8px}
-.nav a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
-.nav-toggle{display:none;background:transparent;border:0;color:var(--muted);font-size:1.25rem}
-
-.header-actions{display:flex;align-items:center;gap:.5rem}
-.theme-toggle{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:.4rem .5rem;border-radius:8px;font-size:1rem}
-.theme-toggle[aria-pressed="true"]{background:var(--accent);color:#021628;border-color:transparent}
-
-
-/* -----------------------------
-   Base / Layout
-   ----------------------------- */
+/* ------------------ Reset & base ------------------ */
 *{box-sizing:border-box}
 html,body{height:100%}
-.theme-root, body{
-  margin:0;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing:antialiased;
-  display:flex; /* keep footer at bottom */
-  flex-direction:column;
-  min-height:100vh;
-}
+/* Make the background gradient cover the viewport and stay fixed so it
+  visually extends beneath content and the footer (prevents visible seams). */
+html, body, .page-resume{background: var(--bg) fixed center/cover no-repeat !important}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'Helvetica Neue',Arial;color:var(--text);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh}
 .container{max-width:var(--max);margin:0 auto;padding:2rem}
 main{flex:1}
 
-
-/* -----------------------------
-   Header & Navigation
-   ----------------------------- */
+/* ------------------ Header & navigation ------------------ */
 .site-header{position:sticky;top:0;backdrop-filter:blur(6px);background:linear-gradient(180deg, rgba(0,0,0,0.01), transparent);padding:.75rem 0;z-index:1500;transition:background-color .28s ease, box-shadow .28s ease, border-color .28s ease}
 .header-inner{display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:700;color:var(--text);text-decoration:none;letter-spacing:0.4px}
+.brand{font-weight:700;color:var(--text);text-decoration:none}
 .nav{display:flex;gap:1rem;align-items:center}
 .nav a{color:var(--muted);text-decoration:none;padding:.4rem .6rem;border-radius:8px}
 .nav a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
 .nav a.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#021628}
-.header-actions{display:flex;align-items:center;gap:.5rem}
-.theme-toggle{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:.4rem .5rem;border-radius:8px;font-size:1rem}
-.theme-toggle[aria-pressed="true"]{background:var(--accent);color:#021628;border-color:transparent}
+.nav-toggle{display:block;background:transparent;border:0;color:var(--muted);font-size:1.25rem}
 
-/* Hamburger (visible on all breakpoints per request) */
+.header-actions{display:flex;align-items:center;gap:.5rem}
+.theme-toggle{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:.4rem .5rem;border-radius:8px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center}
+.theme-toggle[aria-pressed="true"]{background:var(--accent);color:#021628;border-color:transparent}
+.theme-toggle svg{width:18px;height:18px;display:inline-block}
+.theme-toggle .icon-sun{display:none}
+.theme-toggle .icon-moon{display:block}
+.theme-toggle[aria-pressed="true"] .icon-sun{display:block}
+.theme-toggle[aria-pressed="true"] .icon-moon{display:none}
+
+/* ------------------ Hamburger (mobile toggle) ------------------ */
 .nav-toggle{display:block;background:transparent;border:0;color:var(--muted);font-size:1.25rem}
 
 
-/* -----------------------------
-   Overlay (fullscreen frosted nav)
-   ----------------------------- */
+.nav-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1600}
+/* ------------------ Overlay (fullscreen frosted nav) ------------------ */
 .nav-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1600}
 .nav-overlay.open{display:flex}
 .nav-overlay::before{content:'';position:absolute;inset:0;background:var(--overlay-frost);backdrop-filter:blur(10px)}
@@ -124,19 +100,38 @@ main{flex:1}
 
 /* -----------------------------
    Hero / Intro
-   ----------------------------- */
-.hero--large{position:relative;padding:6rem 0 4rem;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background-image:url('/assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
-.hero-inner{display:flex;gap:2rem;align-items:stretch}
-.hero-content{flex:1;max-width:720px}
-.display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
-.display-title .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.subtitle{color:var(--muted);margin-top:.5rem;font-weight:600}
-.lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
-.cta{margin-top:1.6rem;display:flex;gap:0.75rem}
-.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1rem;border-radius:10px;text-decoration:none;font-weight:600}
-.btn-primary{background:linear-gradient(90deg,var(--accent),#5bd4ff);color:#021628;box-shadow:0 8px 30px rgba(119,182,255,0.12)}
-.btn-outline{border:1px solid rgba(0,0,0,0.08);background:transparent;color:var(--muted)}
+  .hero--large{position:relative;padding:6rem 0 4rem;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;background-image:url('/assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
+  .hero-inner{display:flex;gap:2rem;align-items:stretch}
+  .hero-content{flex:1;max-width:720px}
+  .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
+  .display-title .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .subtitle{color:var(--muted);margin-top:.5rem;font-weight:600}
+  .lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
+  /* ------------------ Hero / Intro ------------------ */
+  .hero--large{position:relative;padding:6rem 0 4rem;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;background-image:url('/assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
+  .hero-inner{display:flex;gap:2rem;align-items:stretch}
+  .hero-content{flex:1;max-width:720px}
+  .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
+  .display-title .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .subtitle{color:var(--muted);margin-top:.5rem;font-weight:600}
+  .lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
+
+  /* ------------------ About lead adjustments ------------------ */
+  .about-page .lead{background:transparent;color:var(--text);padding:0;border-radius:0;border:0;font-size:1.05rem}
+  .about-page section{background:transparent}
+
+  .cta{margin-top:1.6rem;display:flex;gap:0.75rem}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1rem;border-radius:10px;text-decoration:none;font-weight:600}
+  .btn-primary{background:linear-gradient(90deg,var(--accent),#5bd4ff);color:#021628;box-shadow:0 8px 30px rgba(119,182,255,0.12)}
+  .btn-outline{border:1px solid rgba(0,0,0,0.08);background:transparent;color:var(--muted)}
+
+  .hero-side{width:320px;display:flex;align-items:flex-start;justify-content:flex-end}
+  .feature-card{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.04);width:260px}
+  .feature-card h4{margin:0 0 .2rem 0;color:var(--accent)}
+  .feature-card .muted{color:var(--muted2);font-size:.9rem;margin-top:.2rem}
+  .feature-card .small{font-size:.85rem;color:var(--muted2);margin-top:.6rem}
 
 .hero-side{width:320px;display:flex;align-items:flex-start;justify-content:flex-end}
 .feature-card{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.04);width:260px}
@@ -159,20 +154,192 @@ main{flex:1}
 .project{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));padding:1rem;border-radius:12px;border:1px solid rgba(0,0,0,0.03)}
 .meta{color:var(--muted2);font-size:.9rem}
 
+/* Global link styles (content links). Nav links have their own rules and remain unchanged */
+a{color:var(--link)}
+a:hover{color:var(--link-hover);text-decoration:underline}
+
+
 
 /* -----------------------------
    Footer
    ----------------------------- */
-.site-footer{padding:2rem 0;color:var(--muted);background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter: blur(6px);border-top: 1px solid rgba(0,0,0,0.04)}
+.site-footer{position:relative;z-index:20;padding:2rem 0;color:var(--muted);background-color:var(--footer-solid);border-top: 1px solid var(--header-border)}
 .site-footer .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .site-footer .footer-left{font-size:.95rem;color:var(--muted)}
-.site-footer .footer-right{display:flex;gap:.75rem;align-items:center}
+.site-footer .footer-right{display:flex;flex-direction:column;gap:.5rem;align-items:flex-end}
 .site-footer .footer-right a{color:var(--muted);text-decoration:none;padding:.4rem .6rem;border-radius:8px}
 .site-footer .footer-right a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+
+/* Cleaner footer link list */
+.footer-links{display:flex;gap:.25rem;list-style:none;padding:0;margin:0;align-items:center}
+.footer-links li{margin:0;padding:0}
+.footer-links li + li::before{content:"•";margin:0 .5rem;color:var(--muted2)}
+.footer-links a{color:var(--muted2);padding:.25rem .4rem;border-radius:6px;font-size:.95rem}
+.footer-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+
+/* On small screens show stacked layout */
+.site-footer .footer-right .footer-links{display:flex;gap:.25rem;align-items:center}
+
+@media (max-width:900px){
+  /* keep footer links compact on medium screens */
+  .site-footer .footer-right .footer-links{gap:.5rem}
+}
+
+@media (max-width:600px){
+  .site-footer .footer-inner{flex-direction:column;align-items:flex-start}
+  .footer-right{align-items:flex-start}
+  .footer-links{flex-wrap:wrap;gap:.5rem;margin-top:.25rem}
+  .footer-links li + li::before{content:"";margin:0}
+}
+
+/* Back to top button */
+.back-to-top{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);z-index:1800;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:999px;background:var(--surface);color:var(--text);border:1px solid rgba(0,0,0,0.06);box-shadow:0 6px 20px rgba(2,6,23,0.08);cursor:pointer;opacity:0;pointer-events:none;transition:transform .28s var(--motion-medium),opacity .22s var(--motion-fast)}
+.back-to-top.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.back-to-top:focus{box-shadow:0 0 0 4px rgba(10,132,255,0.12)}
+.back-to-top svg{width:18px;height:18px;display:block}
+
+@media (max-width:700px){
+  /* Move to bottom-right on smaller screens */
+  .back-to-top{left:auto;right:18px;transform:translateY(8px);translate:none}
+  .back-to-top.visible{transform:translateY(0)}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .back-to-top{transition:none}
+}
+
+/* Resume page: place the resume on a solid surface background
+   - Use --surface so light/dark modes remain consistent
+   - Keep footer as the lighter frosted area below
+ */
+.page-resume{background:var(--bg) !important;color:var(--text)}
+.page-resume .resume-page{background:transparent;padding:3rem 0}
+.page-resume .resume-page .container{padding-top:0;padding-bottom:0}
+.page-resume .resume-doc{max-width:900px;margin:0 auto;padding:1.25rem;border-radius:0;background:transparent;color:var(--text)}
+.resume-doc section{margin:0 0 1rem 0}
+
+/* Ensure resume body copy uses the primary text color for contrast */
+.page-resume .resume-doc,
+.page-resume .resume-doc p,
+.page-resume .resume-doc li,
+.page-resume .resume-doc ul,
+.page-resume .resume-doc a{
+  color: var(--text);
+}
+
+/* Keep small metadata muted but readable */
+.page-resume .resume-doc .muted,
+.page-resume .resume-doc .meta{color:var(--muted2)}
+
+/* Email line shown above footer links */
+.footer-email{font-size:.98rem;color:var(--muted);margin-bottom:.25rem}
+.footer-email a{color:var(--muted2);text-decoration:none}
+.footer-email a:hover{color:var(--text);text-decoration:underline}
+
+@media (max-width:600px){
+  .footer-email{margin-top:0.5rem}
+}
 
 @media (max-width:600px){
   .site-footer .footer-inner{flex-direction:column;align-items:flex-start}
   .site-footer{padding:1.25rem}
+}
+
+/* Ensure resume page footer uses the same footer background and resume doc surface is consistent */
+/* Allow the page background gradient to show through the footer so the
+  resume background runs to the very bottom. If you prefer a solid band
+  we can reintroduce --footer-solid specifically for other pages. */
+/* Keep footer appearance consistent site-wide using the footer-solid token.
+  Dark-mode value is a solid #0b0b0b; light-mode has a subtle light value. */
+.page-resume .site-footer{background-color:var(--footer-solid)}
+.page-resume .resume-doc{background:transparent;box-shadow:none;border:0}
+
+/* Remove frosted / card-like surfaces inside the resume page to keep a flat, solid look */
+.page-resume .card,
+.page-resume .glass,
+.page-resume .feature-card,
+.page-resume .project,
+.page-resume .intro-cards .card{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Also make any section-level surfaces transparent on resume */
+.page-resume section{background:transparent !important}
+
+/* Force the resume content area to be flat so the page background shows through
+   - only target the main resume content (leave header/footer alone) */
+.page-resume .resume-page,
+.page-resume .resume-doc,
+.page-resume .resume-doc *,
+.page-resume main,
+.page-resume main * {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* Extracted resume layout (migrated from inline styles in resume.html) */
+.page-resume .resume-doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  color: var(--text);
+}
+.page-resume .resume-doc > .resume-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.page-resume .resume-doc > .resume-header h1 { margin-bottom: .25rem; }
+.page-resume .resume-doc > .resume-header p { margin: 0 0 .25rem 0; }
+.page-resume .resume-doc section { text-align: left; margin-top: 1.25rem; }
+.page-resume .resume-doc section h2 { text-align: center; }
+.page-resume .resume-doc section:last-of-type { margin-bottom: 1rem; }
+.page-resume .resume-doc .portfolio-link { text-align: center; }
+.page-resume .resume-doc .link-id {
+  /* visually hide the trailing id but keep it in the DOM for copy/paste and screen readers */
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+.page-resume .resume-doc .link-hidden {
+  /* visually hide the leading www. while keeping it accessible */
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+/* Ensure the resume content is transparent so the page background (gradient) shows
+   through fully down to the footer. This removes boxed/solid panels behind text. */
+.page-resume main,
+.page-resume .resume-doc,
+.page-resume .resume-doc section {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Remove any pseudo-element decorations or background-images applied by components
+   inside the resume page which can create dark boxes or panels. */
+.page-resume *::before,
+.page-resume *::after {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  content: none !important;
+}
+
+/* Ensure wrappers and containers are transparent on the resume so the body gradient
+   remains visible between content and footer. */
+.page-resume .container,
+.page-resume .resume-page {
+  background: transparent !important;
 }
 
 

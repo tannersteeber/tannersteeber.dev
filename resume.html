@@ -1,14 +1,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- ------------------ resume.html — Resume / CV ------------------
+       Purpose: Resume content provided by the user (textual)
+  ---------------------------------------------------------------- -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Resume — Tanner Steeber</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 </head>
-<body>
-  <!-- Site header (shared) -->
+<body class="page-resume">
+  <!-- ------------------ Site header / navigation (shared) ------------------ -->
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="/">tannersteeber.dev</a>
@@ -18,44 +21,67 @@
         <a href="/projects.html">Projects</a>
       </nav>
       <div class="header-actions">
-        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <g class="icon-moon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></g>
+            <g class="icon-sun"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></g></g>
+          </svg>
+        </button>
         <button class="nav-toggle" aria-label="Open navigation">☰</button>
       </div>
     </div>
   </header>
 
-  <!-- Resume main: education, coursework, skills, profile -->
+  <!-- Resume main: textual resume content provided by user -->
   <main class="container resume-page">
-    <h1>Resume</h1>
-    <section class="resume-section">
-      <h2>Education</h2>
-      <p><strong>Robert Morris University</strong><br> Bachelor of Science – Computer Science<br> Expected Graduation: 2027</p>
-    </section>
+    <article class="resume-doc">
+      <div class="resume-header">
+        <h1>TANNER J. STEEBER</h1>
+        <p>Pittsburgh, PA | (724) 797-7099 | <a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></p>
+  <p><a href="https://www.linkedin.com/in/tanner-steeber-8bb440304" target="_blank" rel="noopener"><span class="link-hidden">www.</span>linkedin.com/in/tanner-steeber<span class="link-id">-8bb440304</span></a> | <a href="https://github.com/tannersteeber" target="_blank" rel="noopener">github.com/tannersteeber</a></p>
+      </div>
 
-    <section class="resume-section">
-      <h2>Relevant Coursework</h2>
-      <ul>
-        <li>Data Structures and Algorithms</li>
-        <li>Networking</li>
-        <li>Compiler Design</li>
-        <li>Software Development</li>
-        <li>Calculus</li>
-      </ul>
-    </section>
+      <section>
+        <h2>PROFILE</h2>
+        <p>I am a Computer Science student at Robert Morris University with a strong interest in software development and game design. My goal is to pursue a career as a software developer while continuing to develop my skills in programming and interactive system design.</p>
+      </section>
 
-    <section class="resume-section">
-      <h2>Skills</h2>
-      <ul>
-        <li>Git, GitHub</li>
-        <li>VS Code</li>
-        <li>Unreal Engine 5</li>
-      </ul>
-    </section>
+      <section>
+        <h2>EDUCATION</h2>
+        <p><strong>Robert Morris University</strong> - Moon Township, PA | B.S. in Computer Science | May 2027</p>
+        <p><strong>Relevant Courses:</strong> Data Structures &amp; Algorithms, Computer Networking, Advanced Engineering Application Programming, Object-Oriented Programming, Network Security</p>
+      </section>
 
-    <section class="resume-section">
-      <h2>Profile</h2>
-      <p>I am a Computer Science student at Robert Morris University with a strong interest in software development and game design. My goal is to pursue a career as a software developer while continuing to develop my skills in programming and interactive system design.</p>
-    </section>
+      <section>
+        <h2>TECHNICAL EXPERIENCE</h2>
+        <p><strong>Programming Languages:</strong> Experience in C++, Html, Css, JavaScript, SQL, Python</p>
+        <p><strong>Development Tools:</strong> Git, GitHub, Visual Studio Code</p>
+        <p><strong>Cloud &amp; Networking:</strong> AWS, Wireshark</p>
+        <p><strong>Platforms:</strong> Windows, macOS, Linux operating systems; Unreal Engine 5</p>
+      </section>
+
+      <section>
+        <h2>LEADERSHIP &amp; ORGANIZATIONS</h2>
+        <p><strong>Delta Tau Delta Fraternity - Robert Morris University</strong> | 2023 - Present<br>
+        <strong>Brand Manager</strong> | 2023 - 2025</p>
+  <p>Managed the chapter's visual identity and created promotional materials for recruitment, philanthropy, alumni, and chapter events. Worked with chapter leadership to maintain consistent branding and strengthen communication across digital platforms. Ran all chapter social media accounts and produced content and posters for recruitment drives, events, and philanthropy campaigns.</p>
+      </section>
+
+      <section>
+        <h2>VOLUNTEER EXPERIENCE</h2>
+        <p>Volunteered time to the following organizations | 2023 - Present</p>
+        <ul>
+          <li>Leukemia &amp; Lymphoma Society - Light the Night Walk for Blood Cancer</li>
+          <li>Breakthrough T1D - Type 1 Diabetes Research Foundation</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>PORTFOLIO &amp; PROJECT WORK</h2>
+        <p class="portfolio-link"><a href="https://tannerdev.com" target="_blank" rel="noopener">tannerdev.com</a></p>
+        <p>Showcases software development projects, technical coursework, web development, and personal work. Includes project descriptions, technologies used, screenshots, and links to source code where available. Highlights ongoing work in software development, Unreal Engine, and web development.</p>
+      </section>
+    </article>
   </main>
 
   <!-- Navigation Overlay System -->
@@ -68,10 +94,19 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div class="footer-left">© Tanner Steeber <span data-year></span></div>
+      <div class="footer-left">
+        © Tanner Steeber <span data-year></span>
+        <p class="muted small">Computer Science Student — Robert Morris University</p>
+      </div>
       <div class="footer-right">
-        <a href="mailto:tanner.steeber@gmail.com">tanner.steeber@gmail.com</a>
-        <a href="/resume.html">Resume</a>
+        <div class="footer-email"><a href="mailto:tanner.steeber@gmail.com">tanner.steeber@gmail.com</a></div>
+        <ul class="footer-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/about.html">About</a></li>
+          <li><a href="/projects.html">Projects</a></li>
+          <li><a href="/resume.html">Resume</a></li>
+          <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
       </div>
     </div>
   </footer>
