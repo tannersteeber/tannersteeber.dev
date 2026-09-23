@@ -407,6 +407,23 @@ a:hover{color:var(--link-hover);text-decoration:underline}
   content: none !important;
 }
 
+/* Re-enable the nav overlay pseudo-element on the resume page.
+   A global rule above intentionally removed pseudo-elements to avoid
+   unwanted decorative panels on the resume, but that also removed the
+   overlay backdrop (which relies on ::before). Override that here so
+   the frosted fullscreen nav still shows when the hamburger opens. */
+.page-resume .nav-overlay::before {
+  /* use !important so this wins over the global reset above; this
+     rule is placed after the reset. */
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: var(--overlay-frost) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  z-index: 1 !important; /* behind the nav-inner (which uses z-index:2) */
+}
+
 /* Ensure wrappers and containers are transparent on the resume so the body gradient
    remains visible between content and footer. */
 .page-resume .container,
