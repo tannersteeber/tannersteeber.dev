@@ -1,7 +1,7 @@
 /* ------------------ styles.css — Design tokens & site styles ------------------ */
 :root{
   /* Design tokens */
-  --bg-solid: #f7f7f8; /* light fallback */
+  --bg-solid: #fbfbfc; /* light fallback - slightly lighter */
   --bg: var(--bg-solid);
   --surface: #ffffff;
   --text: #0f1724;
@@ -25,11 +25,14 @@
   transition: background .32s ease, color .32s ease;
   --link: #0a84ff;
   --link-hover: #065fd6;
+  /* Thumbnail background used for project card image placeholders */
+  --thumb-bg: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.04));
 }
 
 /* ------------------ Dark theme overrides ------------------ */
 :root.theme-dark{
-  --bg: linear-gradient(180deg,#0b0b0b 0%, #0f0f11 48%, #121213 100%);
+  /* slightly lighter dark gradient so page backgrounds are a touch brighter */
+  --bg: linear-gradient(180deg,#0e0e0e 0%, #111113 48%, #141415 100%);
   --surface: rgba(255,255,255,0.03);
   --text: #f8fafc;
   --muted: rgba(255,255,255,0.88);
@@ -37,6 +40,8 @@
   --accent: #9ca3af;
   --accent-2: #d1d5db;
   --overlay-frost: rgba(8,8,10,0.6);
+  /* Darker thumbnail background in dark mode */
+  --thumb-bg: linear-gradient(180deg,#0a0a0a,#0b0b0b);
   --header-frost: rgba(10,10,12,0.6);
   --header-border: rgba(255,255,255,0.04);
   --link: #7bd4ff;
@@ -45,12 +50,18 @@
   --footer-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   /* Stronger solid footer color in dark mode for consistent band (no gradient artifacts) */
   --footer-solid: #0b0b0b;
+  /* Card surface tokens — make cards almost as dark as the footer */
+  --card-surface: #0c0c0c;
+  --card-surface-2: #0b0b0b;
 }
 
 /* Light theme footer bg (subtle frosted band) */
 :root{
   --footer-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   --footer-solid: rgba(255,255,255,0.02);
+  /* Card surface tokens for light theme (subtle, slightly darker than footer band) */
+  --card-surface: rgba(255,255,255,0.8);
+  --card-surface-2: rgba(255,255,255,0.7);
 }
 
 /* ------------------ Reset & base ------------------ */
@@ -105,7 +116,8 @@ main{flex:1}
   .hero-inner{display:flex;gap:2rem;align-items:stretch}
   .hero-content{flex:1;max-width:720px}
   .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
-  .display-title .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* Light-mode: use the buttons' dark-theme accent gradient for the last name */
+  .display-title .accent{background:linear-gradient(90deg,#9ca3af,#5bd4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
   .subtitle{color:var(--muted);margin-top:.5rem;font-weight:600}
   .lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
   /* ------------------ Hero / Intro ------------------ */
@@ -114,7 +126,8 @@ main{flex:1}
   .hero-inner{display:flex;gap:2rem;align-items:stretch}
   .hero-content{flex:1;max-width:720px}
   .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
-  .display-title .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* Light-mode: use the buttons' dark-theme accent gradient for the last name */
+  .display-title .accent{background:linear-gradient(90deg,#9ca3af,#5bd4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
   .subtitle{color:var(--muted);margin-top:.5rem;font-weight:600}
   .lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
 
@@ -128,14 +141,13 @@ main{flex:1}
   .btn-outline{border:1px solid rgba(0,0,0,0.08);background:transparent;color:var(--muted)}
 
   .hero-side{width:320px;display:flex;align-items:flex-start;justify-content:flex-end}
-  .feature-card{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.04);width:260px}
-  .feature-card h4{margin:0 0 .2rem 0;color:var(--accent)}
+  .feature-card{background:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.04));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.06);width:260px}
   .feature-card .muted{color:var(--muted2);font-size:.9rem;margin-top:.2rem}
   .feature-card .small{font-size:.85rem;color:var(--muted2);margin-top:.6rem}
 
 .hero-side{width:320px;display:flex;align-items:flex-start;justify-content:flex-end}
-.feature-card{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.04);width:260px}
-.feature-card h4{margin:0 0 .2rem 0;color:var(--accent)}
+.feature-card{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.06);width:260px}
+.feature-card h4{margin:0 0 .2rem 0;color:#5bd4ff}
 .feature-card .muted{color:var(--muted2);font-size:.9rem;margin-top:.2rem}
 .feature-card .small{font-size:.85rem;color:var(--muted2);margin-top:.6rem}
 
@@ -145,14 +157,68 @@ main{flex:1}
    ----------------------------- */
 .intro-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:2rem}
 .card{padding:1.25rem;border-radius:12px}
-.glass{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));border:1px solid rgba(0,0,0,0.04);backdrop-filter:blur(var(--glass-blur))}
+.glass{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid rgba(0,0,0,0.06);backdrop-filter:blur(var(--glass-blur))}
+
+/* Intro cards hover animation: subtle lift and scale on hover for interactive affordance */
+.intro-cards .card{transition:transform var(--motion-fast) cubic-bezier(.2,.9,.2,1),box-shadow var(--motion-fast) ease,background-color var(--motion-fast) ease,opacity var(--motion-fast) ease}
+.intro-cards .card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 18px 36px rgba(2,6,23,0.08)}
+.intro-cards .card:active{transform:translateY(-2px) scale(1.01)}
+
+/* Featured project cursor and focus styles */
+#featured-project{cursor:pointer}
+#featured-project:focus{outline:2px solid rgba(11,132,255,0.14);outline-offset:4px}
+#featured-project:hover{transform:translateY(-4px);box-shadow:0 20px 36px rgba(2,6,23,0.12)}
+#featured-project{transition:transform var(--motion-fast) cubic-bezier(.2,.9,.2,1),box-shadow var(--motion-fast) ease,background-color var(--motion-fast) ease,opacity var(--motion-fast) ease}
 
 .skills-list{display:flex;gap:1rem;list-style:none;padding:0;margin:1rem 0;flex-wrap:wrap}
-.skills-list li{background:rgba(0,0,0,0.02);padding:.5rem .75rem;border-radius:999px;color:var(--muted);font-weight:600}
+.skills-list li{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));padding:.5rem .75rem;border-radius:999px;color:var(--muted);font-weight:600}
 
-.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1rem}
-.project{background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));padding:1rem;border-radius:12px;border:1px solid rgba(0,0,0,0.03)}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-top:1rem}
+.project{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));padding:1rem;border-radius:12px;border:1px solid rgba(0,0,0,0.06)}
 .meta{color:var(--muted2);font-size:.9rem}
+
+/* Projects page: collapsible sections and project cards */
+.collapsible-section{margin-top:1.5rem;border-radius:12px;padding:0;border:1px solid rgba(0,0,0,0.04);background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));}
+.collapsible-section > summary{list-style:none;cursor:pointer;padding:1rem 1.25rem;font-weight:700}
+.collapsible-section > summary::-webkit-details-marker{display:none}
+.collapsible-section[open]{box-shadow:0 12px 36px rgba(2,6,23,0.06)}
+
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;padding:1rem}
+.project-card{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border-radius:10px;padding:1rem;border:1px solid rgba(0,0,0,0.04)}
+.project-card h3{margin:0 0 .35rem 0}
+.project-card .repo-link{margin-top:.5rem}
+
+.card-details summary{cursor:pointer;padding:.5rem 0;font-weight:600}
+.card-details summary::-webkit-details-marker{display:none}
+.card-body{padding:.5rem 0;border-top:1px dashed rgba(255,255,255,0.02)}
+
+.card-updates h4,.card-gallery h4{margin:0 0 .4rem 0;font-size:1rem}
+.card-updates ul{margin:0 0 1rem 1.1rem}
+
+.card-gallery .thumbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem}
+.thumb{height:90px;background:var(--thumb-bg);display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--muted2)}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+
+@media (max-width:700px){
+  .projects-grid{grid-template-columns:1fr}
+  .collapsible-section{padding:0}
+}
+
+/* Two-column projects layout */
+.projects-section{margin-top:1.5rem}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;padding:1rem 0}
+
+/* Small vertical space for stacked project cards inside collapsible sections
+  — avoids doubling spacing in grid layouts while giving stacked cards breathing room */
+.collapsible-section .project-card + .project-card{margin-top:.75rem}
+.project-card{margin:0;background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border-radius:10px;padding:1rem;border:1px solid rgba(0,0,0,0.06)}
+
+
+/* Ensure small screens stack columns */
+@media (max-width:900px){
+  .projects-columns{grid-template-columns:1fr}
+  .project-column{min-height:40vh}
+}
 
 /* Global link styles (content links). Nav links have their own rules and remain unchanged */
 a{color:var(--link)}
@@ -383,6 +449,16 @@ button, a, .btn, .nav a, .overlay-nav a, .project, .card, .feature-card, .skills
   .nav.open{position:absolute;top:64px;right:1rem;left:1rem;background:var(--surface);backdrop-filter:blur(6px);box-shadow:0 10px 30px rgba(2,6,23,0.35)}
 }
 
+/* Dark-mode: force homepage name and featured heading to the blue accent for emphasis */
+.theme-dark .hero .display-title .accent,
+.theme-dark .feature-card h4 {
+  /* Dark-mode: use the buttons' light-theme gradient for emphasis */
+  background: linear-gradient(90deg,#0a84ff,#5bd4ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color: transparent;
+}
+
 @media (max-width:600px){
   .container{padding:1rem}
   .hero--large{padding:3rem 0 2rem}
@@ -395,6 +471,27 @@ button, a, .btn, .nav a, .overlay-nav a, .project, .card, .feature-card, .skills
   .nav a{padding:.75rem 1rem;border-radius:8px;font-size:1rem}
   .header-actions{gap:.25rem}
   .theme-toggle{padding:.5rem;border-radius:10px}
+}
+
+/* -----------------------------
+   About page enhancements
+   ----------------------------- */
+.about-hero{display:grid;grid-template-columns:1fr 320px;gap:2rem;align-items:start;margin-top:1.25rem}
+.about-content{min-width:0}
+.about-callout{margin-top:0;padding:0.85rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));}
+.about-callout p{margin:0}
+
+.about-body{display:grid;grid-template-columns:1fr 320px;gap:2rem;margin-top:1.25rem}
+.about-side{padding:0}
+.about-skills{display:flex;flex-direction:column;gap:.5rem;padding:0;margin:0;list-style:none}
+.about-skills li{padding:.45rem .6rem;border-radius:8px;background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));font-weight:600}
+
+.mini-card{margin-top:1rem;padding:.75rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2))}
+.mini-card h4{margin:0 0 .4rem 0}
+
+@media (max-width:900px){
+  .about-hero{grid-template-columns:1fr}
+  .about-body{grid-template-columns:1fr}
 }
 
 /* Focus outlines for keyboard users */

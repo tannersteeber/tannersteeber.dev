@@ -38,27 +38,118 @@
   -->
   <main class="container projects-page">
     <h1>Projects</h1>
-    <p class="lead">A selection of projects and experiments I've worked on. Click any project to view details or a repo link.</p>
+    <p class="lead">A selection of public and in-progress projects. Expand a section to view project cards; expand a card to see updates and images.</p>
 
-  <section class="projects-grid">
-      <article class="project">
-        <h3>Delta Tau Delta Website</h3>
-        <p>Fraternity outreach site for the Zeta Mu Chapter.</p>
-        <p class="meta">Tech: JavaScript, HTML, CSS</p>
-      </article>
+    <!-- Two-column layout: left = Public, right = In-progress (private) -->
+    <div class="projects-columns">
+      <section class="project-column">
+        <header class="column-head">
+          <h2>Public / Open Projects</h2>
+          <p class="muted small">Public repositories with repo links.</p>
+        </header>
 
-      <article class="project">
-        <h3>Example Game Prototype</h3>
-        <p>Prototype built in Unreal Engine 5 focusing on mechanics and player interaction.</p>
-        <p class="meta">Tech: Unreal Engine 5, C++/Blueprints</p>
-      </article>
+        <div class="project-list" id="public-list">
+          <!-- tannersteeber.dev (public) -->
+          <article id="project-tannersteeber-dev" class="project-card project">
+            <h3>tannersteeber.dev</h3>
+            <p>Personal portfolio / site presenting projects, resume, and contact information.</p>
+            <p class="meta">Tech: HTML, CSS, JavaScript</p>
+            <p class="repo-link"><a href="https://github.com/tannersteeber/tannersteeber.dev" target="_blank" rel="noopener">View repository on GitHub</a></p>
 
-      <article class="project">
-        <h3>Project 3</h3>
-        <p>...</p>
-        <p class="meta">Tech: ...</p>
-      </article>
-    </section>
+            <details class="card-details">
+              <summary>Details &amp; Updates</summary>
+              <div class="card-body">
+                <div class="card-updates">
+                  <h4>Recent updates</h4>
+                  <ul>
+                    <li>Added resume text and improved dark-mode visuals.</li>
+                    <li>Unified footer and fixed theme toggle behavior.</li>
+                  </ul>
+                </div>
+
+                <div class="card-gallery">
+                  <h4>Screenshots</h4>
+                  <div class="thumbs">
+                    <div class="thumb empty">No images yet</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </article>
+
+          <!-- Add more public cards here if needed -->
+  </div>
+      </section>
+
+      <section class="project-column">
+        <header class="column-head">
+          <h2>In the works / Private</h2>
+          <p class="muted small">Private repositories and active prototypes.</p>
+        </header>
+
+        <div class="project-list" id="private-list">
+          <article id="project-on-the-line" class="project-card project">
+            <h3>On-the-Line</h3>
+            <p>Progression-focused social app concept — project currently private.</p>
+            <p class="meta">Tech: HTML, CSS, JavaScript</p>
+            <details class="card-details">
+              <summary>Details &amp; Updates</summary>
+              <div class="card-body">
+                <div class="card-updates">
+                  <h4>Recent updates</h4>
+                  <ul>
+                    <li>Designing initial API and database schema.</li>
+                    <li>Prototype UI components in progress.</li>
+                  </ul>
+                </div>
+                <div class="card-gallery">
+                  <h4>Screenshots</h4>
+                  <div class="thumbs"><div class="thumb empty">No images yet</div></div>
+                </div>
+              </div>
+            </details>
+          </article>
+
+          <article id="project-battlefield-6-ui-concept" class="project-card project">
+            <h3>Battlefield-6-UI-Concept</h3>
+            <p>An upgraded UI concept for Battlefield 6 (private).</p>
+            <p class="meta">Tech: HTML, CSS, JavaScript</p>
+            <details class="card-details">
+              <summary>Details &amp; Updates</summary>
+              <div class="card-body">
+                <div class="card-updates">
+                  <h4>Recent updates</h4>
+                  <ul><li>UI mockups and early prototype elements completed.</li></ul>
+                </div>
+                <div class="card-gallery"><h4>Screenshots</h4><div class="thumbs"><div class="thumb empty">No images yet</div></div></div>
+              </div>
+            </details>
+          </article>
+
+          <article id="project-ball-knowledge" class="project-card project">
+            <h3>Ball-Knowledge</h3>
+            <p>Sports prediction platform where users vote on upcoming games and compete on leaderboards (private).</p>
+            <p class="meta">Tech: HTML, CSS, JavaScript</p>
+            <details class="card-details">
+              <summary>Details &amp; Updates</summary>
+              <div class="card-body"><div class="card-updates"><h4>Recent updates</h4><ul><li>Authentication and scoring mechanics underway.</li></ul></div><div class="card-gallery"><h4>Screenshots</h4><div class="thumbs"><div class="thumb empty">No images yet</div></div></div></div>
+            </details>
+          </article>
+
+          <article id="project-bonzai" class="project-card project">
+            <h3>Bonzai</h3>
+            <p>Open world car game prototype (private).</p>
+            <p class="meta">Tech: Unreal Engine, C++</p>
+            <details class="card-details">
+              <summary>Details &amp; Updates</summary>
+              <div class="card-body"><div class="card-updates"><h4>Recent updates</h4><ul><li>Physics and driving mechanics prototyped.</li></ul></div><div class="card-gallery"><h4>Screenshots</h4><div class="thumbs"><div class="thumb empty">No images yet</div></div></div></div>
+            </details>
+          </article>
+
+        </div>
+      </section>
+    </div>
+      
   </main>
 
   <!-- Navigation Overlay System -->
@@ -76,7 +167,7 @@
         <p class="muted small">Projects, prototypes, and tooling</p>
       </div>
       <div class="footer-right">
-        <div class="footer-email"><a href="mailto:tanner.steeber@gmail.com">tanner.steeber@gmail.com</a></div>
+  <div class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
         <ul class="footer-links">
           <li><a href="/">Home</a></li>
           <li><a href="/about.html">About</a></li>

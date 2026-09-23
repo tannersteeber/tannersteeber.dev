@@ -140,4 +140,96 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(check);
   })();
 
+  /* ------------------ Projects columns: per-column scroll recall & top buttons ------------------ */
+  (function () {
+    // Persist scroll position for each project-list so the column remembers where you left off
+    ['public-list','private-list'].forEach(id => {
+      const list = qs(`#${id}`);
+      if (!list) return;
+      const key = `scroll-pos:${id}`;
+      try {
+        const val = sessionStorage.getItem(key);
+        if (val) list.scrollTop = parseInt(val, 10);
+      } catch (e) {}
+      let t = null;
+      list.addEventListener('scroll', () => {
+        if (t) clearTimeout(t);
+        t = setTimeout(() => { try { sessionStorage.setItem(key, String(list.scrollTop)); } catch (e) {} }, 150);
+      }, { passive: true });
+    });
+  })();
+
+  /* project-list column containment removed — projects are now simple lists */
+
+  /* ------------------ Featured project on home page ------------------ */
+  (function () {
+    const featured = qs('#featured-project');
+    if (!featured) return;
+
+    // Use data-target on the featured element if present (explicit project ID), otherwise fall back to DOM lookup
+    const dataTarget = featured.getAttribute('data-target');
+    let id = dataTarget || '';
+    let title = featured.querySelector('.featured-title') ? featured.querySelector('.featured-title').textContent.trim() : 'Project';
+    let meta = featured.querySelector('.featured-meta') ? featured.querySelector('.featured-meta').textContent.trim() : '';
+    let desc = featured.querySelector('.featured-desc') ? featured.querySelector('.featured-desc').textContent.trim() : '';
+
+    if (!id) {
+      // Prefer the manually-picked featured project by id, otherwise fall back to first public project
+      let firstProject = document.getElementById('project-tannersteeber-dev');
+      if (!firstProject) {
+        const publicList = qs('#public-list');
+        if (publicList) firstProject = publicList.querySelector('article.project-card');
+      }
+      if (firstProject) {
+        title = firstProject.querySelector('h3') ? firstProject.querySelector('h3').textContent.trim() : title;
+        meta = firstProject.querySelector('.meta') ? firstProject.querySelector('.meta').textContent.trim() : meta;
+        desc = firstProject.querySelector('p') ? firstProject.querySelector('p').textContent.trim() : desc;
+        id = firstProject.id || '';
+      }
+    }
+
+    // populate the featured card
+    const fTitle = featured.querySelector('.featured-title');
+    const fMeta = featured.querySelector('.featured-meta');
+    const fDesc = featured.querySelector('.featured-desc');
+    if (fTitle) fTitle.textContent = title;
+    if (fMeta) fMeta.textContent = meta;
+    if (fDesc) fDesc.textContent = desc;
+
+    function openProject() {
+      // if we're already on the projects page, just expand the project
+      if (location.pathname.endsWith('/projects.html') || location.pathname.endsWith('projects.html')) {
+        if (!id) return;
+        const target = document.getElementById(id);
+        if (!target) return;
+        const details = target.querySelector('details.card-details');
+        if (details && !details.open) details.open = true;
+        // scroll into view
+        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 40);
+        return;
+      }
+
+      // otherwise, navigate to projects page with hash and let projects page handle expansion on load
+      if (!id) return location.assign('/projects.html');
+      location.assign(`/projects.html#${id}`);
+    }
+
+    featured.addEventListener('click', openProject);
+    featured.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProject(); } });
+  })();
+
+  /* Expand project when landing on projects.html with a hash (e.g., /projects.html#project-id) */
+  (function () {
+    if (!location.hash) return;
+    const id = location.hash.replace('#', '');
+    if (!id) return;
+    // wait a tick for the DOM to be ready
+    setTimeout(() => {
+      const target = document.getElementById(id);
+      if (!target) return;
+      const details = target.querySelector('details.card-details');
+      if (details && !details.open) details.open = true;
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  })();
 });
