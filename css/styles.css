@@ -178,6 +178,76 @@ main{flex:1}
 
 .skills-list{display:flex;gap:1rem;list-style:none;padding:0;margin:1rem 0;flex-wrap:wrap}
 .skills-list li{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));padding:.5rem .75rem;border-radius:999px;color:var(--muted);font-weight:600}
+/* Make skill items look like interactive pills with hover/focus styles */
+.skills-list li{
+  transition:transform var(--motion-fast) ease,background-color var(--motion-fast) ease,color var(--motion-fast) ease,box-shadow var(--motion-fast) ease;
+  cursor:default;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:normal; /* allow wrapping for long labels */
+  min-height:44px; /* uniform button height */
+  padding:.5rem .9rem;
+  text-align:center;
+}
+.skills-list li:hover,
+.skills-list li:focus{
+  transform:translateY(-4px);
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:#021628; /* light-mode hover color remains dark text */
+  box-shadow:0 10px 30px rgba(2,6,23,0.08);
+}
+/* Dark theme: make hovered pill text the light blue link color for contrast */
+.theme-dark .skills-list li:hover,
+.theme-dark .skills-list li:focus{
+  color: var(--link);
+}
+.skills-list.about-skills li{margin-bottom:0.25rem}
+
+/* Improve grid filling to avoid an orphan item in its own row */
+#skills .skills-list{
+  grid-auto-rows: minmax(44px, auto);
+  grid-auto-flow: dense;
+}
+.about-side .skills-list{
+  grid-auto-rows: minmax(40px, auto);
+}
+
+/* ------------------ Skills layout overrides ------------------ */
+/* Home page: compact, centered grid so pills don't look uneven */
+#skills .skills-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:.6rem;
+  align-items:center;
+  justify-items:center;
+  margin-top:1rem;
+}
+#skills .skills-list li{
+  padding:.45rem .7rem;
+  font-size:0.95rem;
+  min-width:110px;
+  text-align:center;
+}
+
+/* About page sidebar: two-column compact list to reduce vertical length */
+.about-side .skills-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(120px,1fr));
+  gap:.5rem;
+  align-items:start;
+}
+.about-side .skills-list li{
+  padding:.4rem .6rem;
+  font-size:0.95rem;
+  justify-self:start;
+}
+
+@media (max-width:700px){
+  /* On smaller screens stack home skills into two columns for readability */
+  #skills .skills-list{grid-template-columns:repeat(2,minmax(120px,1fr));}
+  .about-side .skills-list{grid-template-columns:repeat(2,minmax(120px,1fr));}
+}
 
 .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-top:1rem}
 .project{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));padding:1rem;border-radius:12px;border:1px solid rgba(0,0,0,0.06)}
