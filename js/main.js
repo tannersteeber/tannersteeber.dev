@@ -289,6 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const track = qs('.lb-track', lightbox);
       if (track) {
   trackResizeObserver.disconnect();
+  track._cleanupVerticalClose && track._cleanupVerticalClose();
+  if (track._io) try { track._io.disconnect(); } catch (e) {}
+  track._cleanupInnerClick && track._cleanupInnerClick();
       }
       // clear media content
       const media = qs('.lb-media', lightbox);
@@ -437,6 +440,33 @@ document.addEventListener('DOMContentLoaded', () => {
         track.removeEventListener('touchend', onTouchEnd);
         track.removeEventListener('wheel', onWheel);
       };
+
+      // IntersectionObserver to detect which slide is currently in view
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if (!en.isIntersecting) return;
+          const children = Array.from(track.children);
+          const i = children.indexOf(en.target);
+          if (i >= 0 && i !== idx) {
+            idx = i;
+            lbCounter.textContent = `${idx + 1} / ${pairs.length}`;
+          }
+        });
+      }, { root: track, threshold: 0.6 });
+      Array.from(track.children).forEach(child => io.observe(child));
+      track._io = io;
+
+      // Clicking in the inner area but outside the image or controls should close
+      const inner = qs('.lightbox-inner', lightbox);
+      function onInnerClick(e) {
+        // If click is on an image or on any control, don't close
+        if (e.target.closest && (e.target.closest('.lb-track-img') || e.target.closest('.lb-prev') || e.target.closest('.lb-next') || e.target.closest('.lb-close'))) return;
+        close();
+      }
+      if (inner) {
+        inner.addEventListener('click', onInnerClick);
+        track._cleanupInnerClick = () => inner.removeEventListener('click', onInnerClick);
+      }
       return track;
     }
 

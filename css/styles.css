@@ -342,6 +342,9 @@ main{flex:1}
 /* For light mode keep the close icon muted so it remains visible against light backgrounds */
 .lb-close svg{stroke:var(--muted2)}
 .lb-counter{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.95rem}
+/* Ensure counter text is visible in light mode and crisp (no washed shadow) */
+.lb-counter{color:var(--text);text-shadow:none}
+.theme-dark .lb-counter{color:var(--muted)}
 
 /* Show grab cursor and dragging cursor when pointer-dragging the image */
 .lb-media, .lb-img{cursor:grab}
