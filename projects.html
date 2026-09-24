@@ -62,15 +62,34 @@
                 <div class="card-updates">
                   <h4>Recent updates</h4>
                   <ul>
-                    <li>Update 0.6 — initial public deployment (first live release of the site).</li>
-                    <li>Added resume content and improved dark-mode visuals.</li>
+                    <li>Version 0.9 — early access build.</li>
+                    <li>Feature - added images and image preview/control features.</li>
+                    <li>Version 0.8 — early access build.</li>
+                    <li>Update - Improved Skills and Tools on the Home and About pages. Added buttons to Repo links and adjusted all layouts.</li>
+                    <li>Version 0.6 — initial public deployment (first live release of the site).</li>
                   </ul>
                 </div>
 
                 <div class="card-gallery">
                   <h4>Screenshots</h4>
                   <div class="thumbs">
-                    <div class="thumb empty">No images yet</div>
+                    <div class="thumb">
+                      <!-- Dark and light variants: place matching files in assets/screens/ -->
+                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-1.png" alt="tannersteeber site - dark mode screenshot 1">
+                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-1.png" alt="tannersteeber site - light mode screenshot 1">
+                    </div>
+                    <div class="thumb">
+                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-2.png" alt="tannersteeber site - dark mode screenshot 2">
+                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-2.png" alt="tannersteeber site - light mode screenshot 2">
+                    </div>
+                    <div class="thumb">
+                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-3.png" alt="tannersteeber site - dark mode screenshot 3">
+                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-3.png" alt="tannersteeber site - light mode screenshot 3">
+                    </div>
+                    <div class="thumb">
+                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-4.png" alt="tannersteeber site - dark mode screenshot 4">
+                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-4.png" alt="tannersteeber site - light mode screenshot 4">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -90,7 +109,7 @@
         <div class="project-list" id="private-list">
           <article id="project-on-the-line" class="project-card project">
             <h3>On-the-Line</h3>
-            <p>Progression-focused social app concept — project currently private.</p>
+            <p>Progression-focused social app concept (private).</p>
             <p class="meta">Tech: HTML, CSS, JavaScript</p>
             <details class="card-details">
               <summary>Details &amp; Updates</summary>
@@ -181,7 +200,12 @@
     <div class="nav-overlay-inner">
       <nav class="overlay-nav" aria-label="Overlay Navigation"></nav>
     </div>
-    <button id="overlay-close" class="overlay-close" aria-label="Close navigation">✕</button>
+    <button id="overlay-close" class="overlay-close" aria-label="Close navigation">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
   </div>
 
   <footer class="site-footer">
@@ -204,5 +228,31 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <!-- Lightbox for project screenshots -->
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
+    <div class="lightbox-backdrop" data-action="close"></div>
+    <div class="lightbox-inner">
+      <button class="lb-close" aria-label="Close viewer">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button class="lb-prev" aria-label="Previous image">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <div class="lb-media">
+        <img class="lb-img" src="" alt="" />
+      </div>
+      <button class="lb-next" aria-label="Next image">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <div class="lb-counter" aria-hidden="true"></div>
+    </div>
+  </div>
 </body>
 </html>

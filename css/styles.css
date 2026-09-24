@@ -112,7 +112,10 @@ main{flex:1}
 .overlay-nav{display:flex;flex-direction:column;gap:1.25rem;align-items:center}
 .overlay-nav a{font-size:1.5rem;color:var(--text);text-decoration:none;padding:.75rem 1.25rem;border-radius:10px;background:var(--overlay-link-bg)}
 .overlay-nav a:hover{background:var(--overlay-link-bg-hover)}
-.overlay-close{position:fixed;top:18px;right:18px;z-index:1700;background:transparent;border:0;color:var(--muted);font-size:1.5rem}
+.overlay-close{position:fixed;top:18px;right:18px;z-index:1700;background:transparent;border:0;color:var(--muted);font-size:1.5rem;padding:6px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
+.overlay-close svg{width:18px;height:18px;display:block;stroke:currentColor;fill:none}
+
+.theme-dark .overlay-close svg{stroke:#fff}
 
 
 /* -----------------------------
@@ -274,6 +277,80 @@ main{flex:1}
 .card-gallery .thumbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem}
 .thumb{height:90px;background:var(--thumb-bg);display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--muted2)}
 .thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+
+/* Project screenshot dark/light variants */
+.proj-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
+.thumb{position:relative;overflow:hidden}
+.img-light{display:block}
+.img-dark{display:none}
+.theme-dark .img-light{display:none}
+.theme-dark .img-dark{display:block}
+
+/* Lightbox styles */
+.lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:2000}
+.lightbox.open{display:flex}
+.lightbox-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6)}
+.lightbox-inner{position:relative;z-index:2;max-width:90vw;max-height:90vh;display:flex;align-items:center;gap:12px}
+.lb-media{width:calc(100vw - 220px);max-width:1200px;max-height:80vh;display:flex;align-items:center;justify-content:center}
+/* Track for horizontal swipe — uses scroll-snap to behave like paging */
+.lb-track{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0;border-radius:8px}
+.lb-track::-webkit-scrollbar{height:8px}
+.lb-track-img{flex:0 0 100%;min-width:100%;width:100%;height:80vh;border-radius:8px;object-fit:contain;scroll-snap-align:start;display:block}
+.lb-img{display:none}
+/* Lightbox controls: circular buttons matching the back-to-top visual style */
+.lb-close,.lb-prev,.lb-next{
+  /* Prev/Next keep the circular affordance; close will be icon-only visually. */
+  border:1px solid rgba(0,0,0,0.06);
+  width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:999px;cursor:pointer;color:var(--text);box-shadow:0 6px 20px rgba(2,6,23,0.08);
+}
+.lb-prev,.lb-next{font-size:1.1rem;width:48px;height:48px}
+/* Place the close control in the top-right of the viewport (match overlay/hamburger) */
+.lb-close{position:fixed;top:18px;right:18px;z-index:2100}
+
+/* Make the close control visually icon-only (no filled circle) so the X stands alone.
+  Keep the clickable area for accessibility but remove the visible background and shadow. */
+.lb-close{background:transparent;border:0;padding:6px;width:40px;height:40px}
+.lb-close svg{width:18px;height:18px;display:block}
+
+/* Make inline SVGs inside controls match the back-to-top icon sizing and inherit color */
+.lb-close svg, .lb-prev svg, .lb-next svg{width:18px;height:18px;display:block;stroke:currentColor;fill:none}
+.lb-prev svg, .lb-next svg{width:20px;height:20px}
+
+/* Dark mode: make controls lighter on dark background and use accent color for icons/text */
+.theme-dark .lb-close,
+.theme-dark .lb-prev,
+.theme-dark .lb-next{
+  /* Make the icon itself the visible element in dark mode (white text/icon),
+    don't rely on a bright background color. Keep a subtle border for affordance. */
+  background: transparent;
+  border:1px solid rgba(255,255,255,0.08);
+  color: var(--text); /* --text is light in dark theme (near-white) */
+  box-shadow:none;
+}
+
+/* Explicitly set svg strokes for dark mode controls and the back-to-top so
+   icons render white in dark themes. */
+.theme-dark .lb-prev svg,
+.theme-dark .lb-next svg,
+.theme-dark .lb-close svg,
+.theme-dark .back-to-top svg{
+  stroke: #fff;
+  fill: none;
+}
+
+/* For light mode keep the close icon muted so it remains visible against light backgrounds */
+.lb-close svg{stroke:var(--muted2)}
+.lb-counter{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.95rem}
+
+/* Show grab cursor and dragging cursor when pointer-dragging the image */
+.lb-media, .lb-img{cursor:grab}
+.lightbox.dragging .lb-media, .lightbox.dragging .lb-img{cursor:grabbing}
+
+@media (max-width:800px){
+  .lb-media{width:calc(100vw - 120px)}
+  .lb-prev,.lb-next{padding:.5rem}
+}
 
 @media (max-width:700px){
   .projects-grid{grid-template-columns:1fr}

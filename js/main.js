@@ -239,4 +239,237 @@ document.addEventListener('DOMContentLoaded', () => {
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 60);
   })();
+
+  /* ------------------ Lightbox for project screenshots ------------------ */
+  (function () {
+    const lightbox = qs('#lightbox');
+    if (!lightbox) return;
+  // lbImg was used for single-image lightbox; the carousel uses a track instead
+  // Keep reference for legacy fallbacks if needed (unused currently)
+  const lbImg = qs('.lb-img', lightbox);
+    const lbPrev = qs('.lb-prev', lightbox);
+    const lbNext = qs('.lb-next', lightbox);
+    const lbClose = qs('.lb-close', lightbox);
+    const lbCounter = qs('.lb-counter', lightbox);
+
+  // We'll build per-gallery dark/light pairs when a thumbnail is clicked
+  // so the lightbox only contains images from the gallery that was opened.
+  let pairs = [];
+  let currentThumbs = [];
+  let idx = 0;
+
+    function getSrcForIndex(i) {
+      const p = pairs[i] || {};
+      const darkMode = root.classList.contains('theme-dark');
+      if (darkMode) return p.dark || p.light || '';
+      return p.light || p.dark || '';
+    }
+
+    function open(i) {
+      idx = Number.isFinite(i) ? i : 0;
+      // build a scroll-snap track and show it
+      lightbox.classList.add('open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      buildTrack();
+      const track = qs('.lb-track', lightbox);
+      if (track) {
+        // ensure resize observer is watching the track so we can re-center
+        trackResizeObserver.disconnect();
+        trackResizeObserver.observe(track);
+      }
+      // update counter and scroll to the selected index
+      lbCounter.textContent = `${idx + 1} / ${pairs.length}`;
+      // Defer scroll so layout is ready
+      setTimeout(() => scrollToIndex(idx, 'instant'), 40);
+    }
+
+    function close() {
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      const track = qs('.lb-track', lightbox);
+      if (track) {
+  trackResizeObserver.disconnect();
+      }
+      // clear media content
+      const media = qs('.lb-media', lightbox);
+      if (media) media.innerHTML = '';
+    }
+
+  function next() { idx = (idx + 1) % pairs.length; scrollToIndex(idx); }
+  function prev() { idx = (idx - 1 + pairs.length) % pairs.length; scrollToIndex(idx); }
+
+    // wire gallery thumbnails: when a thumb is clicked, build the
+    // list of thumbnails for that gallery and open the lightbox for the
+    // clicked index. This prevents thumbnails from other cards from
+    // contributing to the gallery size.
+    qsa('.card-gallery .thumbs .thumb').forEach((t) => {
+      t.style.cursor = 'pointer';
+      t.addEventListener('click', () => {
+        const gallery = t.closest('.card-gallery');
+        if (!gallery) return;
+        const thumbsContainer = gallery.querySelector('.thumbs');
+        const tlist = Array.from(thumbsContainer.querySelectorAll('.thumb'));
+        currentThumbs = tlist;
+        pairs = tlist.map(tt => ({
+          dark: (tt.querySelector('.img-dark') && tt.querySelector('.img-dark').src) || '',
+          light: (tt.querySelector('.img-light') && tt.querySelector('.img-light').src) || ''
+        }));
+  const localIndex = tlist.indexOf(t);
+  open(localIndex);
+      });
+    });
+
+    // observe theme changes on <html> so we can update track images
+    const mo = new MutationObserver(() => {
+      if (!lightbox.classList.contains('open')) return;
+      updateTrackForTheme();
+    });
+    mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    // controls
+    lbClose.addEventListener('click', close);
+    lbNext.addEventListener('click', next);
+    lbPrev.addEventListener('click', prev);
+    lightbox.querySelector('.lightbox-backdrop').addEventListener('click', close);
+
+    // When user scrolls the track (native swipe/scroll), update idx and counter
+    function onTrackScroll() {
+      const track = qs('.lb-track', lightbox);
+      if (!track) return;
+      const left = track.scrollLeft;
+      let closest = 0;
+      let closestDist = Infinity;
+      Array.from(track.children).forEach((child, i) => {
+        const dist = Math.abs(child.offsetLeft - left);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
+      });
+      if (closest !== idx) {
+        idx = closest;
+        lbCounter.textContent = `${idx + 1} / ${pairs.length}`;
+      }
+    }
+
+    // Debounced scroll listener for track
+    let scrollTimer = null;
+    function attachTrackScrollListener() {
+      const track = qs('.lb-track', lightbox);
+      if (!track) return;
+      track.removeEventListener('scroll', onTrackScroll);
+      track.addEventListener('scroll', () => {
+        if (scrollTimer) clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(onTrackScroll, 80);
+      }, { passive: true });
+    }
+
+    // keyboard
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
+    });
+
+    // Replace previous gesture handlers with a scroll-snap carousel.
+    // The carousel allows natural horizontal swipe/scroll on touch and
+    // trackpad, and click-drag on desktop (depending on browser). Arrows
+    // and keyboard navigation still call next/prev which scroll the track.
+
+    // Build the horizontal track inside .lb-media for the current `pairs`.
+    function buildTrack() {
+      const media = qs('.lb-media', lightbox);
+      media.innerHTML = '';
+      const track = document.createElement('div');
+      track.className = 'lb-track';
+      pairs.forEach((p, i) => {
+        const img = document.createElement('img');
+        img.className = 'lb-track-img';
+        img.dataset.dark = p.dark || '';
+        img.dataset.light = p.light || '';
+        img.src = getSrcForIndex(i);
+        img.alt = `Screenshot ${i + 1}`;
+        track.appendChild(img);
+      });
+      media.appendChild(track);
+      // return the track element
+      // attach scroll listener
+      // Attach vertical-scroll/touch-to-close behavior
+      const touchState = { startX: 0, startY: 0, active: false };
+
+      function onTouchStart(e) {
+        touchState.active = true;
+        const t = e.touches && e.touches[0];
+        touchState.startX = t ? t.clientX : 0;
+        touchState.startY = t ? t.clientY : 0;
+      }
+
+      function onTouchMove(e) {
+        if (!touchState.active) return;
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        const dx = t.clientX - touchState.startX;
+        const dy = t.clientY - touchState.startY;
+        // mostly vertical movement and beyond threshold => close
+        if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)) {
+          e.preventDefault && e.preventDefault();
+          touchState.active = false;
+          close();
+        }
+      }
+
+      function onTouchEnd() { touchState.active = false; }
+
+      function onWheel(e) {
+        // If the wheel event is mostly vertical, close the lightbox.
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && Math.abs(e.deltaY) > 20) {
+          e.preventDefault && e.preventDefault();
+          close();
+        }
+      }
+
+      track.addEventListener('touchstart', onTouchStart, { passive: true });
+      track.addEventListener('touchmove', onTouchMove, { passive: false });
+      track.addEventListener('touchend', onTouchEnd, { passive: true });
+      track.addEventListener('wheel', onWheel, { passive: false });
+
+      track._cleanupVerticalClose = () => {
+        track.removeEventListener('touchstart', onTouchStart);
+        track.removeEventListener('touchmove', onTouchMove);
+        track.removeEventListener('touchend', onTouchEnd);
+        track.removeEventListener('wheel', onWheel);
+      };
+      return track;
+    }
+
+  // mouse/drag handlers removed — rely on native scroll-snap behavior
+
+    // Scroll to a specific index in the track (centers the child)
+    function scrollToIndex(i, behavior = 'smooth') {
+      const track = qs('.lb-track', lightbox);
+      if (!track) return;
+      const child = track.children[i];
+      if (!child) return;
+      const left = child.offsetLeft;
+      track.scrollTo({ left, behavior });
+      idx = i;
+      lbCounter.textContent = `${idx + 1} / ${pairs.length}`;
+    }
+
+    // Update image srcs for theme changes
+    function updateTrackForTheme() {
+      const track = qs('.lb-track', lightbox);
+      if (!track) return;
+      Array.from(track.children).forEach((img, i) => {
+        const p = pairs[i] || {};
+        img.src = getSrcForIndex(i);
+      });
+    }
+
+    // When user opens the lightbox, build the track and snap to the index
+    const trackResizeObserver = new ResizeObserver(() => {
+      // keep current index centered if layout changes
+      scrollToIndex(idx, 'instant');
+    });
+  // disconnect observer when lightbox closed
+  lightbox.addEventListener('transitionend', () => { if (!lightbox.classList.contains('open')) mo.disconnect(); });
+  })();
 });
