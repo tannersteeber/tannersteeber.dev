@@ -19,12 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ------------------ Theme system ------------------ */
   const root = document.documentElement;
   const THEME_KEY = 'site-theme';
-  const toggles = qsa('.theme-toggle');
+
+  // helper to find all theme toggle buttons (now moved into popup)
+  const getToggles = () => qsa('.theme-toggle');
 
   function applyTheme(theme) {
     const dark = theme === 'dark';
     root.classList.toggle('theme-dark', dark);
-    toggles.forEach(btn => btn.setAttribute('aria-pressed', dark ? 'true' : 'false'));
+  getToggles().forEach(btn => btn.setAttribute('aria-pressed', dark ? 'true' : 'false'));
     try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* ignore */ }
   }
 
@@ -36,64 +38,166 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTheme(prefersDark ? 'dark' : 'light');
   }
 
-  // wire toggle buttons
-  toggles.forEach(btn => btn.addEventListener('click', () => {
-    const nowDark = root.classList.contains('theme-dark');
-    applyTheme(nowDark ? 'light' : 'dark');
-  }));
+  // wire toggle buttons (attach to current toggles; popup may add/remove them)
+  function wireToggles() {
+    getToggles().forEach(btn => {
+      if (btn._wired) return; // avoid duplicate listeners
+      btn.addEventListener('click', () => { const nowDark = root.classList.contains('theme-dark'); applyTheme(nowDark ? 'light' : 'dark'); });
+      btn._wired = true;
+    });
+  }
 
   initTheme();
 
+  // ensure toggles inside popup are wired when popup is first used
+  wireToggles();
+
   /* ------------------ Overlay navigation ------------------ */
-  const overlay = qs('.nav-overlay');
-  const overlayNav = qs('.overlay-nav');
+  /* ------------------ Compact popup menu (desktop & mobile) ------------------ */
+  const popup = qs('#popup-menu');
+  const popupNav = qs('.popup-nav');
   const headerNav = qs('.nav');
-  const overlayClose = qs('.overlay-close');
+  const popupClose = qs('.popup-close');
+  const headerToggles = qsa('.nav-toggle');
+  const mobileToggle = qs('.mobile-nav-toggle');
+  const MOBILE_SIDE_KEY = 'mobile-hamburger-side'; // 'right' or 'left'
+
+  // apply stored mobile side preference
+  function applyMobileSide(side) {
+    if (!mobileToggle) return;
+    if (side === 'left') mobileToggle.classList.add('left'); else mobileToggle.classList.remove('left');
+  // remove any inline positioning so CSS can handle it
+  mobileToggle.style.left = '';
+  mobileToggle.style.right = '';
+    // if popup is currently open on mobile, reposition it to remain above the button
+    try {
+      if (popup && popup.classList.contains('open') && window.innerWidth < 900) {
+        const rect = mobileToggle.getBoundingClientRect();
+        const sideLeft = mobileToggle.classList.contains('left');
+        if (sideLeft) {
+          popup.style.left = (rect.left) + 'px';
+          popup.style.right = '';
+        } else {
+          popup.style.right = (window.innerWidth - rect.right) + 'px';
+          popup.style.left = '';
+        }
+        const top = Math.max(12, rect.top - (popup.offsetHeight + 8));
+        popup.style.top = top + 'px';
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  // initialize side preference
+  (function initMobileSide() {
+    try {
+      const s = localStorage.getItem(MOBILE_SIDE_KEY) || 'right';
+      applyMobileSide(s);
+    } catch (e) {}
+  })();
 
   function syncNav() {
-    if (!overlayNav || !headerNav) return;
-    overlayNav.innerHTML = headerNav.innerHTML;
-    // mark active links inside overlay
-    qsa('a', overlayNav).forEach(a => {
+    if (!popupNav || !headerNav) return;
+    popupNav.innerHTML = headerNav.innerHTML;
+    // mark active links inside popup
+    qsa('a', popupNav).forEach(a => {
       try {
         if (location.pathname === new URL(a.href, location.origin).pathname) a.classList.add('active');
       } catch (e) { /* ignore invalid URLs */ }
     });
+    // If mobile viewport, inject side toggle button into the popup theme row (next to the theme toggle)
+    const settings = qs('.popup-settings', popup);
+    if (settings && window.innerWidth < 900) {
+      const popupTheme = qs('.popup-theme', settings);
+      if (popupTheme && !qs('.side-switch', popupTheme)) {
+        const side = (function(){ try { return localStorage.getItem(MOBILE_SIDE_KEY) || 'right'; } catch(e){ return 'right'; }})();
+        // SVGs: left arrow and right arrow
+        const leftSVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+        const rightSVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+        const btn = document.createElement('button');
+        btn.className = 'side-switch';
+        btn.setAttribute('aria-pressed', side === 'left' ? 'true' : 'false');
+        btn.setAttribute('aria-label', 'Move menu side');
+        btn.title = 'Move menu side';
+        btn.innerHTML = side === 'left' ? leftSVG : rightSVG;
+        popupTheme.appendChild(btn);
+        btn.addEventListener('click', () => {
+          const nowLeft = btn.getAttribute('aria-pressed') === 'true';
+          const newSide = nowLeft ? 'right' : 'left';
+          try { localStorage.setItem(MOBILE_SIDE_KEY, newSide); } catch(e){}
+          btn.setAttribute('aria-pressed', String(!nowLeft));
+          btn.innerHTML = newSide === 'left' ? leftSVG : rightSVG;
+          applyMobileSide(newSide);
+        });
+      }
+    }
   }
 
-  function openNav() {
-    if (!overlay) return;
-    overlay.classList.add('open');
-    overlay.setAttribute('aria-hidden', 'false');
-    document.documentElement.style.overflow = 'hidden';
+  function openPopup(anchorRect) {
+    if (!popup) return;
+    syncNav();
+  // make sure newly-inserted toggles in the popup are wired
+  wireToggles();
+    popup.classList.add('open');
+    popup.setAttribute('aria-hidden', 'false');
+    // Desktop: anchored top-right via CSS. For mobile we position above the mobile button if provided.
+    if (anchorRect && window.innerWidth < 900) {
+      // position popup so it sits above the mobile button; account for left/right placement
+      const sideLeft = mobileToggle && mobileToggle.classList.contains('left');
+      if (sideLeft) {
+        popup.style.left = (anchorRect.left) + 'px';
+        popup.style.right = '';
+      } else {
+        popup.style.right = (window.innerWidth - (anchorRect.right)) + 'px';
+        popup.style.left = '';
+      }
+      const top = Math.max(12, anchorRect.top - (popup.offsetHeight + 8));
+      popup.style.top = top + 'px';
+    } else {
+      // clear inline positioning to allow CSS anchoring
+      popup.style.top = '';
+      popup.style.right = '';
+      popup.style.left = '';
+    }
+    // trap scroll behind the popup on small screens for focus effect
+    if (window.innerWidth < 900) document.documentElement.style.overflow = 'hidden';
   }
 
-  function closeNav() {
-    if (!overlay) return;
-    overlay.classList.remove('open');
-    overlay.setAttribute('aria-hidden', 'true');
+  function closePopup() {
+    if (!popup) return;
+    popup.classList.remove('open');
+    popup.setAttribute('aria-hidden', 'true');
+    popup.style.top = '';
+    popup.style.right = '';
     document.documentElement.style.overflow = '';
   }
 
-  syncNav();
-  qsa('.nav-toggle').forEach(b => b.addEventListener('click', openNav));
-  overlayClose && overlayClose.addEventListener('click', closeNav);
+  // Wire header and mobile toggles
+  headerToggles.forEach(b => b.addEventListener('click', (e) => { e.preventDefault(); openPopup(); }));
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      // If popup is already open, close it. Otherwise open anchored to the mobile button.
+      if (popup && popup.classList.contains('open')) {
+        closePopup();
+      } else {
+        openPopup(mobileToggle.getBoundingClientRect());
+      }
+    });
+  }
+  popupClose && popupClose.addEventListener('click', closePopup);
 
-  // Close overlay when clicking outside overlayNav
-  overlay && overlay.addEventListener('click', (e) => {
-    if (!overlayNav) return;
-    if (!overlayNav.contains(e.target)) closeNav();
-    const a = e.target.closest && e.target.closest('a');
-    if (a && overlayNav.contains(a)) closeNav();
-  });
-
-  // Extra global click close (captures)
+  // Close popup when clicking a nav link or outside
   document.addEventListener('click', (e) => {
-    if (!overlay || !overlay.classList.contains('open')) return;
+    if (!popup || !popup.classList.contains('open')) return;
     const target = e.target;
-    if (!overlayNav) return closeNav();
-    if (overlayNav.contains(target) || target.closest('.nav-toggle')) return;
-    closeNav();
+    if (popup.contains(target)) {
+      const a = target.closest && target.closest('a');
+      if (a && popup.contains(a)) return closePopup();
+      return; // clicks inside popup shouldn't close unless on a link or close button
+    }
+    // ignore clicks on toggles that open it
+    if (target.closest && target.closest('.nav-toggle')) return;
+    closePopup();
   }, true);
 
   /* ------------------ Header scrolled state (rAF) ------------------ */

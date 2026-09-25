@@ -117,6 +117,100 @@ main{flex:1}
 
 .theme-dark .overlay-close svg{stroke:#fff}
 
+/* ------------------ Compact popup menu (desktop & mobile) ------------------ */
+.popup-menu{position:fixed;z-index:1700;display:none}
+.popup-menu.open{display:block}
+.popup-inner{min-width:220px;max-width:320px;background:var(--overlay-frost);backdrop-filter:blur(10px);border-radius:12px;padding:1.1rem 0.75rem 0.75rem;border:1px solid rgba(0,0,0,0.06);box-shadow:var(--elevation-shadow);color:var(--text);position:relative}
+.popup-nav{display:flex;flex-direction:column;gap:.6rem;padding:0.5rem 0.25rem 0.2rem}
+.popup-nav a{
+  padding:.8rem 1rem;
+  border-radius:12px;
+  text-decoration:none;
+  color:var(--muted);
+  /* stronger visible button in light mode */
+  background: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+  display:block;width:100%;box-sizing:border-box
+}
+.popup-nav a:hover{background: rgba(0,0,0,0.08);color:var(--text)}
+
+/* dark theme keeps the existing translucent style for contrast */
+.theme-dark .popup-nav a{background:var(--overlay-link-bg);border-color:rgba(255,255,255,0.04);color:var(--muted)}
+.popup-settings{border-top:1px solid rgba(0,0,0,0.04);padding:.6rem .5rem .8rem;margin-top:.6rem}
+.popup-settings h4{margin:0 0 .35rem 0;font-size:.95rem;color:var(--muted)}
+/* Theme toggle inside popup: make it visually a rounded button */
+.popup-theme .theme-toggle{
+  width:44px;height:44px;padding:0.4rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.75));display:inline-flex;align-items:center;justify-content:center;color:var(--muted);
+}
+.popup-theme .theme-toggle[aria-pressed="true"]{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#021628;border-color:transparent}
+.theme-dark .popup-theme .theme-toggle{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+.popup-theme{display:flex;align-items:center;gap:.5rem}
+.popup-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.04);border:0;font-size:1rem;color:var(--muted);padding:6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;z-index:4}
+.theme-dark .popup-close{background:rgba(255,255,255,0.04);color:var(--muted)}
+
+/* Side switch button in popup settings */
+.popup-theme .side-switch{width:44px;height:44px;padding:.35rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));display:inline-flex;align-items:center;justify-content:center;color:var(--muted);box-shadow:0 6px 18px rgba(2,6,23,0.04)}
+.popup-theme .side-switch svg{display:block}
+.theme-dark .popup-theme .side-switch{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+/* Positioning: desktop anchors near header top-right; mobile anchors near mobile button */
+@media (min-width:900px){
+  .popup-menu{top:18px;right:18px}
+}
+
+@media (max-width:899px){
+  /* mobile popup anchored above the mobile button by default; we'll position JS-side when opening to keep it above the button */
+  .popup-menu{right:18px}
+  .popup-inner{min-width:200px}
+}
+
+/* ------------------ Mobile fixed hamburger ------------------ */
+.mobile-nav-toggle{position:fixed;right:18px;z-index:1700;
+  /* frosted glass look in light mode */
+  background: var(--overlay-frost);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border:1px solid var(--header-border);
+  padding:.6rem .7rem;border-radius:999px;box-shadow:0 8px 24px rgba(2,6,23,0.08);font-size:1.15rem;display:none;color:var(--text)}
+@media (max-width:899px){
+  /* place ~75% down the screen on the lower-right side */
+  .mobile-nav-toggle{display:inline-flex;bottom:25%;transform:translateY(25%)}
+}
+
+/* Dark theme: ensure the mobile hamburger glyph is visible against the darker surface */
+.theme-dark .mobile-nav-toggle{color:var(--text);border-color:rgba(255,255,255,0.06);background:var(--surface)}
+
+/* Support left-handed placement for mobile hamburger */
+.mobile-nav-toggle.left{right:auto;left:18px}
+
+/* side toggle control visible only on mobile popup settings */
+.popup-side-toggle{display:none;align-items:center;gap:.5rem}
+@media (max-width:899px){
+  .popup-side-toggle{display:flex}
+}
+
+/* On small screens hide the header's top-right hamburger so only the floating mobile button is present */
+@media (max-width:899px){
+  .site-header .nav-toggle { display: none; }
+}
+
+/* Make sure header nav-toggle (top-right) remains visible on desktop */
+@media (min-width:900px){
+  .nav-toggle{font-size:1.15rem}
+
+  /* Desktop: make the header hamburger visually match the mobile frosted button */
+  .site-header .nav-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:44px;height:44px;padding:.4rem;border-radius:999px;
+    background:var(--overlay-frost);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid var(--header-border);box-shadow:0 8px 24px rgba(2,6,23,0.06);
+    color:var(--text);font-size:1.15rem
+  }
+  .site-header .nav-toggle:hover{background:var(--overlay-link-bg-hover);color:var(--text)}
+  /* dark theme desktop variant */
+  .theme-dark .site-header .nav-toggle{background:var(--surface);border-color:rgba(255,255,255,0.06);color:var(--text)}
+}
+
 
 /* -----------------------------
    Hero / Intro
@@ -557,22 +651,7 @@ a:hover{color:var(--link-hover);text-decoration:underline}
   content: none !important;
 }
 
-/* Re-enable the nav overlay pseudo-element on the resume page.
-   A global rule above intentionally removed pseudo-elements to avoid
-   unwanted decorative panels on the resume, but that also removed the
-   overlay backdrop (which relies on ::before). Override that here so
-   the frosted fullscreen nav still shows when the hamburger opens. */
-.page-resume .nav-overlay::before {
-  /* use !important so this wins over the global reset above; this
-     rule is placed after the reset. */
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: var(--overlay-frost) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  z-index: 1 !important; /* behind the nav-inner (which uses z-index:2) */
-}
+
 
 /* Ensure wrappers and containers are transparent on the resume so the body gradient
    remains visible between content and footer. */
