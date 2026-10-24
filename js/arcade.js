@@ -222,7 +222,19 @@
       if (g.href) btn.href = g.href;
       else btn.addEventListener('click', () => open(g.id, true));
       a.appendChild(btn);
-      card.append(h, p, a);
+      card.append(h);
+      if (g.releaseDate) {
+        const date = new Date(g.releaseDate + 'T00:00:00Z');
+        if (Number.isFinite(date.getTime())) {
+          const released = document.createElement('time');
+          released.className = 'arcade-release'; released.dateTime = g.releaseDate;
+          released.textContent = 'Released ' + new Intl.DateTimeFormat('en-US', {
+            month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+          }).format(date);
+          card.append(released);
+        }
+      }
+      card.append(p, a);
       if (g.info) card.append(gameInfo(g));
       libraryCards.push(card);
     });

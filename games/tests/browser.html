@@ -35,8 +35,17 @@ if(!name){
   const {SiteTheme}=await import('../shared/engine/SettingsManager.js');
   const {default:Game}=await import(`../${name}/${name}.js`);
   g=new Game();await g.init(root);assert(g.state==='title','title screen');g.engine.stop();
+  for(const [key,value]of Object.entries({desktopMode:'keyboard',invert:false,sensitivity:1,'cruise.autoSpeed':true,'cruise.speed':22,'cruise.assist':false}))g.settings.set(key,value);
   assert(root.querySelector('.g-btn-primary').textContent==='Play','play button');
-  g.startRun();step(120);assert(g.vehicle.s>30,'vehicle advances');assert(g.hud.vals.speed.textContent!=='0','speed HUD');assert(g.hud.el.textContent.includes('mph'),'speed uses mph');if(name==='cruise')assert(g.hud.vals.dist.textContent.endsWith(' mi'),'distance uses miles');
+  g.startRun();if(name==='cutup'){g.traffic.reset();g.traffic.spawnDist=-1000000;}step(120);assert(g.vehicle.s>30,'vehicle advances');assert(g.hud.vals.speed.textContent!=='0','speed HUD');assert(g.hud.el.textContent.includes('mph'),'speed uses mph');if(name==='cruise'){
+   assert(g.hud.vals.dist.textContent.endsWith(' mi'),'distance uses miles');
+   const pickup=g.pickups.items.find(item=>item.active&&item.s>g.vehicle.s);
+   g.vehicle.d=pickup.d;g.pickups.lastD=pickup.d;g.vehicle.s=pickup.s;
+   g.updateRun(1/60,'playing');g.updateHud();assert(g.parts===1&&g.score>0,'car part awards score');assert(g.hud.vals.parts.textContent==='1','parts HUD');
+   const hud=g.hud.el.querySelector('.g-hud-bar').getBoundingClientRect();assert(hud.right<=g.hud.pauseBtn.getBoundingClientRect().left,'expanded HUD fits screen');
+   g.startRun();assert(g.parts===0&&g.score===0,'restart resets collection');step(120);
+  }
+  g.input.pedal=-1;step(10);assert(g.car.brakeLights.material.color.r>1,'brake lights brighten');g.input.pedal=0;step(120);assert(g.car.brakeLights.material.color.r<1,'brake lights return to normal');
   const d=g.vehicle.d;
   window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyA',bubbles:true,cancelable:true}));step(90);window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyA',bubbles:true}));assert(g.vehicle.d<d,`keyboard steers left (before ${d}, after ${g.vehicle.d}, input ${g.input.steer})`);
   g.settings.set('desktopMode','mouse');g.input.reset();const before=g.vehicle.d;
@@ -52,8 +61,8 @@ if(!name){
   assert(pauseBox.left>=0&&pauseBox.right<=innerWidth+1&&pauseBox.bottom<=innerHeight+1,'pause menu fits viewport');
   assert(getComputedStyle(g.menu.screens.pause.querySelector('.g-pause-card')).backdropFilter==='none','pause popup has no magnifying blur');const pausedAt=g.vehicle.s;step();assert(g.vehicle.s===pausedAt,'pause freezes road');
   g.panel.open();assert(!g.panel.el.hidden,'settings opens');const box=g.panel.el.querySelector('.g-card').getBoundingClientRect();assert(box.left>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,'settings fits viewport');g.panel.close();
-  for(const appearance of ['light','dark']){SiteTheme.setPageTheme('signature');SiteTheme.setAppearance(appearance);g.applyPalette();assert(g.palette.night===(appearance==='dark'),'appearance updates scene');}
-  for(const theme of ['retro','rain']){SiteTheme.setPageTheme(theme);g.applyPalette();assert(g.palette.page===theme,'theme updates world');
+  for(const appearance of ['light','dark']){SiteTheme.setPageTheme('signature');SiteTheme.setAppearance(appearance);g.applyPalette();assert(g.palette.night===(appearance==='dark'),'appearance updates scene');g.settings.set('carColor','#d94662');assert(g.car.paintHex===0xd94662,'Signature paint applies immediately');}
+  for(const theme of ['retro','rain']){SiteTheme.setPageTheme(theme);g.applyPalette();assert(g.palette.page===theme,'theme updates world');assert(g.car.paintHex===g.palette.accent.getHex(),'theme paint takes precedence');
    if(theme==='rain'){g.env.update(1/60,g.vehicle.position.y);assert(g.env.binaryRain.every(points=>points.visible&&points.material.map),'binary glyph rain is active');assert(!g.env.rainLines.visible,'binary theme replaces streaks');for(const points of g.env.binaryRain)assert([...points.geometry.attributes.position.array].every(Number.isFinite),'binary particle positions');}}
   for(const quality of ['low','medium','high']){g.settings.set('graphics',quality);assert(g.gr.quality===quality,'quality applies');}
   for(const camera of ['close','far','hood','first']){g.settings.set(name+'.camera',camera);assert(g.cameraCtl.mode===camera,'camera applies');}

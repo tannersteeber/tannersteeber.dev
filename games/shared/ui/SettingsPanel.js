@@ -54,6 +54,8 @@ export class SettingsPanel {
     } else if (f.type === 'range') {
       valueEl = h('span', { class: 'g-val' });
       control = h('input', { class: 'g-range', type: 'range', min: f.min, max: f.max, step: f.step, 'aria-label': f.label, oninput: (e) => { set(parseFloat(e.target.value)); } });
+    } else if (f.type === 'color') {
+      control = h('input', { class: 'g-color', type: 'color', 'aria-label': f.label, oninput: e => set(e.target.value) });
     } else if (f.type === 'check') {
       control = h('input', { class: 'g-check', type: 'checkbox', 'aria-label': f.label, onchange: (e) => set(e.target.checked) });
     }
@@ -97,6 +99,7 @@ export class SettingsPanel {
     this._field(body, { type: 'check', key: 'muted', label: 'Mute' });
 
     this._section(body, 'Appearance');
+    this._field(body, { type: 'color', key: 'carColor', label: 'Car color', show: () => SiteTheme.pageTheme() === 'signature' });
     this._field(body, {
       type: 'select', label: 'Page theme', options: PAGE_THEMES.map(t => [t.id, t.label]),
       get: () => SiteTheme.pageTheme(), set: (v) => { SiteTheme.setPageTheme(v); }, after: () => { this.hooks.onTheme && this.hooks.onTheme(); this.refresh(); }

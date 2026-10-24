@@ -1,3 +1,4 @@
+import { PartPickups } from './PartPickups.js';
 import { mph, miles } from '../shared/engine/Units.js';
 /* Cruise — endless, relaxing drive along winding procedural backroads. */
 import * as THREE from '../vendor/three.module.js';
@@ -18,9 +19,9 @@ class Cruise extends DrivingGame {
   constructor() {
     super({
       id: 'cruise', title: 'Cruise', tagline: 'Endless Scenic Driving',
-      blurb: 'Wind through hills, forests and open fields with no goal except the road ahead.',
+      blurb: 'Wind through hills, forests and open fields and collect small car parts along the way.',
       preset: 'cruise', backHref: '../../arcade.html',
-      hudFields: [{ id: 'speed', label: 'mph', big: true }, { id: 'dist', label: 'Distance' }, { id: 'time', label: 'Time' }],
+      hudFields: [{ id: 'speed', label: 'mph', big: true }, { id: 'dist', label: 'Distance' }, { id: 'time', label: 'Time' }, { id: 'parts', label: 'Parts' }, { id: 'score', label: 'Score' }],
       controlsExtra: [['W / S  or  ↑ / ↓', 'Faster / slower']],
       vehicleExtra: { limit: 8.4, roadHalf: HALF, grassDrag: 0.45, wallScrape: false },
       settingsFields: [
@@ -34,6 +35,18 @@ class Cruise extends DrivingGame {
     const q = new URLSearchParams(location.search).get('seed');
     this.seed = q ? (parseInt(q, 10) || 1) : 1 + Math.floor(Math.random() * 99999);
     this.runTime = 0; this.speedAdj = 0;
+  }
+
+  async init(root) {
+    await super.init(root);
+    if (!this.road) return;
+    this.pickups = new PartPickups(this.scene, this.road, this.seed, this.palette, part => {
+      this.parts++; this.score += part.points;
+      this.hud.toast(part.name + '  +' + part.points, 'ok');
+      this.audio.nearMiss(1);
+      this.updateHud();
+    });
+    this.pickups.reset(this.view);
   }
 
   demoSpeed() { return 18; }
@@ -80,7 +93,7 @@ class Cruise extends DrivingGame {
     });
   }
 
-  onPaletteApplied() { this._colors(); }
+  onPaletteApplied() { this._colors(); this.pickups?.setPalette(this.palette); }
 
   _decorate(b, ctx) {
     const { road, rng, s0, s1, quality: q } = ctx, p = this.palette, o3 = {};
@@ -142,15 +155,20 @@ class Cruise extends DrivingGame {
     }
   }
 
-  resetRun() { this.runTime = 0; this.speedAdj = 0; }
+  resetRun() { this.runTime = 0; this.speedAdj = 0; this.parts = 0; this.score = 0; this.pickups?.reset(this.view); }
   onRunStart() { this.vehicle.speed = Math.max(this.vehicle.speed, 8); }
 
-  updateRun(dt, st) { if (st === 'playing') this.runTime += dt; }
+  updateRun(dt, st) {
+    if (st === 'playing') this.runTime += dt;
+    this.pickups?.update(dt, this.vehicle, st === 'playing', this.view);
+  }
 
   updateHud() {
     const v = this.vehicle, t = Math.floor(this.runTime);
     this.hud.set('speed', String(mph(v.speed)));
     this.hud.set('dist', miles(v.s));
+    this.hud.set('parts', String(this.parts));
+    this.hud.set('score', this.score.toLocaleString());
     this.hud.set('time', Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'));
     this.hud.showPedals(!v.autoSpeed && isTouchDevice() && this.state === 'playing');
   }
@@ -159,6 +177,8 @@ class Cruise extends DrivingGame {
     const d = this.settings.record('cruise.distance');
     return d > 0 ? 'Longest drive: ' + miles(d) : '';
   }
+
+  destroy() { this.pickups?.dispose(); super.destroy(); }
 
   saveRecords() {
     if (this.vehicle && (this.state === 'playing' || this.state === 'paused')) this.settings.submitRecord('cruise.distance', Math.round(this.vehicle.s));

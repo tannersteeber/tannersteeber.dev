@@ -2,7 +2,7 @@
 
 Open `arcade.html`, then choose **Play**. Games also have independent static URLs:
 
-- `games/cruise/` — endless winding backroads, scenery, distance and time; no scoring objective.
+- `games/cruise/` — endless winding backroads, scenery, distance and time; optional car-part pickups with a parts counter and collection score.
 - `games/cutup/` — four-lane traffic weaving, close passes, combos and a saved personal best.
 
 ## Run locally and deploy
@@ -27,6 +27,10 @@ The only runtime dependency is **Three.js r160 / 0.160.0**, already vendored at 
 - **Tilt mode:** select in mobile settings, tap **Enable Tilt Steering**, then calibrate neutral. Denied, missing, invalid or stale sensor readings allow touch fallback. There is no sensor requirement to play.
 
 Speed, cruising settings, distances and records are displayed in mph and miles. Physics and existing saved distances retain their original metre-based units internally. Each Arcade card has an expandable **Info & updates** section; update its `info` data in `library.js` to maintain the history. Genre tabs stay hidden until categories are assigned to future entries.
+
+Drive over a piston to earn 100 points or a brake rotor to earn 150. Parts and score reset when starting a new drive. The world recycles a fixed pickup pool, and collection checks the path traveled between frames.
+
+In both games, rear lights brighten when braking. Signature adds a **Car color** picker under Settings → Appearance; the selected paint is saved and shared between the two games. Retro and Digital Rain keep their theme colors.
 
 Settings include steering sensitivity/inversion, tilt dead zone/range, camera, graphics quality, sound, traffic density, weather/time, and the portfolio's page themes. Signature inherits light/dark appearance; Retro and Digital Rain use their own palettes, just as on the portfolio. Digital Rain renders falling 0/1 sprites in the selected hue; other themes retain normal rain streaks when rainy weather is selected. Appearance preferences share the site's existing storage keys. Driving preferences and records use `tsd.arcade.settings.v1`; invalid or unavailable storage falls back to defaults.
 

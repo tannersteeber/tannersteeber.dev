@@ -43,7 +43,7 @@
 .g-flash{position:absolute;z-index:4;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse,transparent 30%,rgba(230,50,50,.7))}.g-flash.on{animation:g-impact .7s ease-out}
 @keyframes g-impact{from{opacity:1}to{opacity:0}}
 .g-pedals{position:absolute;z-index:3;right:max(20px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));display:flex;gap:12px}
-.g-pedal{min-height:60px;min-width:74px;background:var(--card-surface);color:var(--text);border:1px solid var(--border-strong);border-radius:16px;font:700 .8rem var(--font);touch-action:none;user-select:none}.g-pedal.down{background:var(--accent);color:var(--on-accent)}
+.g-pedal{min-height:60px;min-width:74px;background:var(--card-surface);color:var(--text);border:1px solid var(--border-strong);border-radius:16px;font:700 .8rem var(--font);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.g-pedal.down{background:var(--accent);color:var(--on-accent)}
 .g-big{font-size:2.8rem;font-weight:800;letter-spacing:-.04em;margin:0 0 20px;color:var(--link)}.g-stats{list-style:none;padding:0;display:grid;gap:10px;font-size:.85rem;color:var(--muted)}
 :root[data-page-theme=retro] .g-h1{font-family:var(--font-display);text-shadow:3px 3px var(--accent)}
 :root[data-page-theme=rain] .g-h1{text-shadow:0 0 28px var(--accent-glow)}
@@ -64,3 +64,14 @@
 @media(max-width:600px){.g-pause-screen{padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}.g-pause-card{width:260px}}
 
 .g-pause-heading .g-h2::before,.g-pause-heading .g-h2::after{display:none}
+
+/* Keep hold controls above the mobile browser edge and clear of the home indicator. */
+@media (pointer:coarse), (max-width:900px){
+  .g-pedals{bottom:calc(clamp(56px,8svh,80px) + env(safe-area-inset-bottom))}
+}
+.g-pedal *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+.g-color{width:56px;height:38px;padding:3px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg);cursor:pointer;touch-action:manipulation}
+@media(max-width:600px){
+  [data-game="cruise"] .g-hud-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 16px;max-width:100%}
+}

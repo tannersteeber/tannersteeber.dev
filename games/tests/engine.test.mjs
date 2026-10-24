@@ -121,3 +121,38 @@ test('Digital Rain renders binary glyphs and other themes retain weather streaks
   assert.equal(env.rainLines.visible,true);assert.ok(env.binaryRain.every(points=>!points.visible));
  }finally{env.dispose();document.createElement=originalCreate;}
 });
+
+test('Cruise parts collect once, respect lateral position and reset deterministically',async()=>{
+ const {PartPickups}=await import('../cruise/PartPickups.js');
+ const scene=new THREE.Scene(),r=road(),collected=[];
+ const p=new PartPickups(scene,r,123,{accent:new THREE.Color(0x4488ff)},part=>collected.push(part));
+ try{
+  p.reset(460);const snapshot=p.items.filter(i=>i.active).map(i=>[i.s,i.d,i.type]);assert.ok(snapshot.length>=3);
+  const first=p.items.find(i=>i.active),s=first.s,d=first.d;
+  p.update(0,{s:s-10,d},false,460);p.update(.5,{s:s+10,d},true,460);
+  assert.equal(collected.length,1);assert.ok([100,150].includes(collected[0].points));
+  p.update(.016,{s:s+10,d},true,460);assert.equal(collected.length,1);
+  p.reset(460);assert.deepEqual(p.items.filter(i=>i.active).map(i=>[i.s,i.d,i.type]),snapshot);
+  p.update(0,{s:s-10,d:7},false,460);p.update(.5,{s:s+10,d:7},true,460);assert.equal(collected.length,1);
+  for(let at=200;at<10000;at+=40)p.update(.5,{s:at,d:7},true,650);
+  assert.equal(p.items.length,12);assert.ok(p.items.filter(i=>i.active).every(i=>i.s>=9994));
+  for(const geometry of p.geometry)assert.ok([...geometry.attributes.position.array].every(Number.isFinite));
+ }finally{p.dispose();r.dispose();assert.equal(scene.children.length,0);}
+});
+
+test('rear lights brighten separately from headlights and respond to brake release',()=>{
+ const assets=new AssetManager();assets.shadowTexture=()=>new THREE.Texture();const car=assets.createPlayerCar(0x123456);
+ try{
+  assets.setBraking(car,false);const idle=car.brakeLights.material.color.r,headlight=car.lights.material.color.r;
+  assets.setBraking(car,true);assert.ok(car.brakeLights.material.color.r>idle*3);assert.equal(car.lights.material.color.r,headlight);
+  assets.setBraking(car,false);assert.equal(car.brakeLights.material.color.r,idle);
+  assert.ok([...car.brakeLights.geometry.attributes.position.array].every(Number.isFinite));
+ }finally{assets.dispose();car.shadow.geometry.dispose();car.shadow.material.dispose();}
+});
+
+test('paint persists, rejects invalid colors and only overrides the Signature car',async()=>{
+ const {DrivingGame}=await import('../shared/engine/DrivingGame.js');const settings=new SettingsManager();
+ settings.set('carColor','#e03552');assert.equal(new SettingsManager().get('carColor'),'#e03552');settings.set('carColor','invalid');assert.equal(settings.get('carColor'),'#e03552');
+ const g=new DrivingGame({});g.settings=settings;g.palette={page:'signature',accent:new THREE.Color(0x77ffaa)};assert.equal(g.playerPaint(),0xe03552);
+ g.palette.page='rain';assert.equal(g.playerPaint(),0x77ffaa);g.palette.page='retro';assert.equal(g.playerPaint(),0x77ffaa);storage.clear();
+});

@@ -1,3 +1,21 @@
+/* Locally hosted Cascadia Code for Digital Rain (SIL Open Font License). */
+@font-face{
+  font-family:'Cascadia Code';
+  src:url('../assets/fonts/CascadiaCode.ttf') format('truetype');
+  font-style:normal;
+  font-weight:200 700;
+  font-display:swap;
+}
+
+/* Locally hosted pixel font for Retro (SIL Open Font License in assets/fonts). */
+@font-face{
+  font-family:'Pixelify Sans';
+  src:url('../assets/fonts/PixelifySans.ttf') format('truetype');
+  font-style:normal;
+  font-weight:400 700;
+  font-display:swap;
+}
+
 /* ==========================================================================
    styles.css — tannersteeber.dev
    Frosted-glass surfaces, bold type, blue accents with bone-tan highlights.
@@ -99,7 +117,7 @@ main{flex:1}
 
 h1,h2,h3,h4{margin:0 0 .6rem;line-height:1.1}
 h1,h2{font-family:var(--font-display);font-weight:900;text-transform:uppercase;letter-spacing:-.02em}
-h1{font-size:clamp(2.2rem,6vw,4rem)}
+h1{font-size:clamp(2rem,3.5vw,3rem);margin-bottom:.75rem}
 h2{font-size:clamp(1.5rem,3.5vw,2.25rem)}
 h2::after{content:'';display:block;width:56px;height:4px;margin-top:.6rem;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--bone))}
 h3{font-size:1.2rem;font-weight:700;letter-spacing:-.01em}
@@ -223,8 +241,7 @@ button,a,.btn,.project,.feature-card,.skills-list li{
 .display-title{margin:0;font-size:clamp(3.2rem,12vw,9rem);line-height:.88;letter-spacing:-.045em}
 .display-title .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .subtitle{display:inline-block;margin:1.75rem 0 0;padding:.5rem 1rem;border:1px solid var(--bone);border-radius:999px;background:var(--bone-soft);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
-.lead{max-width:62ch;margin-top:1.1rem;font-size:1.15rem;line-height:1.6;color:var(--muted)}
-.hero-content .lead{font-size:clamp(1.05rem,1.6vw,1.35rem)}
+.lead{max-width:62ch;margin-top:1.1rem;font-size:clamp(1.05rem,1.2vw,1.15rem);line-height:1.6;color:var(--muted)}
 
 /* Signature image (swaps in for the text name once loaded; see main.js) */
 .signature-img{display:none}
@@ -277,9 +294,8 @@ button,a,.btn,.project,.feature-card,.skills-list li{
 #skills .skills-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));margin:0}
 
 /* ---------- 7. Projects & lightbox ---------- */
-.projects-page{padding-top:3rem;padding-bottom:3rem}
-.projects-page>h1{margin-bottom:.5rem;font-size:clamp(2.8rem,9vw,6rem);line-height:.92;letter-spacing:-.04em}
-.projects-page>.lead{margin-top:0;max-width:58ch}
+.projects-page,.arcade-page{padding-top:3rem;padding-bottom:3rem}
+.projects-page>.lead,.arcade-page>.lead,.about-intro>.lead{margin:0;max-width:62ch}
 .projects-columns,.project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;align-items:start;margin-top:1.5rem;align-content:start}
 html{overflow-y:scroll;scrollbar-gutter:stable}
 .project-card{display:flex;flex-direction:column}
@@ -358,10 +374,8 @@ details>summary::-webkit-details-marker{display:none}
 .about-page{display:flex;flex-direction:column;gap:1.5rem;padding-top:3rem;padding-bottom:3rem}
 
 /* Intro header */
-.about-intro{padding:1rem 0 1.5rem}
+.about-intro{padding:0 0 1.5rem}
 .eyebrow{display:inline-block;margin:0 0 1rem;padding:.4rem .9rem;border:1px solid var(--bone);border-radius:999px;background:var(--bone-soft);font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--text)}
-.about-intro h1{margin-bottom:1.25rem;font-size:clamp(3rem,10vw,7rem);line-height:.9;letter-spacing:-.04em}
-.about-intro .lead{max-width:48ch;margin:0;font-size:clamp(1.1rem,2vw,1.5rem);line-height:1.5}
 
 /* Panels */
 .about-panel,.about-callout,.mini-card{
@@ -485,7 +499,6 @@ details>summary::-webkit-details-marker{display:none}
 @media (max-width:600px){
   .container{padding:1rem}
   .hero--large{padding:2rem 0 1.5rem}
-  .lead{font-size:1rem}
   .cta .btn{flex:1 1 100%}
   .feature-card{
     grid-template-columns:1fr auto;grid-template-areas:"tag arrow" "title arrow" "meta arrow" "desc desc";
@@ -572,6 +585,8 @@ details>summary::-webkit-details-marker{display:none}
 
 /* ---------- Retro ---------- */
 :root[data-page-theme="retro"]{
+  --font:'Pixelify Sans',ui-monospace,monospace;
+  --font-display:var(--font);
   --bg:#05061a;
   --card-surface:rgba(10,12,44,.94);
   --card-surface-2:rgba(8,9,34,.94);
@@ -668,6 +683,8 @@ details>summary::-webkit-details-marker{display:none}
 
 /* ---------- Digital Rain ---------- */
 :root[data-page-theme="rain"]{
+  --font:'Cascadia Code',ui-monospace,monospace;
+  --font-display:var(--font);
   --rain-h:144;
   --bg:hsl(var(--rain-h) 90% 2%);
   --card-surface:hsl(var(--rain-h) 80% 4% / .90);
@@ -808,3 +825,7 @@ details>summary::-webkit-details-marker{display:none}
 .arcade-column{display:flex;flex-direction:column;gap:1.5rem;min-width:0}
 .arcade-column .arcade-card{min-width:0}
 .arcade-card>p:not(.meta):not(.repo-link){display:block;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible;min-height:0;flex:none}
+
+.arcade-release{display:block;margin:0 0 .85rem;font-size:.75rem;line-height:1.5;color:var(--muted2)}
+
+:root[data-page-theme="retro"] body{-webkit-font-smoothing:none;font-synthesis:none}

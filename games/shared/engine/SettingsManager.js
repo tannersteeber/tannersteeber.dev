@@ -14,6 +14,7 @@ const CHOICES = {
 const RANGES = { sensitivity: [0.4, 2], tiltDeadzone: [0, 12], tiltRange: [12, 60], volume: [0, 1], 'cruise.speed': [8, 40] };
 function valid(key, value, defaults) {
   if (!Object.hasOwn(defaults, key) || typeof value !== typeof defaults[key]) return false;
+  if (key === 'carColor') return /^#[0-9a-f]{6}$/i.test(value);
   if (CHOICES[key]) return CHOICES[key].includes(value);
   if (RANGES[key]) return Number.isFinite(value) && value >= RANGES[key][0] && value <= RANGES[key][1];
   return true;
@@ -31,6 +32,7 @@ function defaults() {
     desktopMode: 'keyboard',     // keyboard | mouse
     mobileMode: 'touch',         // touch | tilt
     sensitivity: 1,
+    carColor: '#1f6feb',
     invert: false,
     tiltDeadzone: 3,             // degrees
     tiltRange: 30,               // degrees for full lock

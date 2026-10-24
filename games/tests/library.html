@@ -8,7 +8,7 @@ const load=path=>new Promise((resolve,reject)=>{frame.onload=()=>resolve(frame.c
 const result=(name,error)=>{const p=document.createElement('p');p.className=error?'fail':'pass';p.textContent=(error?'FAIL ':'PASS ')+name+(error?': '+error.message:'');report.append(p);if(error)failed++;else passed++;};
 const files=['index.html','about.html','arcade.html','projects.html','resume.html'];
 for(const file of files){try{const d=await load('../../'+file);const links=[...d.querySelectorAll('.nav a')];assert(links.length===5,'five tabs');assert(links.map(a=>a.getAttribute('href')).join()===files.join(),'consistent order');const active=links.filter(a=>a.getAttribute('aria-current')==='page');assert(active.length===1&&active[0].getAttribute('href')===file&&active[0].classList.contains('active'),'correct current tab');result(file);}catch(e){result(file,e);}}
-try{const d=await load('../../projects.html'),a=d.querySelector('#project-tannersteeber-dev');assert(a.querySelector('.recent-update').textContent.includes('v0.9.4'),'recent v0.9.4');assert(a.querySelector('.update-history').textContent.includes('v0.9.3'),'v0.9.3 archived');result('release history');}catch(error){result('release history',error);}
+try{const d=await load('../../projects.html'),a=d.querySelector('#project-tannersteeber-dev');assert(a.querySelector('.recent-update').textContent.includes('v0.9.5'),'recent v0.9.5');assert(a.querySelector('.update-history').textContent.includes('v0.9.4'),'v0.9.4 archived');result('release history');}catch(error){result('release history',error);}
 for(const width of [1060,390]){
  frame.width=width;
  try{

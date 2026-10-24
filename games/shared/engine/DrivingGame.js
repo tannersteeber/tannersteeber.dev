@@ -135,9 +135,14 @@ export class DrivingGame {
   _onSetting(key) {
     const id = this.cfg.id;
     if (key === id + '.camera') this.cameraCtl.setMode(this.settings.get(key));
+    else if (key === 'carColor') this.assets.repaintPlayer(this.car, this.playerPaint());
     else if (key === 'graphics') { this.gr.setQuality(this.settings.get('graphics')); this.road.quality = this.quality.density; this.applyPalette(); }
     else if (key === id + '.timeOfDay' || key === id + '.weather') this.applyPalette();
     else if (key === 'mobileMode' || key === 'desktopMode') { this.input.reset(); if (this.state === 'title') this._showTitle(); }
+  }
+
+  playerPaint() {
+    return this.palette.page === 'signature' ? new THREE.Color(this.settings.get('carColor')).getHex() : this.palette.accent.getHex();
   }
 
   /** Re-skin the whole world from the current page theme / light-dark / time of day / weather. */
@@ -146,7 +151,7 @@ export class DrivingGame {
     this.env.apply(this.palette, this.view);
     this.env.update(0, this.vehicle.position.y);
     this.gr.renderer.setClearColor(this.palette.fog);
-    this.assets.repaintPlayer(this.car, this.palette.accent.getHex());
+    this.assets.repaintPlayer(this.car, this.playerPaint());
     this.headlight.intensity = this.palette.lampsOn && this.settings.get('graphics') !== 'low' ? 2.2 : 0;
     this.road.quality = this.quality.density;
     this.onPaletteApplied();
@@ -165,6 +170,7 @@ export class DrivingGame {
     this.cameraCtl.snap();
     this.resetRun();
     this.vehicle.applyTo(this.car.group);
+    this.assets.setBraking(this.car, false);
     this.road.update(this.vehicle.s, this.view, 110, Infinity);
   }
 
@@ -242,6 +248,7 @@ export class DrivingGame {
 
     this.beforeVehicle && this.beforeVehicle(dt, inp, st);
     v.update(dt, inp);
+    this.assets.setBraking(this.car, playing && (inp.throttle < 0 || (v.autoSpeed && v.targetSpeed < v.speed - 0.5 && v.accelNow < -0.8)));
     this.updateRun(dt, st, inp);
 
     this.road.update(v.s, this.view, 110, 1);

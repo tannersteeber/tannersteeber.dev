@@ -78,11 +78,11 @@ function wheels(b, d, r, w, zf) {
   wheelAt(b, d.W, r, w, -d.L * zf);
 }
 
-function lightsInto(b, d, tall) {
+function lightsInto(b, d, tall, end) {
   const { L, W } = d, y = tall ? 0.95 : 0.66;
   for (const s of [-1, 1]) {
-    b.box(s * W * 0.33, y, L / 2 + 0.01, 0.34, 0.14, 0.06, 0, color(0xfff4c9));
-    b.box(s * W * 0.34, y + 0.02, -L / 2 - 0.01, 0.34, 0.14, 0.06, 0, color(0xff2b2b));
+    if (end !== 'rear') b.box(s * W * 0.33, y, L / 2 + 0.01, 0.34, 0.14, 0.06, 0, color(0xfff4c9));
+    if (end !== 'front') b.box(s * W * 0.34, y + 0.02, -L / 2 - 0.01, 0.34, 0.14, 0.06, 0, color(0xff2b2b));
   }
 }
 
@@ -92,6 +92,7 @@ export class AssetManager {
   constructor() {
     this.material = new THREE.MeshLambertMaterial({ vertexColors: true });
     this.glowMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+    this.brakeMaterial = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0x595959 });
     this.carGeos = new Map();
     this.lightGeos = new Map();
     this._shadowTex = null;
@@ -111,9 +112,10 @@ export class AssetManager {
     return g;
   }
 
-  carLightGeometry(type) {
-    let g = this.lightGeos.get(type);
-    if (!g) { const b = new MeshBuilder(); lightsInto(b, CAR_TYPES[type], false); g = b.build(); this.lightGeos.set(type, g); }
+  carLightGeometry(type, end) {
+    const key = type + ':' + (end || 'both');
+    let g = this.lightGeos.get(key);
+    if (!g) { const b = new MeshBuilder(); lightsInto(b, CAR_TYPES[type], false, end); g = b.build(); this.lightGeos.set(key, g); }
     return g;
   }
 
@@ -131,26 +133,36 @@ export class AssetManager {
   createPlayerCar(hex) {
     const group = new THREE.Group();
     const body = new THREE.Mesh(this.carGeometry('player', hex, true), this.material);
-    const lights = new THREE.Mesh(this.carLightGeometry('player'), this.glowMaterial);
-    group.add(body, lights);
+    const lights = new THREE.Mesh(this.carLightGeometry('player', 'front'), this.glowMaterial);
+    const brakeLights = new THREE.Mesh(this.carLightGeometry('player', 'rear'), this.brakeMaterial);
+    group.add(body, lights, brakeLights);
     group.rotation.order = 'YXZ';
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 5.4), new THREE.MeshBasicMaterial({
       map: this.shadowTexture(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2
     }));
     shadow.rotation.x = -Math.PI / 2;
-    return { group, body, lights, shadow, dims: CAR_TYPES.player };
+    return { group, body, lights, brakeLights, shadow, paintHex: hex, dims: CAR_TYPES.player };
+  }
+
+  setBraking(car, braking) {
+    car.brakeLights.material.color.setScalar(braking ? 1.5 : 0.35);
   }
 
   /** Replace the player's paint (e.g. when the page theme changes). */
   repaintPlayer(car, hex) {
+    if (car.paintHex === hex) return;
+    const previous = car.body.geometry;
     car.body.geometry = this.carGeometry('player', hex, true);
+    this.carGeos.delete('player:' + car.paintHex + ':1');
+    previous.dispose();
+    car.paintHex = hex;
   }
 
   dispose() {
     this.carGeos.forEach(g => g.dispose());
     this.lightGeos.forEach(g => g.dispose());
     this.carGeos.clear(); this.lightGeos.clear();
-    this.material.dispose(); this.glowMaterial.dispose();
+    this.material.dispose(); this.glowMaterial.dispose(); this.brakeMaterial.dispose();
     if (this._shadowTex) this._shadowTex.dispose();
   }
 }
