@@ -286,7 +286,10 @@ html{overflow-y:scroll;scrollbar-gutter:stable}
 .project-card>p:not(.meta):not(.repo-link){flex:1 0 auto;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.8em}
 .project-card .meta{align-self:flex-start}
 .project-card .card-details{margin-top:auto}
-.project-grid>.project-card[hidden],.project-grid>[hidden]{display:none}
+/* Cards without a repo button reserve the same space so all cards share one default height */
+.project-card:not(:has(.repo-link)) .card-details{margin-top:calc(1.1rem + 2.9rem)}
+.project-grid>.project-card[hidden],.project-grid>[hidden],.project-col>.project-card[hidden]{display:none}
+.project-col{display:flex;flex-direction:column;gap:1.5rem;min-width:0;align-items:stretch}
 .project-empty{grid-column:1/-1;margin:0;padding:2rem;text-align:center;color:var(--muted2)}
 
 /* Filters */

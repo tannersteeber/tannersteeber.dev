@@ -92,9 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const w = popup.offsetWidth, h = popup.offsetHeight;
     const cx = rect.left + rect.width / 2;
     const rightSide = cx > vw / 2;
-    let left;
-    if (mobile) left = rightSide ? rect.right - w : rect.left;
-    else left = vw - w - 18; // desktop: tucked against the right side of the page
+    // line the menu up with the button's edge on every screen size so it stays attached to it
+    let left = rightSide ? rect.right - w : rect.left;
     left = Math.max(12, Math.min(left, vw - w - 12));
     const top = Math.max(8, above ? rect.top - h - 12 : rect.bottom + 12);
     const caret = Math.max(24, Math.min(cx - left, w - 24));
@@ -379,7 +378,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ok) shown++;
       });
       if (empty) empty.hidden = shown > 0;
+      layout();
     }
+
+    // Independent columns: expanding a card only pushes down cards in its own column
+    const mq = window.matchMedia('(max-width:900px)');
+    let cols = [];
+    function layout() {
+      const n = mq.matches ? 1 : 2;
+      cols.forEach(c => c.remove());
+      cols = [];
+      for (let i = 0; i < n; i++) {
+        const col = document.createElement('div');
+        col.className = 'project-col';
+        grid.insertBefore(col, empty || null);
+        cols.push(col);
+      }
+      cards.filter(c => !c.hidden).forEach((c, i) => cols[i % n].appendChild(c));
+      cards.filter(c => c.hidden).forEach(c => cols[0].appendChild(c));
+    }
+    mq.addEventListener && mq.addEventListener('change', layout);
 
     qsa('[data-filter-status]').forEach(btn => btn.addEventListener('click', () => {
       state.status = btn.dataset.filterStatus;
@@ -400,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       apply();
     }));
+    apply();
   })();
 
   /* ------------------ Featured project on home page ------------------ */
