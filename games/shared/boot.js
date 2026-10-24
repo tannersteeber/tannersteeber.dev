@@ -2,6 +2,10 @@
 import { SiteTheme } from './engine/SettingsManager.js';
 SiteTheme.apply();
 const root = document.getElementById('game-root');
+// Long presses belong to game controls rather than browser text/image callouts.
+root.addEventListener('contextmenu', event => event.preventDefault());
+root.addEventListener('selectstart', event => event.preventDefault());
+root.addEventListener('dragstart', event => event.preventDefault());
 const game = document.body.dataset.game;
 try {
   const { default: Game } = await import(`../${game}/${game}.js`);

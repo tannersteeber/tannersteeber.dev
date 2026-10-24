@@ -44,3 +44,21 @@ Arcade.register({
     }]
   }
 });
+
+Arcade.register({
+  id: 'ripagolf', title: 'RipaGolf', icon: 'games/ripagolf/mark.svg', releaseDate: '2026-10-24',
+  description: 'Swing. Predict. Survive. Read each golf hole, lock in a prediction and build your virtual-point streak.',
+  href: 'games/ripagolf/',
+  info: {
+    about: [
+      'Endless seeded par 3, 4 and 5 holes with nine clubs, wind, slopes, sand, water and putting. Choose your performance prediction before each hole; a win extends the streak and a miss ends the run.',
+      'Free virtual points only, with no money, purchases or prizes. Your statistics, milestone badges, settings and current run are saved in this browser. Website themes transform the table and course accents without resetting play.'
+    ],
+    controls: 'On mobile, swipe upward in the dedicated swing zone. On desktop, set Power and use Time swing / Space and strike at the center. A/D aim, 1–9 select clubs, drag the course to adjust the view, and use the mouse wheel to zoom. Escape pauses.',
+    updates: [{ title: 'First release', items: [
+      'Feature — Procedural golf, fixed-step shot physics, nine clubs and precision putting.',
+      'Feature — Prediction chips, streak rewards, local statistics and milestone badges.',
+      'Update — Live website themes, mobile swipe controls and saved-run resume.'
+    ] }]
+  }
+});

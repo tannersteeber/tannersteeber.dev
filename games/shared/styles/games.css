@@ -75,3 +75,17 @@
 @media(max-width:600px){
   [data-game="cruise"] .g-hud-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 16px;max-width:100%}
 }
+
+/* Persistent Arcade navigation, including title, pause and settings screens. */
+.g-arcade-back{position:absolute;z-index:20;top:max(20px,env(safe-area-inset-top));left:max(20px,env(safe-area-inset-left));display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;box-sizing:border-box;border:1px solid var(--border-strong);border-radius:50px;background:var(--card-surface);color:var(--text);font:700 .8rem var(--font);text-decoration:none;touch-action:manipulation}
+.g-arcade-back:hover{color:var(--link);text-decoration:none}
+.g-hud{top:calc(max(20px,env(safe-area-inset-top)) + 60px);right:max(20px,env(safe-area-inset-right))}
+.g-screen:not(.g-pause-screen){padding-top:calc(max(20px,env(safe-area-inset-top)) + 60px)}
+.g-panel{padding-top:calc(max(20px,env(safe-area-inset-top)) + 60px)}
+.g-panel-inner{max-height:calc(100dvh - max(20px,env(safe-area-inset-top)) - 76px)}
+@media(max-width:600px){
+ .g-arcade-back{top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));padding:10px 13px;font-size:.7rem}
+ .g-hud{top:calc(max(12px,env(safe-area-inset-top)) + 58px);right:12px}
+ .g-screen:not(.g-pause-screen),.g-panel{padding-top:calc(max(12px,env(safe-area-inset-top)) + 58px)}
+ .g-panel-inner{max-height:calc(100dvh - max(12px,env(safe-area-inset-top)) - 74px)}
+}

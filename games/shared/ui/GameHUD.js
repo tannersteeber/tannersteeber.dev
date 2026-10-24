@@ -17,10 +17,11 @@ export class GameHUD {
     this.toastEl = h('div', { class: 'g-toast', 'aria-live': 'polite' });
     this.flashEl = h('div', { class: 'g-flash' });
     this.pauseBtn = h('button', { class: 'g-pause-toggle', type: 'button', 'aria-label': 'Pause', 'data-ui': '', text: 'II', onclick: () => hooks.onPause() });
+    this.arcadeLink = h('a', { class: 'g-arcade-back', href: '../../arcade.html', 'data-ui': '', text: '← Arcade' });
     this.pedals = h('div', { class: 'g-pedals', 'data-ui': '', hidden: true },
       this._pedal('Brake', -1, hooks), this._pedal('Gas', 1, hooks));
     this.hooks = hooks;
-    root.append(this.el, this.toastEl, this.flashEl, this.pauseBtn, this.pedals);
+    root.append(this.el, this.toastEl, this.flashEl, this.pauseBtn, this.arcadeLink, this.pedals);
   }
 
   _pedal(label, dir, hooks) {

@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RipaGolf browser checks</title>
+<link rel="stylesheet" href="../../css/styles.css"><link rel="stylesheet" href="../ripagolf/ripagolf.css">
+<style>body.runner{overflow:auto;padding:24px;background:#eef3ef;color:#163829}body.runner h1{font:700 24px system-ui}#results{font:14px/1.7 monospace}iframe{position:fixed;inset:0;z-index:50;border:0;max-width:100%}</style></head><body>
+<script type="module">
+const isCase=new URLSearchParams(location.search).has('case');
+if(!isCase){
+ document.body.className='runner';document.body.append(Object.assign(document.createElement('h1'),{textContent:'RipaGolf browser checks'}));
+ const report=Object.assign(document.createElement('div'),{id:'results'});document.body.append(report);
+ const cases=[[1060,700],[390,780],[780,390]];let count=0,fail=0,frame;
+ const next=()=>{frame?.remove();if(count===cases.length){document.title=fail?'FAIL RipaGolf browser checks':'PASS 3 RipaGolf browser checks';report.append(Object.assign(document.createElement('p'),{textContent:'DONE'}));return;}
+  const [w,h]=cases[count++];frame=document.createElement('iframe');frame.width=w;frame.height=h;frame.title=`RipaGolf ${w}×${h}`;frame.src='?case=1';document.body.append(frame);
+ };
+ window.addEventListener('message',e=>{if(e.origin!==location.origin||e.data?.kind!=='ripagolf-check')return;report.append(Object.assign(document.createElement('p'),{textContent:e.data.text}));if(e.data.text.startsWith('FAIL'))fail++;document.title=`RipaGolf checks ${count}/3`;next();});next();
+}else{
+ document.body.className='rg-game';document.body.dataset.game='ripagolf';const root=document.createElement('main');root.id='game-root';document.body.append(root);
+ const keys=['tsd.ripagolf.v1','site-theme','page-theme','rain-hue'],saved=new Map(keys.map(k=>[k,localStorage.getItem(k)]));let game;
+ const errors=[];window.addEventListener('error',e=>errors.push(e.message));
+ const assert=(v,msg)=>{if(!v)throw Error(msg);};
+ const fits=el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1;};
+ try{
+  localStorage.removeItem('tsd.ripagolf.v1');
+  const {default:Game}=await import('../ripagolf/ripagolf.js');game=new Game();await game.init(root);game.engine.stop();game.store.set('muted',true);game.audio.volume();
+  assert(game.phase==='title','main menu');assert(getComputedStyle(root).userSelect==='none','game text selection disabled');assert(getComputedStyle(game.ui.modal.querySelector('.rg-panel')).backgroundImage!=='none','panel felt background renders');assert(fits(game.ui.modal.querySelector('.rg-panel')),'title fits');
+  const topLink=game.ui.top.querySelector('a'),topPause=game.ui.top.querySelector('button');
+  const reachable=el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2));};
+  assert(reachable(topLink)&&reachable(topPause),'main menu header receives pointer clicks');
+  const compactMenu=()=>{const panel=game.ui.modal.querySelector('.rg-panel'),r=panel.getBoundingClientRect();assert(r.width<=280&&r.top>=70&&r.top<=90&&innerWidth-r.right<=24,'compact menu anchored upper right');assert(getComputedStyle(game.ui.modal.querySelector('.rg-actions')).flexDirection==='column','stacked menu actions');};
+  topPause.click();compactMenu();assert(game.ui.kind==='title-menu'&&game.phase==='title','title pause button opens menu without starting a run');
+  assert(reachable(topLink)&&reachable(topPause),'menu header remains clickable');
+  topPause.click();assert(game.ui.kind==='title','title menu toggles closed');
+  game.ui.help();assert(game.ui.modal.textContent.includes('Space'),'controls help');game.returnScreen();
+  game.newRun();assert(game.phase==='overview'||game.phase==='prediction','hole overview');if(game.phase==='overview')game.openPredictions();assert(game.phase==='prediction','prediction board');assert(reachable(topLink)&&reachable(topPause),'prediction header remains clickable');assert(fits(game.ui.modal.querySelector('.rg-panel')),'prediction board fits');
+  const chip=game.ui.chips.querySelector('[data-prediction="exact-par"]');chip.click();game.ui.lockButton.click();assert(game.hole.locked&&game.phase==='aim','prediction locks');const locked=game.hole.prediction;game.selection='bogey';game.lockPrediction();assert(game.hole.prediction===locked,'locked chip immutable');
+  game.ui.hud.hidden=false;game.ui.update();assert(fits(game.ui.shot),'shot controls fit');assert(fits(game.ui.hud),'HUD fits');
+  game.controls.keys.add('KeyA');const initialAim=game.aim;game.controls.update(.1);game.controls.reset();assert(game.aim<initialAim,'keyboard aim');
+  game.setAim(0);game.setPower(.35);const zone=game.ui.swingZone,rect=zone.getBoundingClientRect();
+  if(game.ui.mobile.matches){
+  assert(rect.height>=150,'mobile swipe area has finger travel');
+  game.ui.adjustments.open=true;assert(fits(game.ui.shot),'expanded adjustments stay inside dock');game.ui.adjustments.open=false;
+  await new Promise(requestAnimationFrame);game.gr.resize();game.update(1/60);game.gr.render();
+  const viewport=game.viewport.getBoundingClientRect(),dock=game.ui.shot.getBoundingClientRect();
+  assert(viewport.bottom<=dock.top+1||viewport.right<=dock.left+1,'course viewport does not overlap controls');
+  const projected=game.world.ball.position.clone().project(game.gr.camera);
+  assert(Math.abs(projected.x)<1&&Math.abs(projected.y)<1,'ball visible in unobstructed course viewport');
+  zone.dispatchEvent(new PointerEvent('pointerdown',{pointerId:20,pointerType:'touch',clientX:rect.left+50,clientY:rect.bottom-5,bubbles:true,cancelable:true}));zone.dispatchEvent(new PointerEvent('pointermove',{pointerId:20,pointerType:'touch',clientX:rect.left+50,clientY:rect.top+5,bubbles:true,cancelable:true}));zone.dispatchEvent(new PointerEvent('pointerup',{pointerId:20,pointerType:'touch',clientX:rect.left+50,clientY:rect.top+5,bubbles:true,cancelable:true}));
+  }else{assert(rect.height===0,'desktop swipe area hidden');game.ui.swingButton.click();game.update(.46);game.ui.swingButton.click();}
+  assert(game.phase==='flight'&&game.hole.strokes===1,`touch swipe launches (phase ${game.phase}, strokes ${game.hole.strokes}, ball ${game.ball.status}, zone ${rect.height}px, sensitivity ${game.store.settings.swingSensitivity}, errors ${errors.join(" | ")})`);
+  for(let i=0;i<2400&&game.phase==='flight';i++)game.update(1/60);assert(game.phase==='aim','ball settles and next shot available');
+  game.ball.reset({x:0,z:0});game.prepareLie();game.setPower(.2);
+  const canvas=game.gr.canvas,mouseAim=game.aim,zoom=game.zoom;
+  canvas.dispatchEvent(new PointerEvent('pointerdown',{pointerId:21,pointerType:'mouse',clientX:200,clientY:200}));
+  canvas.dispatchEvent(new PointerEvent('pointermove',{pointerId:21,pointerType:'mouse',clientX:230,clientY:210}));
+  canvas.dispatchEvent(new PointerEvent('pointerup',{pointerId:21,pointerType:'mouse'}));
+  canvas.dispatchEvent(new WheelEvent('wheel',{deltaY:100,cancelable:true}));
+  assert(game.aim!==mouseAim&&game.zoom>zoom,'mouse aim and trackpad wheel zoom');
+  game.ui.swingButton.click();assert(game.phase==='timing','desktop timing starts');
+  const initialNeedle=game.ui.needle.style.transform;
+  game.update(1/60);const nextNeedle=game.ui.needle.style.transform;assert(nextNeedle!==initialNeedle,'timing needle moves on the next frame');
+  game.update(1/60);assert(game.ui.needle.style.transform!==nextNeedle,'timing needle moves between HUD refreshes');
+  assert(Math.abs(parseFloat(game.ui.needle.style.transform.slice(12))-(game.timingValue+1)*50)<.0001,'needle matches actual swing accuracy');
+  game.update(.46-2/60);game.ui.swingButton.click();assert(game.phase==='flight','desktop timing strike launches');
+  for(let i=0;i<2400&&game.phase==='flight';i++)game.update(1/60);assert(game.phase==='aim','timed shot settles');
+  // Theme changes during an actual shot may only alter presentation.
+  game.shoot(.3,0);game.update(.1);game.pause();compactMenu();assert(reachable(topLink)&&reachable(topPause),'paused header remains clickable');const snapshot=JSON.stringify(game.ball.snapshot()),course=game.course,geometry=game.world.terrain.geometry,score=game.run.score,strokes=game.hole.strokes,windTime=game.windTime;
+  for(const theme of ['signature','retro','rain','future-test']){
+    if(theme==='future-test')document.documentElement.style.setProperty('--accent','#65b8dc');
+    game.theme.setPage(theme);game.theme.apply();
+    assert(JSON.stringify(game.ball.snapshot())===snapshot,'theme preserves ball state');assert(game.course===course&&game.world.terrain.geometry===geometry,'theme preserves geometry');assert(game.run.score===score&&game.hole.strokes===strokes&&game.windTime===windTime,'theme preserves run and wind');
+  }
+  for(const dark of [false,true]){game.theme.setPage('signature');game.theme.setDark(dark);assert(JSON.stringify(game.ball.snapshot())===snapshot,'appearance preserves physics');}
+  game.openSettings();assert(fits(game.ui.modal.querySelector('.rg-panel')),'settings fits');game.setting('graphics','low');assert(game.gr.quality==='low','quality applies');game.closeSettings();
+  game.capture();const savedBall=JSON.stringify(game.ball.snapshot());game.mainMenu();game.resumeSaved();assert(JSON.stringify(game.ball.snapshot())===savedBall,'saved run restores shot');
+  // Use a known short putt fixture to exercise the complete UI settlement, not a fake win.
+  game.course.greenX=game.course.greenZ=0;game.ball.reset({x:game.course.pin.x,z:game.course.pin.z-3});game.hole.strokes=game.course.par-1;game.hole.prediction='exact-par';game.hole.locked=true;game.phase='aim';game.prepareLie();game.ui.ready();game.shoot(.05,0);
+  for(let i=0;i<1800&&game.phase==='flight';i++)game.update(1/60);
+  assert(game.ball.status==='holed'&&game.hole.result?.won,'putt completes and prediction wins');assert(game.run.streak===1&&game.run.score>0,'streak and points awarded');assert(game.ui.modal.textContent.includes('Prediction won'),'win screen');
+  const scored=game.store.stats.lifetimePoints;game.finishHole();assert(game.store.stats.lifetimePoints===scored,'no duplicate awards');game.ui.statistics();assert(game.ui.modal.textContent.includes('Lifetime points'),'statistics');game.returnScreen();game.nextHole();assert(game.run.holeIndex===2,'endless next hole');
+  if(game.phase==='overview')game.openPredictions();game.selection='exact-par';game.lockPrediction();game.course.greenX=game.course.greenZ=0;game.ball.reset({x:game.course.pin.x,z:game.course.pin.z-3});game.hole.strokes=game.course.par;game.prepareLie();game.shoot(.05,0);
+  for(let i=0;i<1800&&game.phase==='flight';i++)game.update(1/60);
+  assert(game.hole.result&&!game.hole.result.won&&game.run.streak===0&&game.run.status==='lost','failed prediction ends run');assert(game.ui.modal.textContent.includes('Streak lost'),'loss screen');
+  game.gr.render();assert(game.gr.renderer.getContext().getError()===0,'WebGL renders without errors');
+  parent.postMessage({kind:'ripagolf-check',text:`PASS ${innerWidth}×${innerHeight}: menus, swipe, mouse, timing, physics, live themes, persistence, quality, putting, wins, losses and next hole`},location.origin);
+ }catch(error){console.error(error);parent.postMessage({kind:'ripagolf-check',text:`FAIL ${innerWidth}×${innerHeight}: ${error.stack}`},location.origin);}
+ finally{game?.destroy();for(const [key,value]of saved){if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}}
+}
+</script></body></html>

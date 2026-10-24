@@ -215,6 +215,10 @@
       const card = document.createElement('article');
       card.className = 'project-card project arcade-card';
       const h = document.createElement('h3'); h.textContent = g.title;
+      if (g.icon) {
+        const icon = document.createElement('span'); icon.className = 'arcade-game-icon'; icon.setAttribute('aria-hidden', 'true');
+        icon.style.maskImage = icon.style.webkitMaskImage = 'url("' + g.icon + '")'; h.prepend(icon);
+      }
       const p = document.createElement('p'); p.textContent = g.description;
       const a = document.createElement('p'); a.className = 'repo-link';
       const btn = document.createElement(g.href ? 'a' : 'button');

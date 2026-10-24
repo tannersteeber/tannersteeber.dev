@@ -36,13 +36,16 @@ if(!name){
   const {default:Game}=await import(`../${name}/${name}.js`);
   g=new Game();await g.init(root);assert(g.state==='title','title screen');g.engine.stop();
   for(const [key,value]of Object.entries({desktopMode:'keyboard',invert:false,sensitivity:1,'cruise.autoSpeed':true,'cruise.speed':22,'cruise.assist':false}))g.settings.set(key,value);
+  const back=g.hud.arcadeLink;
+  const backReachable=()=>{const r=back.getBoundingClientRect();assert(!back.hidden&&r.left>=0&&r.top>=0&&r.right<=innerWidth,'Arcade link fits');assert(back.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)),'Arcade link receives clicks');assert(new URL(back.href).pathname.endsWith('/arcade.html'),'Arcade link destination');};
+  backReachable();
   assert(root.querySelector('.g-btn-primary').textContent==='Play','play button');
   g.startRun();if(name==='cutup'){g.traffic.reset();g.traffic.spawnDist=-1000000;}step(120);assert(g.vehicle.s>30,'vehicle advances');assert(g.hud.vals.speed.textContent!=='0','speed HUD');assert(g.hud.el.textContent.includes('mph'),'speed uses mph');if(name==='cruise'){
    assert(g.hud.vals.dist.textContent.endsWith(' mi'),'distance uses miles');
    const pickup=g.pickups.items.find(item=>item.active&&item.s>g.vehicle.s);
    g.vehicle.d=pickup.d;g.pickups.lastD=pickup.d;g.vehicle.s=pickup.s;
    g.updateRun(1/60,'playing');g.updateHud();assert(g.parts===1&&g.score>0,'car part awards score');assert(g.hud.vals.parts.textContent==='1','parts HUD');
-   const hud=g.hud.el.querySelector('.g-hud-bar').getBoundingClientRect();assert(hud.right<=g.hud.pauseBtn.getBoundingClientRect().left,'expanded HUD fits screen');
+   const hud=g.hud.el.querySelector('.g-hud-bar').getBoundingClientRect();assert(hud.right<=innerWidth&&hud.top>=back.getBoundingClientRect().bottom,'expanded HUD fits below navigation');
    g.startRun();assert(g.parts===0&&g.score===0,'restart resets collection');step(120);
   }
   g.input.pedal=-1;step(10);assert(g.car.brakeLights.material.color.r>1,'brake lights brighten');g.input.pedal=0;step(120);assert(g.car.brakeLights.material.color.r<1,'brake lights return to normal');
@@ -55,12 +58,12 @@ if(!name){
   root.dispatchEvent(new PointerEvent('pointerdown',{pointerId:7,pointerType:'touch',clientX:1,bubbles:true,cancelable:true}));g.input.update(.1);assert(g.input.steer<0,'touch steers left');
   root.dispatchEvent(new PointerEvent('pointerdown',{pointerId:8,pointerType:'touch',clientX:innerWidth-1,bubbles:true,cancelable:true}));for(let i=0;i<30;i++)g.input.update(.05);assert(g.input.steer===0,'opposite touches cancel');
   root.dispatchEvent(new PointerEvent('pointercancel',{pointerId:7,bubbles:true}));root.dispatchEvent(new PointerEvent('pointerup',{pointerId:8,bubbles:true}));assert(g.input.holds.size===0,'touch cleanup');g.settings.controlMode=originalMode;
-  g.pause();assert(g.state==='paused'&&!g.input.enabled,'pause disables input');
+  backReachable();g.pause();backReachable();assert(g.state==='paused'&&!g.input.enabled,'pause disables input');
   const pauseBox=g.menu.screens.pause.querySelector('.g-pause-card').getBoundingClientRect();
   assert(pauseBox.width>=240&&pauseBox.width<=282&&pauseBox.height>200,'pause panel has popup dimensions');
   assert(pauseBox.left>=0&&pauseBox.right<=innerWidth+1&&pauseBox.bottom<=innerHeight+1,'pause menu fits viewport');
   assert(getComputedStyle(g.menu.screens.pause.querySelector('.g-pause-card')).backdropFilter==='none','pause popup has no magnifying blur');const pausedAt=g.vehicle.s;step();assert(g.vehicle.s===pausedAt,'pause freezes road');
-  g.panel.open();assert(!g.panel.el.hidden,'settings opens');const box=g.panel.el.querySelector('.g-card').getBoundingClientRect();assert(box.left>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,'settings fits viewport');g.panel.close();
+  g.panel.open();backReachable();assert(!g.panel.el.hidden,'settings opens');const box=g.panel.el.querySelector('.g-card').getBoundingClientRect();assert(box.left>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,'settings fits viewport');g.panel.close();
   for(const appearance of ['light','dark']){SiteTheme.setPageTheme('signature');SiteTheme.setAppearance(appearance);g.applyPalette();assert(g.palette.night===(appearance==='dark'),'appearance updates scene');g.settings.set('carColor','#d94662');assert(g.car.paintHex===0xd94662,'Signature paint applies immediately');}
   for(const theme of ['retro','rain']){SiteTheme.setPageTheme(theme);g.applyPalette();assert(g.palette.page===theme,'theme updates world');assert(g.car.paintHex===g.palette.accent.getHex(),'theme paint takes precedence');
    if(theme==='rain'){g.env.update(1/60,g.vehicle.position.y);assert(g.env.binaryRain.every(points=>points.visible&&points.material.map),'binary glyph rain is active');assert(!g.env.rainLines.visible,'binary theme replaces streaks');for(const points of g.env.binaryRain)assert([...points.geometry.attributes.position.array].every(Number.isFinite),'binary particle positions');}}

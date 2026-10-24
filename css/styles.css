@@ -829,3 +829,12 @@ details>summary::-webkit-details-marker{display:none}
 .arcade-release{display:block;margin:0 0 .85rem;font-size:.75rem;line-height:1.5;color:var(--muted2)}
 
 :root[data-page-theme="retro"] body{-webkit-font-smoothing:none;font-synthesis:none}
+
+.arcade-card h3:has(.arcade-game-icon){display:flex;align-items:center;gap:.5rem}
+.arcade-game-icon{display:inline-block;flex-shrink:0;width:34px;height:34px;background:var(--accent);mask-size:contain;mask-repeat:no-repeat;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat}
+
+/* Game surfaces support held touch controls without text selection or callouts. */
+body[data-game],body[data-game] *{
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  -webkit-user-drag:none;
+}

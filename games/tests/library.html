@@ -8,13 +8,13 @@ const load=path=>new Promise((resolve,reject)=>{frame.onload=()=>resolve(frame.c
 const result=(name,error)=>{const p=document.createElement('p');p.className=error?'fail':'pass';p.textContent=(error?'FAIL ':'PASS ')+name+(error?': '+error.message:'');report.append(p);if(error)failed++;else passed++;};
 const files=['index.html','about.html','arcade.html','projects.html','resume.html'];
 for(const file of files){try{const d=await load('../../'+file);const links=[...d.querySelectorAll('.nav a')];assert(links.length===5,'five tabs');assert(links.map(a=>a.getAttribute('href')).join()===files.join(),'consistent order');const active=links.filter(a=>a.getAttribute('aria-current')==='page');assert(active.length===1&&active[0].getAttribute('href')===file&&active[0].classList.contains('active'),'correct current tab');result(file);}catch(e){result(file,e);}}
-try{const d=await load('../../projects.html'),a=d.querySelector('#project-tannersteeber-dev');assert(a.querySelector('.recent-update').textContent.includes('v0.9.5'),'recent v0.9.5');assert(a.querySelector('.update-history').textContent.includes('v0.9.4'),'v0.9.4 archived');result('release history');}catch(error){result('release history',error);}
+try{const d=await load('../../projects.html'),a=d.querySelector('#project-tannersteeber-dev');assert(a.querySelector('.recent-update').textContent.includes('v0.9.6'),'recent v0.9.6');assert(a.querySelector('.update-history').textContent.includes('v0.9.5'),'v0.9.5 archived');result('release history');}catch(error){result('release history',error);}
 for(const width of [1060,390]){
  frame.width=width;
  try{
   const d=await load('../../arcade.html'),w=frame.contentWindow;
   assert(w.getComputedStyle(d.querySelector('#arcade-filters')).display==='none','genre tabs hidden');
-  const cards=[...d.querySelectorAll('.arcade-card')];assert(cards.length===2,'two games');assert(!d.querySelector('.arcade-card .status-badge'),'no genre badges');
+  const cards=[...d.querySelectorAll('.arcade-card')];assert(cards.length===3,'three games');assert(!d.querySelector('.arcade-card .status-badge'),'no genre badges');
   for(const theme of ['light','dark','retro','rain']){
    d.documentElement.classList.toggle('theme-dark',theme==='dark');if(theme==='retro'||theme==='rain')d.documentElement.setAttribute('data-page-theme',theme);else d.documentElement.removeAttribute('data-page-theme');
    const second=cards[1].getBoundingClientRect();
@@ -27,6 +27,16 @@ for(const width of [1060,390]){
   }
   result('Arcade '+width+'px: independent expansion, full descriptions, four appearances');
  }catch(error){result('Arcade '+width+'px',error);}
+}
+for(const name of ['cruise','cutup','ripagolf']){
+ try{
+  const d=await load(`../${name}/index.html`),w=frame.contentWindow,root=d.getElementById('game-root');
+  await new Promise((resolve,reject)=>{let tries=0;const check=()=>root.classList.contains('ready')?resolve():++tries>300?reject(Error('game startup timeout')):w.requestAnimationFrame(check);check();});
+  assert(!root.querySelector('.g-start-error,.rg-error'),'game loads');
+  for(const el of [d.body,...root.querySelectorAll('button,p,h1,span,canvas')])assert(w.getComputedStyle(el).userSelect==='none','selection disabled');
+  for(const type of ['selectstart','contextmenu','dragstart'])assert(!root.dispatchEvent(new w.Event(type,{bubbles:true,cancelable:true})),type+' suppressed');
+  result(name+': game-wide selection, callouts and dragging disabled');
+ }catch(error){result(name,error);}
 }
 document.title=failed?`FAIL ${failed} site UI checks`:`PASS ${passed} site UI checks`;
 const end=document.createElement('p');end.textContent=failed?'DONE — failures above':'DONE — all checks passed';report.append(end);

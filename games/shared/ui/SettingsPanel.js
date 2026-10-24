@@ -14,7 +14,7 @@ export class SettingsPanel {
     this.settings = settings; this.input = input; this.hooks = hooks || {};
     this.touch = isTouchDevice();
     this.rows = [];
-    this.el = h('div', { class: 'g-panel', 'data-ui': '', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Settings', hidden: true });
+    this.el = h('div', { class: 'g-panel', 'data-ui': '', role: 'dialog', 'aria-label': 'Settings', hidden: true });
     const inner = h('div', { class: 'g-card g-panel-inner' });
     inner.append(h('h2', { class: 'g-h2', text: 'Settings' }));
     const body = h('div', { class: 'g-panel-body' });
@@ -30,7 +30,7 @@ export class SettingsPanel {
     input.tilt.onStatus = () => this.refresh();
     this._key = (e) => {
       if (e.code === 'Tab' && !this.el.hidden) {
-        const all = [...this.el.querySelectorAll('button, select, input, a')].filter(el => !el.disabled && el.getClientRects().length);
+        const all = [this.el.parentElement.querySelector('.g-arcade-back'),...this.el.querySelectorAll('button, select, input, a')].filter(Boolean).filter(el => !el.disabled && el.getClientRects().length);
         const first = all[0], last = all[all.length - 1];
         if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
         else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
@@ -142,7 +142,7 @@ export class SettingsPanel {
   open() {
     this._previousFocus = document.activeElement;
     this.refresh(); this.el.hidden = false;
-    for (const el of this.el.parentElement.children) if (el !== this.el) el.inert = true;
+    for (const el of this.el.parentElement.children) if (el !== this.el && !el.matches('.g-arcade-back')) el.inert = true;
     this.el.querySelector('select, button').focus();
   }
   close() { if (this.el.hidden) return; this.el.hidden = true; for (const el of this.el.parentElement.children) el.inert = false; this._previousFocus?.focus({ preventScroll: true }); this.hooks.onClose && this.hooks.onClose(); }
