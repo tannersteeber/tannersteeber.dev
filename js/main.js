@@ -79,14 +79,31 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileToggle.style.left = mobileToggle.style.top = mobileToggle.style.right = mobileToggle.style.bottom = '';
   }
 
-  // Position the popup beside the button: below it at the top, above it at the bottom
-  function placePopup(rect) {
-    const sideLeft = mobileToggle.classList.contains('left');
-    const atBottom = mobileToggle.classList.contains('bottom');
-    if (sideLeft) { popup.style.left = rect.left + 'px'; popup.style.right = ''; }
-    else { popup.style.right = (window.innerWidth - rect.right) + 'px'; popup.style.left = ''; }
-    const top = atBottom ? Math.max(12, rect.top - (popup.offsetHeight + 8)) : rect.bottom + 8;
+  // Position the popup against its button: below it at the top, above it at the bottom.
+  // A caret on the popup points at the button, and the popup grows out of that point.
+  function placePopup(anchor) {
+    const rect = anchor.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const mobile = vw < 900;
+    const above = mobile && mobileToggle.classList.contains('bottom');
+    // never let the menu reach the button: cap its height to the free space on its side
+    const room = (above ? rect.top : window.innerHeight - rect.bottom) - 12 - 8;
+    popup.style.setProperty('--pop-max', Math.max(160, room) + 'px');
+    const w = popup.offsetWidth, h = popup.offsetHeight;
+    const cx = rect.left + rect.width / 2;
+    const rightSide = cx > vw / 2;
+    let left;
+    if (mobile) left = rightSide ? rect.right - w : rect.left;
+    else left = vw - w - 18; // desktop: tucked against the right side of the page
+    left = Math.max(12, Math.min(left, vw - w - 12));
+    const top = Math.max(8, above ? rect.top - h - 12 : rect.bottom + 12);
+    const caret = Math.max(24, Math.min(cx - left, w - 24));
+    popup.style.left = left + 'px';
     popup.style.top = top + 'px';
+    popup.style.right = 'auto';
+    popup.style.setProperty('--caret-x', caret + 'px');
+    popup.style.transformOrigin = caret + 'px ' + (above ? '100%' : '0');
+    popup.classList.toggle('from-bottom', above);
   }
 
   // Drag (mouse or touch) the button to any corner; it snaps on release
@@ -126,6 +143,118 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileToggle.addEventListener('click', (e) => { if (dragged) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   })();
 
+  /* ------------------ Page themes (Signature default, Retro, Digital Rain) ------------------ */
+  const PAGE_THEMES = [
+    { id: 'signature', label: 'Signature' },
+    { id: 'retro', label: 'Retro' },
+    { id: 'rain', label: 'Digital Rain' }
+  ];
+  const PAGE_THEME_KEY = 'page-theme';
+  let rainTimer = null, rainCanvas = null;
+
+  function stopRain() {
+    if (rainTimer) { clearInterval(rainTimer); rainTimer = null; }
+    if (rainCanvas) { rainCanvas.remove(); rainCanvas = null; }
+  }
+
+  // Falling binary characters behind the page (Digital Rain only)
+  function startRain() {
+    stopRain();
+    rainCanvas = document.createElement('canvas');
+    rainCanvas.className = 'rain-canvas';
+    rainCanvas.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(rainCanvas);
+    const ctx = rainCanvas.getContext('2d');
+    const size = 16;
+    let cols = 0, drops = [];
+    const resize = () => {
+      rainCanvas.width = window.innerWidth;
+      rainCanvas.height = window.innerHeight;
+      cols = Math.ceil(rainCanvas.width / size);
+      drops = Array.from({ length: cols }, () => Math.random() * -40);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    const step = () => {
+      if (document.hidden) return;
+      const h = root.style.getPropertyValue('--rain-h') || 144;
+      ctx.fillStyle = 'hsla(' + h + ',90%,2%,.14)';
+      ctx.fillRect(0, 0, rainCanvas.width, rainCanvas.height);
+      ctx.fillStyle = 'hsl(' + h + ',100%,61%)';
+      ctx.font = size + 'px monospace';
+      for (let i = 0; i < cols; i++) {
+        if (drops[i] > 0) ctx.fillText(Math.random() > .5 ? '1' : '0', i * size, drops[i] * size);
+        if (drops[i] * size > rainCanvas.height && Math.random() > .975) drops[i] = 0;
+        drops[i] += 1;
+      }
+    };
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) { for (let n = 0; n < 60; n++) step(); return; } // static frame only
+    rainTimer = setInterval(step, 70);
+  }
+
+  function applyPageTheme(id) {
+    if (!PAGE_THEMES.some(t => t.id === id)) id = 'signature';
+    if (id === 'signature') root.removeAttribute('data-page-theme');
+    else root.setAttribute('data-page-theme', id);
+    if (id === 'rain') startRain(); else stopRain();
+    qsa('.popup-pagethemes button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pageTheme === id)));
+    try { localStorage.setItem(PAGE_THEME_KEY, id); } catch (e) { /* ignore */ }
+  }
+
+  // Build the picker inside the popup's settings area
+  (function initPageThemePicker() {
+    const settings = popup && qs('.popup-settings', popup);
+    if (!settings) return;
+    const label = document.createElement('h4');
+    label.className = 'pagetheme-label';
+    label.textContent = 'Page theme';
+    const group = document.createElement('div');
+    group.className = 'popup-pagethemes';
+    PAGE_THEMES.forEach(t => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.pageTheme = t.id;
+      b.textContent = t.label;
+      b.addEventListener('click', () => {
+        // clicking Digital Rain while it is already active resets it to the original green
+        if (t.id === 'rain' && root.getAttribute('data-page-theme') === 'rain') {
+          hue.value = '144';
+          root.style.setProperty('--rain-h', '144');
+          try { localStorage.setItem('rain-hue', '144'); } catch (e) { /* ignore */ }
+          return;
+        }
+        applyPageTheme(t.id);
+      });
+      group.appendChild(b);
+    });
+    settings.append(label, group);
+
+    // Digital Rain colour slider (shown by CSS only while that theme is active)
+    const HUE_KEY = 'rain-hue';
+    const hueWrap = document.createElement('div');
+    hueWrap.className = 'popup-rainhue';
+    const hueLabel = document.createElement('h4');
+    hueLabel.className = 'pagetheme-label';
+    hueLabel.textContent = 'Rain color';
+    const hue = document.createElement('input');
+    hue.type = 'range'; hue.min = '0'; hue.max = '360'; hue.step = '1';
+    hue.setAttribute('aria-label', 'Digital Rain color');
+    let savedHue = '144';
+    try { savedHue = localStorage.getItem(HUE_KEY) || '144'; } catch (e) { /* ignore */ }
+    hue.value = savedHue;
+    root.style.setProperty('--rain-h', savedHue);
+    hue.addEventListener('input', () => {
+      root.style.setProperty('--rain-h', hue.value);
+      try { localStorage.setItem(HUE_KEY, hue.value); } catch (e) { /* ignore */ }
+    });
+    hueWrap.append(hueLabel, hue);
+    settings.append(hueWrap);
+    let stored = null;
+    try { stored = localStorage.getItem(PAGE_THEME_KEY); } catch (e) { /* ignore */ }
+    applyPageTheme(stored || 'signature');
+  })();
+
   function syncNav() {
     if (!popupNav || !headerNav) return;
     popupNav.innerHTML = headerNav.innerHTML;
@@ -137,23 +266,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function openPopup(anchorRect) {
+  function openPopup(anchor) {
     if (!popup) return;
     syncNav();
-  // make sure newly-inserted toggles in the popup are wired
-  wireToggles();
-    popup.classList.add('open');
+    wireToggles();
+    popup.classList.add('open', 'opening');
     popup.setAttribute('aria-hidden', 'false');
-    // Desktop: anchored top-right via CSS. For mobile we position above the mobile button if provided.
-    if (anchorRect && window.innerWidth < 900) {
-      placePopup(anchorRect);
-    } else {
-      // clear inline positioning to allow CSS anchoring
-      popup.style.top = '';
-      popup.style.right = '';
-      popup.style.left = '';
-    }
-    // trap scroll behind the popup on small screens for focus effect
+    setTimeout(() => popup.classList.remove('opening'), 400);
+    // measure and place before the next paint so it never appears in the wrong spot
+    if (anchor) placePopup(anchor);
+    // trap scroll behind the popup on small screens
     if (window.innerWidth < 900) document.documentElement.style.overflow = 'hidden';
   }
 
@@ -161,15 +283,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!popup) return;
     popup.classList.remove('open');
     popup.setAttribute('aria-hidden', 'true');
-    popup.style.top = '';
-    popup.style.right = '';
     document.documentElement.style.overflow = '';
   }
 
   // Wire header and mobile toggles
   headerToggles.forEach(b => b.addEventListener('click', (e) => {
     e.preventDefault();
-    if (popup && popup.classList.contains('open')) closePopup(); else openPopup();
+    if (popup && popup.classList.contains('open')) closePopup(); else openPopup(b);
   }));
   if (mobileToggle) {
     mobileToggle.addEventListener('click', (e) => {
@@ -178,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (popup && popup.classList.contains('open')) {
         closePopup();
       } else {
-        openPopup(mobileToggle.getBoundingClientRect());
+        openPopup(mobileToggle);
       }
     });
   }

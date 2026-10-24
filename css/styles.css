@@ -141,7 +141,7 @@ button,a,.btn,.project,.feature-card,.skills-list li{
 }
 .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:.4rem;border-radius:999px}
 .nav-toggle:hover{background:var(--hover-bg-strong)}
-.mobile-nav-toggle{position:fixed;right:18px;z-index:1700;display:none;align-items:center;justify-content:center;width:52px;height:52px;padding:0;border-radius:999px}
+.mobile-nav-toggle{position:fixed;right:18px;z-index:1800;display:none;align-items:center;justify-content:center;width:52px;height:52px;padding:0;border-radius:999px}
 .mobile-nav-toggle.left{right:auto;left:18px}
 
 /* Theme toggle (lives in the popup) */
@@ -152,15 +152,26 @@ button,a,.btn,.project,.feature-card,.skills-list li{
 .theme-toggle[aria-pressed="true"] .icon-sun{display:block}
 .theme-toggle[aria-pressed="true"] .icon-moon{display:none}
 
-/* Popup menu: top-right on desktop, above the floating button on mobile (JS positions it) */
-.popup-menu{position:fixed;z-index:1700;display:none}
+/* Popup menu: JS places it against its button; it grows out of the button and a caret points back at it */
+.popup-menu{position:fixed;z-index:1700;display:none;--caret-x:50%}
 .popup-menu.open{display:block;animation:pop var(--medium) var(--ease)}
-@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+/* while the menu is growing in, nothing inside it may fade or transition */
+.popup-menu.opening,.popup-menu.opening *{transition:none!important}
+@keyframes pop{from{transform:scale(.4)}to{transform:none}}
+.popup-menu::before{
+  content:'';position:absolute;z-index:2;top:-8px;left:var(--caret-x);width:16px;height:16px;
+  background:var(--bg);border-top:1px solid var(--border-strong);border-left:1px solid var(--border-strong);
+  transform:translateX(-50%) rotate(45deg);border-top-left-radius:4px;
+}
+.popup-menu.from-bottom::before{
+  top:auto;bottom:-8px;border:0;border-bottom:1px solid var(--border-strong);border-right:1px solid var(--border-strong);
+  border-top-left-radius:0;border-bottom-right-radius:4px;
+}
 .popup-inner{
-  position:relative;width:280px;max-width:calc(100vw - 36px);max-height:calc(100vh - 36px);
+  position:relative;width:280px;max-width:calc(100vw - 36px);max-height:min(calc(100vh - 36px),var(--pop-max,100vh));
   padding:1rem;overflow-y:auto;overscroll-behavior:contain;color:var(--text);
-  background:var(--frost);-webkit-backdrop-filter:saturate(180%) blur(28px);backdrop-filter:saturate(180%) blur(28px);
-  border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-lg);
+  background:var(--bg);
+  border:1px solid var(--border-strong);border-radius:24px;box-shadow:var(--shadow-lg);
 }
 .popup-close{
   position:absolute;top:1rem;right:1rem;z-index:4;display:inline-flex;align-items:center;justify-content:center;
@@ -414,6 +425,9 @@ details>summary::-webkit-details-marker{display:none}
 .resume-doc ul{padding-left:1.2rem}
 .resume-doc li{margin-bottom:.3rem}
 .resume-doc,.resume-doc p,.resume-doc li{color:var(--text)}
+/* resume links match the text colour and only change colour on hover */
+.resume-doc a{color:inherit;text-decoration:none}
+.resume-doc a:hover,.resume-doc a:focus-visible{color:var(--accent);text-decoration:none}
 .resume-doc .resume-header{margin-bottom:1rem;text-align:center}
 .resume-doc .resume-header h1{margin-bottom:.4rem}
 .resume-doc .resume-header p{margin:0 0 .25rem}
@@ -488,4 +502,264 @@ details>summary::-webkit-details-marker{display:none}
 @media (max-width:800px){
   .lb-media{width:calc(100vw - 120px)}
   .lb-prev,.lb-next{width:40px;height:40px}
+}
+
+/* ==========================================================================
+   11. Page themes
+   Default ("Signature") has no attribute. Retro and Digital Rain are set with
+   :root[data-page-theme="retro" | "rain"] and always use their own dark palette.
+   `:root[data-page-theme] ...` targets rules shared by both.
+   ========================================================================== */
+
+/* Theme picker inside the popup (injected by main.js) */
+.popup-pagethemes{display:grid;grid-template-columns:1fr;gap:.5rem}
+.popup-pagethemes button{
+  display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:.5rem .9rem;
+  border-radius:14px;cursor:pointer;font:inherit;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text);background:var(--hover-bg);border:1px solid var(--border-strong);
+}
+.popup-pagethemes button[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);border-color:transparent}
+.popup-pagethemes button[aria-pressed="true"]::after{content:'✓'}
+.popup-settings .pagetheme-label{margin-top:.9rem}
+:root[data-page-theme] .popup-theme{display:none}          /* light/dark switch doesn't apply to the dark-only themes */
+:root[data-page-theme] .popup-settings h4:first-child{display:none}
+
+/* ---------- Shared by Retro and Digital Rain ---------- */
+:root[data-page-theme]{--radius:2px;--radius-sm:2px;--font:ui-monospace,'SF Mono',Menlo,Consolas,'Courier New',monospace;--font-display:var(--font);color-scheme:dark}
+:root[data-page-theme] body{background:transparent}
+:root[data-page-theme] h1,:root[data-page-theme] h2,:root[data-page-theme] h3{letter-spacing:.04em}
+:root[data-page-theme] .project-card,
+:root[data-page-theme] .project,
+:root[data-page-theme] .feature-card,
+:root[data-page-theme] #skills,
+:root[data-page-theme] .about-panel,
+:root[data-page-theme] .about-callout,
+:root[data-page-theme] .mini-card,
+:root[data-page-theme] .page-resume .resume-doc,
+:root[data-page-theme] .popup-inner,
+:root[data-page-theme] .project-empty{border-radius:3px}
+:root[data-page-theme] .btn,
+:root[data-page-theme] .skills-list li,
+:root[data-page-theme] .meta,
+:root[data-page-theme] .status-badge,
+:root[data-page-theme] .subtitle,
+:root[data-page-theme] .filter-tabs,
+:root[data-page-theme] .filter-types,
+:root[data-page-theme] .filter-tab,
+:root[data-page-theme] .filter-chip,
+:root[data-page-theme] .popup-nav a,
+:root[data-page-theme] .popup-pagethemes button,
+:root[data-page-theme] .nav a,
+:root[data-page-theme] .feature-card h4,
+:root[data-page-theme] .feature-card::after,
+:root[data-page-theme] .thumb{border-radius:2px}
+:root[data-page-theme] .nav-toggle,
+:root[data-page-theme] .mobile-nav-toggle,
+:root[data-page-theme] .back-to-top{border-radius:3px;-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-page-theme] .site-header{-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-page-theme] .project-card:hover{transform:none}
+:root[data-page-theme] .popup-nav a::after{content:''}
+:root[data-page-theme] .popup-nav a:hover::before,
+:root[data-page-theme] .popup-nav a.active::before{content:'> ';margin-right:.5rem}
+:root[data-page-theme] .popup-nav a{justify-content:flex-start}
+:root[data-page-theme] .popup-nav::before{content:'MENU'}
+:root[data-page-theme] .project-card h3,
+:root[data-page-theme] .feature-card h3{text-transform:uppercase}
+:root[data-page-theme] .cta{justify-content:center}
+
+/* ---------- Retro ---------- */
+:root[data-page-theme="retro"]{
+  --bg:#05061a;
+  --card-surface:rgba(10,12,44,.94);
+  --card-surface-2:rgba(8,9,34,.94);
+  --text:#ffe9a0;
+  --muted:#b9c2ee;
+  --muted2:#8c94c8;
+  --accent:#4cc9f0;
+  --accent-2:#9b5de5;
+  --accent-glow:rgba(155,93,229,.35);
+  --on-accent:#05061a;
+  --bone:#ffe9a0;
+  --bone-soft:rgba(255,233,160,.10);
+  --link:#4cc9f0;
+  --link-hover:#ffe9a0;
+  --border:rgba(76,201,240,.40);
+  --border-strong:#4cc9f0;
+  --frost:rgba(8,9,34,.96);
+  --hover-bg:rgba(76,201,240,.10);
+  --hover-bg-strong:rgba(76,201,240,.22);
+  --header-frost:rgba(5,6,26,.92);
+  --footer-bg:#04051a;
+  --thumb-bg:linear-gradient(180deg,#0b0e3a,#070927);
+  --shadow:4px 4px 0 #9b5de5;
+  --shadow-lg:6px 6px 0 #9b5de5;
+}
+:root[data-page-theme="retro"] body::before{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 220' preserveAspectRatio='none'%3E%3Cpath fill='%23131a55' d='M0 220V150h40v-30h60V90h50v40h60V80h50V50h60v50h70v40h60V70h50v40h80v30h70v-20h60V90h60v40h70v-30h60v50h80v-20h80V90h40v130z'/%3E%3Cpath fill='%230a0d33' d='M0 220V185h80v-25h40v25h90v-45h30v45h110v-30h40v30h130v-60h50v60h40v-40h30v40h120v-25h40v25h100v-50h60v50h90v-30h40v30h80v-20h50v20h70v-35h40v35h80v35z'/%3E%3C/svg%3E") bottom/100% 32vh no-repeat,
+    radial-gradient(2px 2px at 8% 14%,#fff 50%,transparent 52%),
+    radial-gradient(2px 2px at 22% 32%,#ff8fb0 50%,transparent 52%),
+    radial-gradient(2px 2px at 41% 10%,#ffe9a0 50%,transparent 52%),
+    radial-gradient(2px 2px at 58% 26%,#fff 50%,transparent 52%),
+    radial-gradient(2px 2px at 73% 12%,#4cc9f0 50%,transparent 52%),
+    radial-gradient(2px 2px at 90% 30%,#fff 50%,transparent 52%),
+    radial-gradient(2px 2px at 33% 52%,#fff 50%,transparent 52%),
+    radial-gradient(2px 2px at 82% 48%,#ffe9a0 50%,transparent 52%),
+    linear-gradient(180deg,#04051a 0%,#0b0e3a 55%,#2a1555 82%,#5a2a73 100%);
+}
+:root[data-page-theme="retro"] body::after{
+  content:'';position:fixed;z-index:-1;pointer-events:none;right:9%;top:44%;width:clamp(70px,9vw,130px);aspect-ratio:1;border-radius:50%;
+  background:linear-gradient(180deg,#ffe9a0 0 52%,#ff9f7a 52% 58%,#ffe9a0 58% 62%,#ff5c8a 62% 70%,#9b5de5 70% 100%);
+}
+:root[data-page-theme="retro"]::after{
+  content:'';position:fixed;inset:0;z-index:3000;pointer-events:none;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px);
+}
+:root[data-page-theme="retro"] .site-header{border-bottom:2px solid rgba(76,201,240,.35);box-shadow:none}
+:root[data-page-theme="retro"] .brand{color:var(--text)}
+:root[data-page-theme="retro"] .brand::before{content:'▶ 1P';width:auto;height:auto;background:none;transform:none;border-radius:0;font-size:.85em;color:var(--accent)}
+:root[data-page-theme="retro"] .nav{padding:.35rem .5rem;border:2px solid var(--accent);border-radius:4px;box-shadow:3px 3px 0 var(--accent-2)}
+:root[data-page-theme="retro"] .nav a{background:none;color:var(--muted)}
+:root[data-page-theme="retro"] .nav a:hover{background:none;color:var(--text)}
+:root[data-page-theme="retro"] .nav a.active{background:none;color:var(--text)}
+:root[data-page-theme="retro"] .nav a.active::before{content:'> ';color:var(--accent)}
+:root[data-page-theme="retro"] h2::after{height:4px;width:64px;background:linear-gradient(90deg,var(--accent),#ff5c8a,var(--accent-2));border-radius:0}
+:root[data-page-theme="retro"] .project-card::before{background:linear-gradient(90deg,var(--accent),#ff5c8a,var(--accent-2))}
+:root[data-page-theme="retro"] .project-card,
+:root[data-page-theme="retro"] .feature-card,
+:root[data-page-theme="retro"] #skills,
+:root[data-page-theme="retro"] .about-panel,
+:root[data-page-theme="retro"] .about-callout,
+:root[data-page-theme="retro"] .mini-card,
+:root[data-page-theme="retro"] .popup-inner,
+:root[data-page-theme="retro"] .page-resume .resume-doc{border:3px solid var(--accent);box-shadow:var(--shadow)}
+:root[data-page-theme="retro"] .about-callout{border-left-width:3px}
+/* hero: centred title card, signature with a pixel-style offset shadow, flanked subtitle, framed call to action */
+:root[data-page-theme="retro"] .display-title{filter:drop-shadow(3px 3px 0 #9b5de5)}
+:root[data-page-theme="retro"] .display-title.has-signature .signature-img{background:linear-gradient(180deg,#fff6c9 0%,#ffe9a0 45%,#4cc9f0 75%,#9b5de5 100%)}
+:root[data-page-theme="retro"] .subtitle{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1.5rem;padding:0;border:0;background:none;color:var(--muted);font-size:.8rem;letter-spacing:.22em}
+:root[data-page-theme="retro"] .subtitle::before,
+:root[data-page-theme="retro"] .subtitle::after{content:'';flex:0 1 70px;height:2px;background:var(--accent)}
+:root[data-page-theme="retro"] .subtitle::after{background:var(--accent-2)}
+:root[data-page-theme="retro"] .btn-primary{gap:.9rem;padding:.85rem 1.6rem;border:3px solid var(--accent);border-right-color:var(--accent-2);border-bottom-color:var(--accent-2);border-radius:4px;color:var(--text);background:rgba(5,6,26,.7);box-shadow:none}
+:root[data-page-theme="retro"] .btn-primary::before{content:'>';color:var(--accent)}
+:root[data-page-theme="retro"] .btn-primary::after{content:'<';color:var(--accent-2)}
+:root[data-page-theme="retro"] .btn-primary:hover{color:var(--on-accent);background:var(--text);filter:none}
+:root[data-page-theme="retro"] .feature-card::after{background:var(--accent);color:var(--on-accent);border-radius:0}
+:root[data-page-theme="retro"] .feature-card h4,
+:root[data-page-theme="retro"] .meta,
+:root[data-page-theme="retro"] .status-badge{border:2px solid var(--accent-2);background:none;color:var(--text)}
+:root[data-page-theme="retro"] .skills-list li{border:2px solid var(--accent);background:rgba(5,6,26,.7);color:var(--text)}
+:root[data-page-theme="retro"] .skills-list li:hover,
+:root[data-page-theme="retro"] .skills-list li:focus{background:var(--accent);color:var(--on-accent);box-shadow:3px 3px 0 var(--accent-2);transform:translate(-2px,-2px)}
+:root[data-page-theme="retro"] .filter-tabs,
+:root[data-page-theme="retro"] .filter-types{border:2px solid var(--accent);background:rgba(5,6,26,.7);border-radius:3px}
+:root[data-page-theme="retro"] .filter-tab.active{background:var(--accent);color:var(--on-accent)}
+:root[data-page-theme="retro"] .filter-chip.active{background:var(--text);color:var(--on-accent);box-shadow:none}
+:root[data-page-theme="retro"] .popup-nav a{border:2px solid var(--border)}
+:root[data-page-theme="retro"] .popup-nav a.active,
+:root[data-page-theme="retro"] .popup-pagethemes button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+:root[data-page-theme="retro"] .popup-pagethemes button{border:2px solid var(--border)}
+:root[data-page-theme="retro"] .site-footer{border-top:2px solid rgba(76,201,240,.35);background:rgba(4,5,26,.92)}
+
+/* ---------- Digital Rain ---------- */
+:root[data-page-theme="rain"]{
+  --rain-h:144;
+  --bg:hsl(var(--rain-h) 90% 2%);
+  --card-surface:hsl(var(--rain-h) 80% 4% / .90);
+  --card-surface-2:hsl(var(--rain-h) 90% 3% / .90);
+  --text:hsl(var(--rain-h) 100% 81%);
+  --muted:hsl(var(--rain-h) 70% 62%);
+  --muted2:hsl(var(--rain-h) 50% 45%);
+  --accent:hsl(var(--rain-h) 100% 61%);
+  --accent-2:hsl(var(--rain-h) 100% 78%);
+  --accent-glow:hsl(var(--rain-h) 100% 61% / .30);
+  --on-accent:hsl(var(--rain-h) 100% 4%);
+  --bone:hsl(var(--rain-h) 100% 61%);
+  --bone-soft:hsl(var(--rain-h) 100% 61% / .08);
+  --link:hsl(var(--rain-h) 70% 62%);
+  --link-hover:hsl(var(--rain-h) 100% 88%);
+  --border:hsl(var(--rain-h) 100% 61% / .32);
+  --border-strong:hsl(var(--rain-h) 100% 61% / .75);
+  --frost:hsl(var(--rain-h) 90% 3% / .95);
+  --hover-bg:hsl(var(--rain-h) 100% 61% / .08);
+  --hover-bg-strong:hsl(var(--rain-h) 100% 61% / .18);
+  --header-frost:hsl(var(--rain-h) 90% 2% / .92);
+  --footer-bg:hsl(var(--rain-h) 90% 2%);
+  --thumb-bg:linear-gradient(180deg,hsl(var(--rain-h) 90% 5%),hsl(var(--rain-h) 90% 3%));
+  --shadow:0 0 14px hsl(var(--rain-h) 100% 61% / .14);
+  --shadow-lg:0 0 22px hsl(var(--rain-h) 100% 61% / .24);
+}
+:root[data-page-theme="rain"]::after{
+  content:'';position:fixed;inset:0;z-index:3000;pointer-events:none;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px),radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+.rain-canvas{position:fixed;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none;opacity:.55}
+:root[data-page-theme="rain"] .site-header{margin:10px 10px 0;border:1px solid var(--border-strong);box-shadow:var(--shadow)}
+:root[data-page-theme="rain"] .brand::before{content:'[';width:auto;height:auto;background:none;transform:none;border-radius:0;color:var(--accent)}
+:root[data-page-theme="rain"] .brand::after{content:']';color:var(--accent)}
+:root[data-page-theme="rain"] .brand{gap:.4rem}
+:root[data-page-theme="rain"] .nav a{background:none;color:var(--muted)}
+:root[data-page-theme="rain"] .nav a::before{content:'[ ';color:var(--accent)}
+:root[data-page-theme="rain"] .nav a::after{content:' ]';color:var(--accent)}
+:root[data-page-theme="rain"] .nav a:hover,
+:root[data-page-theme="rain"] .nav a.active{background:none;color:var(--text);text-shadow:0 0 8px var(--accent-glow)}
+:root[data-page-theme="rain"] h2::before{content:'// ';color:var(--accent)}
+:root[data-page-theme="rain"] h2::after{width:100%;height:1px;background:var(--border);border-radius:0}
+:root[data-page-theme="rain"] .project-card::before{display:none}
+:root[data-page-theme="rain"] .project-card,
+:root[data-page-theme="rain"] .feature-card,
+:root[data-page-theme="rain"] #skills,
+:root[data-page-theme="rain"] .about-panel,
+:root[data-page-theme="rain"] .about-callout,
+:root[data-page-theme="rain"] .mini-card,
+:root[data-page-theme="rain"] .popup-inner,
+:root[data-page-theme="rain"] .page-resume .resume-doc{border:1px solid var(--border-strong);box-shadow:var(--shadow)}
+:root[data-page-theme="rain"] .about-callout{border-left-width:1px}
+:root[data-page-theme="rain"] .display-title{filter:drop-shadow(3px 3px 0 hsl(var(--rain-h) 80% 20%)) drop-shadow(0 0 14px hsl(var(--rain-h) 100% 61% / .45))}
+:root[data-page-theme="rain"] .display-title.has-signature .signature-img{background:hsl(var(--rain-h) 100% 74%)}
+:root[data-page-theme="rain"] .subtitle{display:flex;align-items:center;justify-content:center;gap:.9rem;margin-top:1.5rem;padding:0;border:0;background:none;color:var(--text);font-size:.85rem;letter-spacing:.12em}
+:root[data-page-theme="rain"] .subtitle::before,
+:root[data-page-theme="rain"] .subtitle::after{content:'';flex:0 1 80px;height:1px;background:var(--border-strong)}
+/* call to action: stacked terminal menu */
+:root[data-page-theme="rain"] .hero-card .cta{flex-direction:column;align-items:stretch;max-width:420px;margin:1.75rem auto 0;gap:.6rem}
+:root[data-page-theme="rain"] .btn-primary{justify-content:space-between;padding:.8rem 1rem;border:1px solid var(--border);color:var(--text);background:hsl(var(--rain-h) 90% 3% / .85);box-shadow:none;letter-spacing:.12em}
+:root[data-page-theme="rain"] .btn-primary::before{content:'['}
+:root[data-page-theme="rain"] .btn-primary::after{content:']'}
+:root[data-page-theme="rain"] .btn-primary:hover{border-color:var(--accent);color:var(--accent-2);background:hsl(var(--rain-h) 100% 61% / .10);filter:none;transform:none}
+:root[data-page-theme="rain"] .btn-primary:hover::before{content:'>'}
+:root[data-page-theme="rain"] .feature-card h4::before{content:'// '}
+:root[data-page-theme="rain"] .feature-card h4,
+:root[data-page-theme="rain"] .meta,
+:root[data-page-theme="rain"] .status-badge{border:0;background:none;padding-left:0;padding-right:0;color:var(--muted)}
+:root[data-page-theme="rain"] .feature-card::after{background:none;color:var(--accent);border:1px solid var(--accent);border-radius:0}
+:root[data-page-theme="rain"] .status-badge::before{content:'[ '}
+:root[data-page-theme="rain"] .status-badge::after{content:' ]'}
+:root[data-page-theme="rain"] .skills-list li{justify-content:flex-start;border:1px solid var(--border);background:hsl(var(--rain-h) 90% 3% / .8);color:var(--muted)}
+:root[data-page-theme="rain"] .skills-list li::before{content:'> ';color:var(--accent);margin-right:.4rem}
+:root[data-page-theme="rain"] .skills-list li:hover,
+:root[data-page-theme="rain"] .skills-list li:focus{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow);transform:none}
+:root[data-page-theme="rain"] .skills-list li:hover::before{color:var(--on-accent)}
+:root[data-page-theme="rain"] .filter-tabs,
+:root[data-page-theme="rain"] .filter-types{border:1px solid var(--border-strong);background:hsl(var(--rain-h) 90% 3% / .8);border-radius:0}
+:root[data-page-theme="rain"] .filter-tab.active,
+:root[data-page-theme="rain"] .filter-chip.active{background:var(--accent);color:var(--on-accent);box-shadow:none}
+:root[data-page-theme="rain"] .popup-nav a{border:1px solid var(--border)}
+:root[data-page-theme="rain"] .popup-nav a.active,
+:root[data-page-theme="rain"] .popup-pagethemes button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+:root[data-page-theme="rain"] .popup-pagethemes button{border:1px solid var(--border)}
+:root[data-page-theme="rain"] .site-footer{border-top:1px solid var(--border-strong)}
+
+/* colour slider (Digital Rain only) */
+.popup-rainhue{display:none}
+:root[data-page-theme="rain"] .popup-rainhue{display:block}
+.popup-rainhue input{-webkit-appearance:none;appearance:none;width:100%;height:12px;margin:.2rem 0 0;border:1px solid var(--border-strong);background:linear-gradient(90deg,hsl(0 100% 55%),hsl(60 100% 55%),hsl(120 100% 55%),hsl(180 100% 55%),hsl(240 100% 60%),hsl(300 100% 60%),hsl(360 100% 55%))}
+.popup-rainhue input::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:24px;border:2px solid var(--text);background:var(--bg);cursor:pointer}
+.popup-rainhue input::-moz-range-thumb{width:12px;height:20px;border:2px solid var(--text);border-radius:0;background:var(--bg);cursor:pointer}
+
+@media (max-width:700px){
+  :root[data-page-theme="retro"] body::after{right:6%;top:40%}
+  :root[data-page-theme="retro"] .subtitle::before,:root[data-page-theme="retro"] .subtitle::after{flex-basis:24px}
+  :root[data-page-theme="rain"] .site-header{margin:6px 6px 0}
 }
