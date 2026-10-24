@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Projects — Tanner Steeber</title>
-  <link rel="stylesheet" href="css/styles.css?v=0.9.2">
+  <link rel="stylesheet" href="css/styles.css?v=0.9.4">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -15,10 +15,12 @@
   <header class="site-header">
     <div class="container header-inner">
   <a class="brand" href="index.html">tannersteeber.dev</a>
-      <nav class="nav">
-  <a href="index.html">Home</a>
-  <a href="about.html">About</a>
-  <a href="resume.html">Resume</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="arcade.html">Arcade</a>
+        <a href="projects.html" class="active" aria-current="page">Projects</a>
+        <a href="resume.html">Resume</a>
       </nav>
       <div class="header-actions">
         <button class="nav-toggle" aria-label="Open navigation">☰</button>
@@ -65,14 +67,17 @@
                 <div class="card-updates">
                   <!-- Recent update: shows only the most recent version and its notes -->
                   <details class="recent-update" open>
-                    <summary><strong>Recent update</strong> — v0.9.3</summary>
+                    <summary><strong>Recent update</strong> — v0.9.4</summary>
                     <div class="update-body">
                       <ul>
-                        <li><strong>v0.9.3</strong>
+                        <li><strong>v0.9.4</strong>
                           <ul>
-                            <li>Patch - Menu now opens attached to its button on every screen size, never covers the button, and no longer flashes see-through when it opens.</li>
-                            <li>Patch - Fixed the spacing of the projects filter bars on mobile and made resume links match the text color.</li>
-                            <li>Patch - The featured project on the home page now shows its version.</li>
+                            <li>Feature - Added the Arcade library with original Cruise and Cutup 3D driving games, shared controls, menus, sound, camera views, weather, graphics settings and local records.</li>
+                            <li>Feature - Added expandable Info &amp; updates sections with game descriptions, controls and build notes.</li>
+                            <li>Update - Both games follow Signature, Retro and Digital Rain themes, and display speed in mph and distance in miles. Digital Rain uses falling 1s and 0s in both games.</li>
+                            <li>Update - Every portfolio page now shows all navigation tabs in Home, About, Arcade, Projects, Resume order and highlights the current page.</li>
+                            <li>Patch - Fixed the driving pause menus to match the compact site popup on desktop and mobile.</li>
+                            <li>Patch - Arcade cards expand independently, descriptions are fully visible, and the temporary game category tags have been removed.</li>
                           </ul>
                         </li>
                       </ul>
@@ -84,6 +89,13 @@
                     <summary><strong>Update history</strong></summary>
                     <div class="update-body">
                       <ul>
+                        <li><strong>v0.9.3</strong>
+                          <ul>
+                            <li>Patch - Menu now opens attached to its button on every screen size, never covers the button, and no longer flashes see-through when it opens.</li>
+                            <li>Patch - Fixed the spacing of the projects filter bars on mobile and made resume links match the text color.</li>
+                            <li>Patch - The featured project on the home page now shows its version.</li>
+                          </ul>
+                        </li>
                         <li><strong>v0.9.2</strong>
                           <ul>
                             <li>Feature - Page themes: a new theme picker in the menu with Signature (the default look), Retro and Digital Rain, which has its own color slider. Your choice is remembered on every page.</li>
@@ -302,6 +314,7 @@
         <ul class="footer-links">
           <li><a href="index.html">Home</a></li>
           <li><a href="about.html">About</a></li>
+          <li><a href="arcade.html">Arcade</a></li>
           <li><a href="projects.html">Projects</a></li>
           <li><a href="resume.html">Resume</a></li>
           <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
@@ -310,7 +323,7 @@
     </div>
   </footer>
 
-  <script src="js/main.js?v=0.9.2"></script>
+  <script src="js/main.js?v=0.9.4"></script>
   <!-- Lightbox for project screenshots -->
   <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
     <div class="lightbox-backdrop" data-action="close"></div>

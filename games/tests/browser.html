@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arcade browser checks</title>
+<link rel="stylesheet" href="../../css/styles.css"><link rel="stylesheet" href="../shared/styles/games.css">
+<style>body.test-runner{padding:24px;overflow:auto}#results{white-space:pre-wrap;font:14px/1.8 monospace}iframe{display:block;position:fixed;top:0;left:0;z-index:1;border:1px solid #888;max-width:100%}</style>
+</head>
+<body>
+<script type="module">
+const params=new URLSearchParams(location.search),name=params.get('game');
+if(!name){
+ const initialStorage=new Map(['site-theme','page-theme','rain-hue','tsd.arcade.settings.v1'].map(k=>[k,localStorage.getItem(k)]));
+ window.addEventListener('pagehide',()=>{for(const [key,value]of initialStorage){if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}});
+ document.body.className='test-runner';
+ const title=document.createElement('h1');title.textContent='Arcade browser checks';document.body.append(title);
+ const report=document.createElement('div');report.id='results';report.textContent='Running desktop, portrait and landscape checks…\n';document.body.append(report);
+ const cases=['cruise','cutup'].flatMap(game=>[[960,600],[390,780],[780,390]].map(([w,h])=>({game,w,h})));
+ let index=0, activeFrame=null, failures=0;
+ const next=()=>{
+  activeFrame?.remove();
+  if(index===cases.length){const done=document.createElement('p');done.textContent='DONE';document.title=failures ? 'FAIL driving UI checks' : 'PASS 6 driving UI checks';report.append(done);return;}
+  const c=cases[index++],frame=document.createElement('iframe');frame.width=c.w;frame.height=c.h;frame.title=`${c.game} ${c.w}×${c.h}`;
+  frame.src=`?game=${c.game}`;activeFrame=frame;document.body.append(frame);
+ };
+ window.addEventListener('message',e=>{if(e.origin!==location.origin||e.data?.kind!=='arcade-check')return;const line=document.createElement('p');line.textContent=e.data.text;report.append(line);if(e.data.text.startsWith('FAIL'))failures++;document.title=`Driving UI checks ${index}/6`;next();});next();
+}else{
+ document.body.className='game-page';document.body.dataset.game=name;
+ const root=document.createElement('main');root.id='game-root';document.body.append(root);
+ const saved=new Map(['site-theme','page-theme','rain-hue','tsd.arcade.settings.v1'].map(k=>[k,localStorage.getItem(k)]));
+ let g;
+ const assert=(value,message)=>{if(!value)throw Error(message);};
+ const step=(count=30)=>{for(let i=0;i<count;i++)g._frame(1/60);};
+ try{
+  const {SiteTheme}=await import('../shared/engine/SettingsManager.js');
+  const {default:Game}=await import(`../${name}/${name}.js`);
+  g=new Game();await g.init(root);assert(g.state==='title','title screen');g.engine.stop();
+  assert(root.querySelector('.g-btn-primary').textContent==='Play','play button');
+  g.startRun();step(120);assert(g.vehicle.s>30,'vehicle advances');assert(g.hud.vals.speed.textContent!=='0','speed HUD');assert(g.hud.el.textContent.includes('mph'),'speed uses mph');if(name==='cruise')assert(g.hud.vals.dist.textContent.endsWith(' mi'),'distance uses miles');
+  const d=g.vehicle.d;
+  window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyA',bubbles:true,cancelable:true}));step(90);window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyA',bubbles:true}));assert(g.vehicle.d<d,`keyboard steers left (before ${d}, after ${g.vehicle.d}, input ${g.input.steer})`);
+  g.settings.set('desktopMode','mouse');g.input.reset();const before=g.vehicle.d;
+  root.dispatchEvent(new PointerEvent('pointermove',{pointerId:1,pointerType:'mouse',clientX:innerWidth-1,bubbles:true}));g.input.update(.1);assert(g.input.steer===0,'ordinary movement does not steer');
+  root.dispatchEvent(new PointerEvent('pointerdown',{pointerId:1,pointerType:'mouse',button:0,clientX:innerWidth-1,bubbles:true,cancelable:true}));step(90);assert(g.vehicle.d>before,`held mouse steers (before ${before}, after ${g.vehicle.d}, input ${g.input.steer})`);root.dispatchEvent(new PointerEvent('pointerup',{pointerId:1,bubbles:true}));
+  const originalMode=g.settings.controlMode.bind(g.settings);g.settings.controlMode=()=> 'touch';g.input.reset();
+  root.dispatchEvent(new PointerEvent('pointerdown',{pointerId:7,pointerType:'touch',clientX:1,bubbles:true,cancelable:true}));g.input.update(.1);assert(g.input.steer<0,'touch steers left');
+  root.dispatchEvent(new PointerEvent('pointerdown',{pointerId:8,pointerType:'touch',clientX:innerWidth-1,bubbles:true,cancelable:true}));for(let i=0;i<30;i++)g.input.update(.05);assert(g.input.steer===0,'opposite touches cancel');
+  root.dispatchEvent(new PointerEvent('pointercancel',{pointerId:7,bubbles:true}));root.dispatchEvent(new PointerEvent('pointerup',{pointerId:8,bubbles:true}));assert(g.input.holds.size===0,'touch cleanup');g.settings.controlMode=originalMode;
+  g.pause();assert(g.state==='paused'&&!g.input.enabled,'pause disables input');
+  const pauseBox=g.menu.screens.pause.querySelector('.g-pause-card').getBoundingClientRect();
+  assert(pauseBox.width>=240&&pauseBox.width<=282&&pauseBox.height>200,'pause panel has popup dimensions');
+  assert(pauseBox.left>=0&&pauseBox.right<=innerWidth+1&&pauseBox.bottom<=innerHeight+1,'pause menu fits viewport');
+  assert(getComputedStyle(g.menu.screens.pause.querySelector('.g-pause-card')).backdropFilter==='none','pause popup has no magnifying blur');const pausedAt=g.vehicle.s;step();assert(g.vehicle.s===pausedAt,'pause freezes road');
+  g.panel.open();assert(!g.panel.el.hidden,'settings opens');const box=g.panel.el.querySelector('.g-card').getBoundingClientRect();assert(box.left>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,'settings fits viewport');g.panel.close();
+  for(const appearance of ['light','dark']){SiteTheme.setPageTheme('signature');SiteTheme.setAppearance(appearance);g.applyPalette();assert(g.palette.night===(appearance==='dark'),'appearance updates scene');}
+  for(const theme of ['retro','rain']){SiteTheme.setPageTheme(theme);g.applyPalette();assert(g.palette.page===theme,'theme updates world');
+   if(theme==='rain'){g.env.update(1/60,g.vehicle.position.y);assert(g.env.binaryRain.every(points=>points.visible&&points.material.map),'binary glyph rain is active');assert(!g.env.rainLines.visible,'binary theme replaces streaks');for(const points of g.env.binaryRain)assert([...points.geometry.attributes.position.array].every(Number.isFinite),'binary particle positions');}}
+  for(const quality of ['low','medium','high']){g.settings.set('graphics',quality);assert(g.gr.quality===quality,'quality applies');}
+  for(const camera of ['close','far','hood','first']){g.settings.set(name+'.camera',camera);assert(g.cameraCtl.mode===camera,'camera applies');}
+  g.resume();step();assert(g.state==='playing','resume');
+  g.vehicle.s=3000;g.road.update(3000,g.view,110,Infinity);g.startRun();assert(g.vehicle.s===0,'restart after road pruning');step();
+  if(name==='cutup'){
+   const c=g.traffic.cars[0];c.active=true;c.s=g.vehicle.s;c.d=g.vehicle.d;c.speed=g.vehicle.speed;c.lane=1;
+   g.updateRun(1/60,'playing');assert(g.state==='crashed','collision ends run');
+   await new Promise(resolve=>setTimeout(resolve,1400));assert(g.state==='over','game over screen');
+  }
+  g.pause();g.gr.render();assert(g.gr.renderer.getContext().getError()===0,'WebGL has no errors');assert(root.querySelector('a[href="../../arcade.html"]'),'Arcade navigation');
+  parent.postMessage({kind:'arcade-check',text:`PASS ${name} ${innerWidth}×${innerHeight}: rendering, controls, menus, themes, quality, cameras, restart${name==='cutup'?', collision/game over':''}`},location.origin);
+ }catch(error){console.error(error);parent.postMessage({kind:'arcade-check',text:`FAIL ${name} ${innerWidth}×${innerHeight}: ${error.stack}`},location.origin);}
+ finally{g?.destroy();for(const [key,value]of saved){if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}}
+}
+</script>
+</body>
+</html>

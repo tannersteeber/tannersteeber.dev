@@ -13,3 +13,7 @@ Every entry in a project's update notes starts with one of three labels:
 - **Patch** - Bug fixes and small corrections.
 
 Builds before the new scheme are kept in the update history as alpha (0.6 - 0.8) and early access (0.9 - 0.9.3).
+
+## Arcade
+
+Cruise and Cutup are original browser driving games built with a shared vanilla JavaScript/Three.js engine. No build is required. See [game setup, controls and testing](games/README.md).

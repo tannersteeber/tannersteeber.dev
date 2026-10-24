@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Site UI checks running</title>
+<style>body{margin:20px;font:15px/1.5 system-ui}h1{font-size:22px}iframe{display:block;border:1px solid #888;max-width:100%}.pass{color:#187338}.fail{color:#b11}</style></head>
+<body><h1>Navigation, Arcade cards and release checks</h1><div id="results"></div><iframe id="preview" title="Site under test" width="1060" height="650"></iframe>
+<script type="module">
+const frame=document.getElementById('preview'),report=document.getElementById('results');let failed=0,passed=0;
+const assert=(ok,text)=>{if(!ok)throw Error(text);};
+const load=path=>new Promise((resolve,reject)=>{frame.onload=()=>resolve(frame.contentDocument);frame.onerror=reject;frame.src=path;});
+const result=(name,error)=>{const p=document.createElement('p');p.className=error?'fail':'pass';p.textContent=(error?'FAIL ':'PASS ')+name+(error?': '+error.message:'');report.append(p);if(error)failed++;else passed++;};
+const files=['index.html','about.html','arcade.html','projects.html','resume.html'];
+for(const file of files){try{const d=await load('../../'+file);const links=[...d.querySelectorAll('.nav a')];assert(links.length===5,'five tabs');assert(links.map(a=>a.getAttribute('href')).join()===files.join(),'consistent order');const active=links.filter(a=>a.getAttribute('aria-current')==='page');assert(active.length===1&&active[0].getAttribute('href')===file&&active[0].classList.contains('active'),'correct current tab');result(file);}catch(e){result(file,e);}}
+try{const d=await load('../../projects.html'),a=d.querySelector('#project-tannersteeber-dev');assert(a.querySelector('.recent-update').textContent.includes('v0.9.4'),'recent v0.9.4');assert(a.querySelector('.update-history').textContent.includes('v0.9.3'),'v0.9.3 archived');result('release history');}catch(error){result('release history',error);}
+for(const width of [1060,390]){
+ frame.width=width;
+ try{
+  const d=await load('../../arcade.html'),w=frame.contentWindow;
+  assert(w.getComputedStyle(d.querySelector('#arcade-filters')).display==='none','genre tabs hidden');
+  const cards=[...d.querySelectorAll('.arcade-card')];assert(cards.length===2,'two games');assert(!d.querySelector('.arcade-card .status-badge'),'no genre badges');
+  for(const theme of ['light','dark','retro','rain']){
+   d.documentElement.classList.toggle('theme-dark',theme==='dark');if(theme==='retro'||theme==='rain')d.documentElement.setAttribute('data-page-theme',theme);else d.documentElement.removeAttribute('data-page-theme');
+   const second=cards[1].getBoundingClientRect();
+   cards[0].querySelector('summary').click();assert(cards[0].querySelector('details').open,'info expands');assert(!cards[1].querySelector('details').open,'other info stays closed');
+   assert(cards[0].querySelector('.arcade-info-body').textContent.includes('Current build'),'updates present');
+   assert(cards[1].getBoundingClientRect().height===second.height,'other card height unchanged');
+   if(width>600)assert(cards[1].getBoundingClientRect().top===second.top,'other column stays in place');
+   for(const card of cards){const p=card.querySelector('p');assert(w.getComputedStyle(p).display==='block'&&p.scrollHeight<=p.clientHeight+1,'description not clipped');}
+   cards[0].querySelector('summary').click();assert(!cards[0].querySelector('details').open,'info collapses');
+  }
+  result('Arcade '+width+'px: independent expansion, full descriptions, four appearances');
+ }catch(error){result('Arcade '+width+'px',error);}
+}
+document.title=failed?`FAIL ${failed} site UI checks`:`PASS ${passed} site UI checks`;
+const end=document.createElement('p');end.textContent=failed?'DONE — failures above':'DONE — all checks passed';report.append(end);
+</script></body></html>

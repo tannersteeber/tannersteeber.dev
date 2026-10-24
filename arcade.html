@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arcade — Tanner Steeber</title>
+  <link rel="stylesheet" href="css/styles.css?v=0.9.4">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+  <a class="brand" href="index.html">tannersteeber.dev</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="arcade.html" class="active" aria-current="page">Arcade</a>
+        <a href="projects.html">Projects</a>
+        <a href="resume.html">Resume</a>
+      </nav>
+      <div class="header-actions">
+        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container arcade-page">
+    <h1>Arcade</h1>
+    <p class="lead">A library of browser games. Pick one and play — every game follows the site theme.</p>
+
+    <!-- Library: cards are generated from the game registry in js/arcade.js -->
+    <section id="arcade-library" aria-label="Game library">
+      <div class="project-filters arcade-filters" id="arcade-filters" hidden>
+        <div class="filter-types" role="group" aria-label="Game genre" id="arcade-genres"></div>
+      </div>
+      <div class="arcade-grid" id="arcade-grid"></div>
+      <p class="project-empty" id="arcade-empty" hidden>No games yet — check back soon.</p>
+    </section>
+
+    <!-- Player: shown when a game is chosen -->
+    <section id="arcade-player" class="arcade-player" aria-label="Game player" hidden>
+      <div class="arcade-bar">
+        <button class="btn arcade-back" id="arcade-back" type="button">← Library</button>
+        <h2 class="arcade-title" id="arcade-title"></h2>
+        <div class="arcade-bar-actions">
+          <button class="btn" id="arcade-restart" type="button">Restart</button>
+          <button class="btn" id="arcade-full" type="button">Fullscreen</button>
+        </div>
+      </div>
+      <div class="arcade-stage" id="arcade-stage">
+        <canvas id="arcade-canvas" tabindex="0" aria-label="Game canvas"></canvas>
+      </div>
+      <p class="arcade-controls muted small" id="arcade-controls"></p>
+    </section>
+  </main>
+
+  <!-- Popup menu: anchored top-right on desktop, beside the floating button on mobile -->
+  <div id="popup-menu" class="popup-menu" aria-hidden="true">
+    <div class="popup-inner">
+      <nav class="popup-nav" aria-label="Popup Navigation"></nav>
+      <div class="popup-settings">
+        <h4>Settings</h4>
+        <div class="popup-theme">
+          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <g class="icon-moon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></g>
+              <g class="icon-sun"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></g></g>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <button class="popup-close" aria-label="Close menu">✕</button>
+    </div>
+  </div>
+
+  <!-- Mobile-only floating menu button (drag to any corner) -->
+  <button class="mobile-nav-toggle" aria-label="Open navigation">☰</button>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">
+        © Tanner Steeber <span data-year></span>
+        <p class="muted small">Browser games and experiments</p>
+      </div>
+      <div class="footer-right">
+  <div class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="arcade.html">Arcade</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="resume.html">Resume</a></li>
+          <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js?v=0.9.4"></script>
+  <script src="js/arcade.js?v=0.9.4"></script>
+  <script src="games/library.js?v=0.9.4"></script>
+</body>
+</html>

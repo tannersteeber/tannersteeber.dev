@@ -766,3 +766,45 @@ details>summary::-webkit-details-marker{display:none}
   :root[data-page-theme="retro"] .subtitle::before,:root[data-page-theme="retro"] .subtitle::after{flex-basis:24px}
   :root[data-page-theme="rain"] .site-header{margin:6px 6px 0}
 }
+
+/* ==========================================================
+   12. Arcade
+   ========================================================== */
+.arcade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-top:1.5rem;align-items:stretch}
+.arcade-filters{margin-top:1.5rem}
+.arcade-card>p:not(.repo-link){min-height:0;flex:1 0 auto}
+.arcade-card .repo-link{margin-top:auto;padding-top:1.1rem}
+.arcade-player{margin-top:1.5rem}
+.arcade-bar{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.arcade-title{margin:0;flex:1;font-family:var(--font-display);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(1.2rem,2.6vw,1.6rem)}
+.arcade-bar-actions{display:flex;gap:.5rem}
+.arcade-stage{margin-top:1rem;display:flex;justify-content:center;align-items:center;background:var(--card-surface-2);border:1px solid var(--border-strong);border-radius:var(--radius);padding:0;overflow:hidden;box-shadow:var(--shadow)}
+.arcade-stage canvas{display:block;max-width:100%;background:var(--bg);outline:none;touch-action:none}
+.arcade-stage:fullscreen{background:var(--bg);border:0;border-radius:0}
+.arcade-controls{margin:.75rem 0 0}
+:root[data-page-theme] .arcade-stage{border-radius:3px;box-shadow:none}
+:root[data-page-theme="retro"] .arcade-stage{box-shadow:4px 4px 0 var(--accent)}
+@media (max-width:600px){
+  .arcade-grid{grid-template-columns:1fr}
+  .arcade-bar-actions{width:100%}
+  .arcade-bar-actions .btn{flex:1}
+}
+
+/* Game information and release history expand independently on each library card. */
+.arcade-filters[hidden]{display:none}
+.arcade-info{margin-top:1.25rem;border-top:1px solid var(--border-strong);padding-top:.25rem}
+.arcade-info summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:48px;padding:.6rem 0;color:var(--link);font-size:.82rem;font-weight:800;letter-spacing:.04em;cursor:pointer;list-style:none}
+.arcade-info summary::-webkit-details-marker{display:none}
+.arcade-info summary::after{content:'+';font-size:1.3rem;font-weight:500}
+.arcade-info[open] summary::after{content:'−'}
+.arcade-info summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+.arcade-info-body{padding:.5rem 0 .25rem;color:var(--muted);font-size:.85rem;line-height:1.65;overflow-wrap:anywhere}
+.arcade-info-body h4{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin:1.1rem 0 .5rem;color:var(--text)}
+.arcade-info-body h4:first-child{margin-top:0}.arcade-info-body h5{font-size:.82rem;margin:.5rem 0;color:var(--text)}
+.arcade-info-body p{margin:0 0 .65rem}.arcade-info-body ul{margin:.5rem 0;padding-left:1.2rem}.arcade-info-body li+li{margin-top:.4rem}
+
+/* Each Arcade column grows independently, like the Projects layout. */
+.arcade-grid{align-items:start}
+.arcade-column{display:flex;flex-direction:column;gap:1.5rem;min-width:0}
+.arcade-column .arcade-card{min-width:0}
+.arcade-card>p:not(.meta):not(.repo-link){display:block;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible;min-height:0;flex:none}
