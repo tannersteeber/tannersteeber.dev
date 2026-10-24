@@ -1,751 +1,491 @@
-/* ------------------ styles.css — Design tokens & site styles ------------------ */
+/* ==========================================================================
+   styles.css — tannersteeber.dev
+   Frosted-glass surfaces, bold type, blue accents with bone-tan highlights.
+   Light/dark themes via :root.theme-dark. Desktop (>=900px) and mobile layouts.
+
+   Contents
+   1. Design tokens        6. Skills
+   2. Base                 7. Projects & lightbox
+   3. Header & menu popup  8. About
+   4. Buttons              9. Footer, back-to-top
+   5. Home hero            10. Resume, motion, responsive
+   ========================================================================== */
+
+/* ---------- 1. Design tokens ---------- */
 :root{
-  /* Design tokens */
-  --bg-solid: #fbfbfc; /* light fallback - slightly lighter */
-  --bg: var(--bg-solid);
-  --surface: #ffffff;
-  --text: #0f1724;
-  --muted: #374151;
-  --muted2: #6b7280;
-  --accent: #0a84ff;
-  --accent-2: #51b977;
-  --overlay-frost: rgba(255,255,255,0.55);
-  /* Background used for overlay navigation links (theme-aware) */
-  --overlay-link-bg: rgba(255,255,255,0.02);
-  --overlay-link-bg-hover: rgba(255,255,255,0.04);
-  --glass-blur: 8px;
-  --radius: 12px;
-  --max: 1200px;
+  --bg:#fff;
+  --bg-glow:none;
+  --card-surface:rgba(255,255,255,.88);
+  --card-surface-2:rgba(246,246,247,.78);
+  --text:#000;
+  --muted:#2b2b2e;
+  --muted2:#66666c;
+  --accent:#1f6feb;
+  --accent-2:#5aaeff;
+  --accent-glow:rgba(31,111,235,.30);
+  --on-accent:#fff;
+  --bone:#d9ccb0;
+  --bone-soft:rgba(226,214,190,.45);
+  --link:#1558c0;
+  --link-hover:#0b3a85;
+  --border:rgba(0,0,0,.09);
+  --border-strong:rgba(0,0,0,.16);
+  --frost:rgba(255,255,255,.78);
+  --hover-bg:rgba(0,0,0,.05);
+  --hover-bg-strong:rgba(0,0,0,.10);
+  --header-frost:rgba(255,255,255,.76);
+  --footer-bg:#f2f2f4;
+  --thumb-bg:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.03));
+  --shadow:0 10px 30px rgba(20,20,30,.08);
+  --shadow-lg:0 24px 60px rgba(20,20,30,.14);
 
-  /* Motion */
-  --motion-fast: 180ms;
-  --motion-medium: 280ms;
-  --elevation-shadow: 0 10px 30px rgba(2,6,23,0.08);
-
-  --header-frost: rgba(255,255,255,0.85);
-  --header-border: rgba(0,0,0,0.06);
-
-  transition: background .32s ease, color .32s ease;
-  --link: #0a84ff;
-  --link-hover: #065fd6;
-  /* Thumbnail background used for project card image placeholders */
-  --thumb-bg: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.04));
+  --radius:20px;
+  --radius-sm:12px;
+  --max:1200px;
+  --fast:180ms;
+  --medium:280ms;
+  --ease:cubic-bezier(.2,.9,.2,1);
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-display:'Helvetica Neue','SF Pro Display',-apple-system,'Arial Narrow',Arial,sans-serif;
+  color-scheme:light;
 }
 
-/* ------------------ Dark theme overrides ------------------ */
 :root.theme-dark{
-  /* slightly lighter dark gradient so page backgrounds are a touch brighter */
-  --bg: linear-gradient(180deg,#0e0e0e 0%, #111113 48%, #141415 100%);
-  --surface: rgba(255,255,255,0.03);
-  --text: #f8fafc;
-  --muted: rgba(255,255,255,0.88);
-  --muted2: rgba(255,255,255,0.65);
-  --accent: #9ca3af;
-  --accent-2: #d1d5db;
-  --overlay-frost: rgba(8,8,10,0.6);
-  /* Stronger translucent backgrounds for overlay links in dark mode so the frosted panels are visible */
-  --overlay-link-bg: rgba(255,255,255,0.08);
-  --overlay-link-bg-hover: rgba(255,255,255,0.12);
-  /* Darker thumbnail background in dark mode */
-  --thumb-bg: linear-gradient(180deg,#0a0a0a,#0b0b0b);
-  --header-frost: rgba(10,10,12,0.6);
-  --header-border: rgba(255,255,255,0.04);
-  --link: #7bd4ff;
-  --link-hover: #5bd4ff;
-  /* Footer surface used for footer band (keeps consistent across pages) */
-  --footer-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  /* Stronger solid footer color in dark mode for consistent band (no gradient artifacts) */
-  --footer-solid: #0b0b0b;
-  /* Card surface tokens — make cards almost as dark as the footer */
-  --card-surface: #0c0c0c;
-  --card-surface-2: #0b0b0b;
+  --bg:#000;
+  --bg-glow:none;
+  --card-surface:rgba(20,20,22,.82);
+  --card-surface-2:rgba(10,10,11,.82);
+  --text:#e6d9bd;
+  --muted:rgba(230,217,189,.86);
+  --muted2:rgba(230,217,189,.58);
+  --accent:#4a9bff;
+  --accent-2:#9ccfff;
+  --accent-glow:rgba(74,155,255,.32);
+  --on-accent:#04101f;
+  --bone:#e3d7bd;
+  --bone-soft:rgba(227,215,189,.14);
+  --link:#8cc4ff;
+  --link-hover:#c4e0ff;
+  --border:rgba(255,255,255,.10);
+  --border-strong:rgba(255,255,255,.20);
+  --frost:rgba(10,10,12,.76);
+  --hover-bg:rgba(255,255,255,.07);
+  --hover-bg-strong:rgba(255,255,255,.14);
+  --header-frost:rgba(0,0,0,.66);
+  --footer-bg:#060607;
+  --thumb-bg:linear-gradient(180deg,#0a0a0a,#101012);
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+  --shadow-lg:0 24px 60px rgba(0,0,0,.6);
+  color-scheme:dark;
 }
 
-/* Light theme footer bg (subtle frosted band) */
-:root{
-  --footer-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  --footer-solid: rgba(255,255,255,0.02);
-  /* Card surface tokens for light theme (subtle, slightly darker than footer band) */
-  --card-surface: rgba(255,255,255,0.8);
-  --card-surface-2: rgba(255,255,255,0.7);
-}
-
-/* ------------------ Reset & base ------------------ */
+/* ---------- 2. Base ---------- */
 *{box-sizing:border-box}
-html,body{height:100%}
-/* Make the background gradient cover the viewport and stay fixed so it
-  visually extends beneath content and the footer (prevents visible seams). */
-html, body, .page-resume{background: var(--bg) fixed center/cover no-repeat !important}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'Helvetica Neue',Arial;color:var(--text);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh}
-.container{max-width:var(--max);margin:0 auto;padding:2rem}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;background:var(--bg)}
+html,body{min-height:100%}
+body{
+  margin:0;display:flex;flex-direction:column;min-height:100vh;
+  font-family:var(--font);line-height:1.55;color:var(--text);
+  background:var(--bg-glow) no-repeat,var(--bg);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  transition:background-color .32s ease,color .32s ease;
+}
+img{max-width:100%}
 main{flex:1}
+.container{width:100%;max-width:var(--max);margin:0 auto;padding:2rem}
+.muted{color:var(--muted2)}
+.small{font-size:.9rem}
+::selection{background:var(--accent);color:var(--on-accent)}
 
-/* ------------------ Header & navigation ------------------ */
-.site-header{position:sticky;top:0;backdrop-filter:blur(6px);background:linear-gradient(180deg, rgba(0,0,0,0.01), transparent);padding:.75rem 0;z-index:1500;transition:background-color .28s ease, box-shadow .28s ease, border-color .28s ease}
-.header-inner{display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:700;color:var(--text);text-decoration:none}
-.nav{display:flex;gap:1rem;align-items:center}
-.nav a{color:var(--muted);text-decoration:none;padding:.4rem .6rem;border-radius:8px}
-.nav a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
-.nav a.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#021628}
-.nav-toggle{display:block;background:transparent;border:0;color:var(--muted);font-size:1.25rem}
+h1,h2,h3,h4{margin:0 0 .6rem;line-height:1.1}
+h1,h2{font-family:var(--font-display);font-weight:900;text-transform:uppercase;letter-spacing:-.02em}
+h1{font-size:clamp(2.2rem,6vw,4rem)}
+h2{font-size:clamp(1.5rem,3.5vw,2.25rem)}
+h2::after{content:'';display:block;width:56px;height:4px;margin-top:.6rem;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--bone))}
+h3{font-size:1.2rem;font-weight:700;letter-spacing:-.01em}
+p{margin:0 0 .8rem}
+a{color:var(--link);text-underline-offset:3px}
+a:hover{color:var(--link-hover);text-decoration:underline}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
 
+/* Shared motion */
+button,a,.btn,.project,.feature-card,.skills-list li{
+  transition:transform var(--fast) var(--ease),box-shadow var(--fast) ease,background-color var(--fast) ease,
+             color var(--fast) ease,opacity var(--fast) ease,filter var(--fast) ease;
+}
+
+/* ---------- 3. Header, hamburger & menu popup ---------- */
+.site-header{
+  position:sticky;top:0;z-index:1500;padding:.7rem 0;background:var(--header-frost);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid transparent;
+  transition:border-color .28s ease,box-shadow .28s ease,background-color .28s ease;
+}
+.site-header.scrolled{border-bottom-color:var(--border);box-shadow:0 6px 24px rgba(0,0,0,.06)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-top:.25rem;padding-bottom:.25rem}
 .header-actions{display:flex;align-items:center;gap:.5rem}
-.theme-toggle{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:.4rem .5rem;border-radius:8px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center}
-.theme-toggle[aria-pressed="true"]{background:var(--accent);color:#021628;border-color:transparent}
-.theme-toggle svg{width:18px;height:18px;display:inline-block}
+
+.brand{display:inline-flex;align-items:center;gap:.55rem;font-family:var(--font-display);font-weight:900;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text);text-decoration:none}
+.brand::before{content:'';width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,var(--accent),var(--accent-2));transform:rotate(45deg)}
+.brand:hover{color:var(--text);text-decoration:none}
+
+.nav{display:flex;align-items:center;gap:.25rem;margin:0 .75rem 0 auto}
+.nav a{padding:.45rem .9rem;border-radius:999px;font-size:.88rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.nav a:hover{color:var(--text);background:var(--hover-bg)}
+.nav a.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:var(--on-accent)}
+
+.nav-toggle,.mobile-nav-toggle{
+  font-size:1.15rem;color:var(--text);cursor:pointer;background:var(--frost);
+  border:1px solid var(--border);box-shadow:var(--shadow);
+}
+.nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:.4rem;border-radius:999px}
+.nav-toggle:hover{background:var(--hover-bg-strong)}
+.mobile-nav-toggle{position:fixed;right:18px;z-index:1700;display:none;align-items:center;justify-content:center;width:52px;height:52px;padding:0;border-radius:999px}
+.mobile-nav-toggle.left{right:auto;left:18px}
+
+/* Theme toggle (lives in the popup) */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;padding:.4rem;border-radius:12px;cursor:pointer;color:var(--text);background:transparent;border:1px solid var(--border-strong)}
+.theme-toggle svg{width:18px;height:18px;display:block}
 .theme-toggle .icon-sun{display:none}
-.theme-toggle .icon-moon{display:block}
+.theme-toggle[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);border-color:transparent}
 .theme-toggle[aria-pressed="true"] .icon-sun{display:block}
 .theme-toggle[aria-pressed="true"] .icon-moon{display:none}
 
-/* ------------------ Hamburger (mobile toggle) ------------------ */
-.nav-toggle{display:block;background:transparent;border:0;color:var(--muted);font-size:1.25rem}
-
-
-.nav-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1600}
-/* ------------------ Overlay (fullscreen frosted nav) ------------------ */
-.nav-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1600}
-.nav-overlay.open{display:flex}
-.nav-overlay::before{content:'';position:absolute;inset:0;background:var(--overlay-frost);backdrop-filter:blur(10px)}
-.nav-overlay-inner{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%}
-.overlay-nav{display:flex;flex-direction:column;gap:1.25rem;align-items:center}
-.overlay-nav a{font-size:1.5rem;color:var(--text);text-decoration:none;padding:.75rem 1.25rem;border-radius:10px;background:var(--overlay-link-bg)}
-.overlay-nav a:hover{background:var(--overlay-link-bg-hover)}
-.overlay-close{position:fixed;top:18px;right:18px;z-index:1700;background:transparent;border:0;color:var(--muted);font-size:1.5rem;padding:6px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
-.overlay-close svg{width:18px;height:18px;display:block;stroke:currentColor;fill:none}
-
-.theme-dark .overlay-close svg{stroke:#fff}
-
-/* ------------------ Compact popup menu (desktop & mobile) ------------------ */
+/* Popup menu: top-right on desktop, above the floating button on mobile (JS positions it) */
 .popup-menu{position:fixed;z-index:1700;display:none}
-.popup-menu.open{display:block}
-.popup-inner{min-width:220px;max-width:320px;background:var(--overlay-frost);backdrop-filter:blur(10px);border-radius:12px;padding:1.1rem 0.75rem 0.75rem;border:1px solid rgba(0,0,0,0.06);box-shadow:var(--elevation-shadow);color:var(--text);position:relative}
-.popup-nav{display:flex;flex-direction:column;gap:.6rem;padding:0.5rem 0.25rem 0.2rem}
+.popup-menu.open{display:block;animation:pop var(--medium) var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+.popup-inner{
+  position:relative;width:280px;max-width:calc(100vw - 36px);max-height:calc(100vh - 36px);
+  padding:1rem;overflow-y:auto;overscroll-behavior:contain;color:var(--text);
+  background:var(--frost);-webkit-backdrop-filter:saturate(180%) blur(28px);backdrop-filter:saturate(180%) blur(28px);
+  border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-lg);
+}
+.popup-close{
+  position:absolute;top:1rem;right:1rem;z-index:4;display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;padding:0;border:0;border-radius:999px;cursor:pointer;font-size:.9rem;
+  color:var(--muted);background:var(--hover-bg);
+}
+.popup-close:hover{background:var(--hover-bg-strong);color:var(--text)}
+
+.popup-nav{display:flex;flex-direction:column;gap:.4rem}
+.popup-nav::before,.popup-settings h4{display:block;font-size:.7rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2)}
+.popup-nav::before{content:'Menu';height:32px;line-height:32px;margin:0 0 .25rem .25rem;padding-right:40px}
 .popup-nav a{
-  padding:.8rem 1rem;
-  border-radius:12px;
-  text-decoration:none;
-  color:var(--muted);
-  /* stronger visible button in light mode */
-  background: rgba(0,0,0,0.06);
-  border: 1px solid rgba(0,0,0,0.04);
-  display:block;width:100%;box-sizing:border-box
+  display:flex;align-items:center;justify-content:space-between;width:100%;padding:.9rem 1.1rem;border-radius:16px;
+  font-size:.88rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+  color:var(--text);background:var(--hover-bg);border:1px solid var(--border);
 }
-.popup-nav a:hover{background: rgba(0,0,0,0.08);color:var(--text)}
+.popup-nav a::after{content:'→';font-weight:600;color:var(--accent);transition:transform var(--fast) var(--ease)}
+.popup-nav a:hover{background:var(--hover-bg-strong)}
+.popup-nav a:hover::after{transform:translateX(3px)}
+.popup-nav a.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:var(--on-accent);border-color:transparent}
+.popup-nav a.active::after{color:var(--on-accent)}
 
-/* dark theme keeps the existing translucent style for contrast */
-.theme-dark .popup-nav a{background:var(--overlay-link-bg);border-color:rgba(255,255,255,0.04);color:var(--muted)}
-.popup-settings{border-top:1px solid rgba(0,0,0,0.04);padding:.6rem .5rem .8rem;margin-top:.6rem}
-.popup-settings h4{margin:0 0 .35rem 0;font-size:.95rem;color:var(--muted)}
-/* Theme toggle inside popup: make it visually a rounded button */
+.popup-settings{margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--border)}
+.popup-settings h4{margin:0 0 .6rem .25rem}
+.popup-theme{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:.5rem}
 .popup-theme .theme-toggle{
-  width:44px;height:44px;padding:0.4rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.75));display:inline-flex;align-items:center;justify-content:center;color:var(--muted);
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;width:100%;min-height:48px;padding:.55rem .7rem;
+  border-radius:14px;cursor:pointer;font:inherit;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text);background:var(--hover-bg);border:1px solid var(--border-strong);
 }
-.popup-theme .theme-toggle[aria-pressed="true"]{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#021628;border-color:transparent}
-.theme-dark .popup-theme .theme-toggle{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-.popup-theme{display:flex;align-items:center;gap:.5rem}
-.popup-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.04);border:0;font-size:1rem;color:var(--muted);padding:6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;z-index:4}
-.theme-dark .popup-close{background:rgba(255,255,255,0.04);color:var(--muted)}
+.popup-theme .theme-toggle[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);border-color:transparent}
+.popup-theme .theme-toggle::after{content:'Dark mode'}
+.popup-theme .theme-toggle[aria-pressed="true"]::after{content:'Light mode'}
 
-/* Side switch button in popup settings */
-.popup-theme .side-switch{width:44px;height:44px;padding:.35rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));display:inline-flex;align-items:center;justify-content:center;color:var(--muted);box-shadow:0 6px 18px rgba(2,6,23,0.04)}
-.popup-theme .side-switch svg{display:block}
-.theme-dark .popup-theme .side-switch{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+/* ---------- 4. Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.4rem;border-radius:999px;font-size:.85rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+.btn:hover{text-decoration:none}
+.btn-primary{border:0;color:var(--on-accent);background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 10px 28px var(--accent-glow)}
+.btn-primary:hover{color:var(--on-accent);filter:brightness(1.06)}
+.cta{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.6rem}
 
-/* Positioning: desktop anchors near header top-right; mobile anchors near mobile button */
+/* ---------- 5. Home hero ---------- */
+.hero--large{padding:5rem 0 2rem}
+.hero-inner{display:flex;flex-direction:column;gap:2.5rem}
+.hero-profile{display:block}
+.hero-card{text-align:center}
+.hero-card .lead{margin-left:auto;margin-right:auto}
+.hero-card .cta{justify-content:center}
+.display-title{margin:0;font-size:clamp(3.2rem,12vw,9rem);line-height:.88;letter-spacing:-.045em}
+.display-title .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.subtitle{display:inline-block;margin:1.75rem 0 0;padding:.5rem 1rem;border:1px solid var(--bone);border-radius:999px;background:var(--bone-soft);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
+.lead{max-width:62ch;margin-top:1.1rem;font-size:1.15rem;line-height:1.6;color:var(--muted)}
+.hero-content .lead{font-size:clamp(1.05rem,1.6vw,1.35rem)}
+
+/* Signature image (swaps in for the text name once loaded; see main.js) */
+.signature-img{display:none}
+.display-title.has-signature{font-size:0;line-height:0;letter-spacing:0}
+.display-title.has-signature .first,
+.display-title.has-signature .accent{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.display-title.has-signature .signature-img{
+  display:block;width:min(100%,780px);aspect-ratio:2090/502;margin:0 auto;
+  background:#000;                              /* light mode: black ink */
+  -webkit-mask:url('../assets/signature.png?v=3') center/contain no-repeat;
+          mask:url('../assets/signature.png?v=3') center/contain no-repeat;
+  transition:background-color .32s ease;
+}
+.theme-dark .display-title.has-signature .signature-img{background:#fff}  /* dark mode: white ink */
+
+/* Featured project strip */
+.feature-card{
+  display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"tag title arrow" "tag meta arrow" "tag desc arrow";
+  align-items:center;column-gap:1.5rem;row-gap:.15rem;padding:1.5rem 1.75rem;border-radius:28px;cursor:pointer;
+  color:var(--text);background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));
+  border:1px solid var(--bone);box-shadow:var(--shadow);
+}
+.feature-card:hover{border-color:var(--accent)}
+.feature-card::after{
+  content:'↗';grid-area:arrow;display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;
+  border-radius:999px;font-size:1.4rem;font-weight:800;color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent-2));
+}
+.feature-card h4{grid-area:tag;margin:0;padding:.45rem .9rem;border:1px solid var(--bone);border-radius:999px;background:var(--bone-soft);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text)}
+.feature-card h3{grid-area:title;margin:0;font-family:var(--font-display);font-weight:900;font-size:clamp(1.2rem,2.4vw,1.7rem);letter-spacing:-.02em;text-transform:uppercase}
+.feature-card .muted,.feature-card .small{margin:0}
+.feature-card .muted{grid-area:meta;font-size:.9rem;font-weight:700;color:var(--accent)}
+.feature-card .small{grid-area:desc;color:var(--muted2)}
+#featured-project:focus-visible{outline:3px solid var(--text);outline-offset:4px}
+
+/* ---------- 6. Skills ---------- */
+.skills-list{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.2rem 0;padding:0;list-style:none}
+.skills-list li{
+  display:flex;align-items:center;justify-content:center;min-height:44px;padding:.5rem 1rem;border-radius:999px;
+  font-size:.92rem;font-weight:700;text-align:center;color:var(--muted);cursor:default;
+  background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid var(--border);
+}
+.skills-list li:hover,.skills-list li:focus{transform:translateY(-3px);color:var(--on-accent);border-color:transparent;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 10px 26px var(--accent-glow)}
+
+#skills{
+  display:grid;grid-template-columns:minmax(200px,1fr) 2.4fr;gap:2rem;align-items:start;
+  max-width:calc(var(--max) - 4rem);margin-top:1.25rem;padding:2.25rem;border-radius:32px;
+  background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid var(--border);box-shadow:var(--shadow);
+}
+#skills h2{margin:0}
+#skills .skills-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));margin:0}
+
+/* ---------- 7. Projects & lightbox ---------- */
+.projects-page{padding-top:3rem;padding-bottom:3rem}
+.projects-page>h1{margin-bottom:.5rem;font-size:clamp(2.8rem,9vw,6rem);line-height:.92;letter-spacing:-.04em}
+.projects-page>.lead{margin-top:0;max-width:58ch}
+.projects-columns,.project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;align-items:start;margin-top:1.5rem;align-content:start}
+html{overflow-y:scroll;scrollbar-gutter:stable}
+.project-card{display:flex;flex-direction:column}
+.project-card>p:not(.meta):not(.repo-link){flex:1 0 auto;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.8em}
+.project-card .meta{align-self:flex-start}
+.project-card .card-details{margin-top:auto}
+.project-grid>.project-card[hidden],.project-grid>[hidden]{display:none}
+.project-empty{grid-column:1/-1;margin:0;padding:2rem;text-align:center;color:var(--muted2)}
+
+/* Filters */
+.project-filters{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;margin-top:2rem}
+.filter-tabs,.filter-types{display:inline-flex;flex-wrap:wrap;gap:.35rem;padding:.3rem;border:1px solid var(--border-strong);border-radius:999px;background:var(--hover-bg)}
+.filter-tab,.filter-chip{padding:.55rem 1.1rem;border:0;border-radius:999px;background:transparent;cursor:pointer;font:inherit;font-size:.74rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.filter-tab:hover,.filter-chip:hover{color:var(--text)}
+.filter-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent)}
+.filter-chip.active{background:var(--bone-soft);box-shadow:inset 0 0 0 1px var(--bone);color:var(--text)}
+.status-badge{display:inline-block;margin-bottom:.8rem;padding:.25rem .7rem;border-radius:999px;background:var(--hover-bg-strong);font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
+.project-column{min-width:0}
+.column-head{margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border-strong)}
+.column-head h2{margin-bottom:.25rem;font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase}
+.column-head .small{margin:0}
+.project-list{display:flex;flex-direction:column;gap:1.25rem}
+.project-card,.project{
+  position:relative;margin:0;padding:1.75rem;border-radius:28px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;
+  background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));
+  transition:transform var(--medium) var(--ease),box-shadow var(--medium) var(--ease),border-color var(--medium) var(--ease);
+}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+.project-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--border-strong)}
+.project-card h3{margin:0 0 .6rem;font-family:var(--font-display);font-weight:900;font-size:clamp(1.3rem,2.6vw,1.7rem);letter-spacing:-.02em;text-transform:uppercase}
+.project-card>p{margin:0 0 .9rem;color:var(--muted)}
+.project-card .repo-link{margin:1.1rem 0 0}
+.meta{display:inline-block;margin:0;padding:.35rem .8rem;border:1px solid var(--bone);border-radius:999px;background:var(--bone-soft);font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text)!important}
+
+details>summary{list-style:none;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
+.card-details>summary{display:flex;align-items:center;justify-content:space-between;margin-top:.6rem;padding:.7rem 0;border-top:1px solid var(--border);font-size:.8rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.recent-update>summary,.update-history>summary{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;font-weight:700}
+.card-details>summary::after,.recent-update>summary::after,.update-history>summary::after{content:'+';font-size:1.2rem;font-weight:400;color:var(--accent);transition:transform var(--fast) var(--ease)}
+.card-details[open]>summary::after,.recent-update[open]>summary::after,.update-history[open]>summary::after{transform:rotate(45deg)}
+.card-body{padding-top:.5rem}
+.card-updates h4,.card-gallery h4{margin:.4rem 0;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
+.card-updates ul,.update-body ul{margin:0 0 .8rem 1.1rem;padding:0;color:var(--muted)}
+
+.card-gallery .thumbs{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}
+.thumb{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:16/10;overflow:hidden;border:1px solid var(--border);border-radius:16px;background:var(--thumb-bg);font-size:.85rem;color:var(--muted2)}
+.proj-img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;transition:transform var(--medium) var(--ease)}
+.thumb:hover .proj-img{transform:scale(1.06)}
+.img-dark,.theme-dark .img-light{display:none}
+.theme-dark .img-dark{display:block}
+
+.lightbox{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.lightbox-inner{position:relative;z-index:2;display:flex;align-items:center;gap:12px;max-width:95vw;max-height:90vh}
+.lb-media{display:flex;align-items:center;justify-content:center;width:calc(100vw - 220px);max-width:1200px;max-height:80vh;cursor:grab}
+.lb-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;border-radius:var(--radius-sm)}
+.lb-track::-webkit-scrollbar{height:8px}
+.lb-track-img{display:block;flex:0 0 100%;width:100%;min-width:100%;height:80vh;border-radius:var(--radius-sm);object-fit:contain;scroll-snap-align:start}
+.lb-img{display:none;cursor:grab}
+.lightbox.dragging .lb-media,.lightbox.dragging .lb-img{cursor:grabbing}
+.lb-close,.lb-prev,.lb-next{
+  display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;padding:0;border-radius:999px;cursor:pointer;
+  color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+}
+.lb-close:hover,.lb-prev:hover,.lb-next:hover{background:rgba(255,255,255,.22)}
+.lb-close{position:fixed;top:18px;right:18px;z-index:2100;width:44px;height:44px}
+.lb-close svg,.lb-prev svg,.lb-next svg{display:block;width:20px;height:20px;stroke:#fff;fill:none}
+.lb-counter{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);font-size:.95rem;letter-spacing:.08em;color:#fff}
+
+/* ---------- 8. About ---------- */
+.about-page{display:flex;flex-direction:column;gap:1.5rem;padding-top:3rem;padding-bottom:3rem}
+
+/* Intro header */
+.about-intro{padding:1rem 0 1.5rem}
+.eyebrow{display:inline-block;margin:0 0 1rem;padding:.4rem .9rem;border:1px solid var(--bone);border-radius:999px;background:var(--bone-soft);font-size:.72rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--text)}
+.about-intro h1{margin-bottom:1.25rem;font-size:clamp(3rem,10vw,7rem);line-height:.9;letter-spacing:-.04em}
+.about-intro .lead{max-width:48ch;margin:0;font-size:clamp(1.1rem,2vw,1.5rem);line-height:1.5}
+
+/* Panels */
+.about-panel,.about-callout,.mini-card{
+  border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+  background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));
+}
+.about-panel{padding:2rem;border-radius:28px}
+.about-panel h2{margin-bottom:1rem}
+.about-panel p:last-child{margin-bottom:0}
+.about-panel p{max-width:68ch;font-size:1.08rem;color:var(--muted)}
+
+/* Background + side cards */
+.about-hero{display:grid;grid-template-columns:1.6fr 1fr;gap:1.5rem;align-items:stretch}
+.about-side-hero{display:flex;flex-direction:column;gap:1.5rem}
+.about-callout,.mini-card{padding:1.5rem}
+.about-callout{flex:1;border-left:5px solid var(--bone)}
+.about-callout p{margin:0;color:var(--muted)}
+.mini-card{background:linear-gradient(180deg,var(--bone-soft),var(--card-surface-2))}
+.mini-card h4,.about-callout h4{margin:0 0 .6rem;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2)}
+.mini-card ul{margin:0;padding:0;list-style:none}
+.mini-card li{padding:.5rem 0;border-top:1px solid var(--border);font-weight:600}
+.mini-card li:first-child{border-top:0;padding-top:0}
+
+/* Skills */
+.about-skills-panel .skills-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem;margin:0}
+
+/* ---------- 9. Footer & back-to-top ---------- */
+.site-footer{position:relative;z-index:20;margin-top:3rem;padding:2.5rem 0;color:var(--muted);background:var(--footer-bg);border-top:1px solid var(--border)}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:1.5rem}
+.footer-left{font-size:.95rem}
+.footer-left p{margin:.2rem 0 0}
+.footer-right{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+.footer-email{margin-bottom:.25rem;font-size:.98rem}
+.footer-email a{font-weight:600;color:var(--muted);text-decoration:none}
+.footer-email a:hover{color:var(--accent);text-decoration:underline}
+.footer-links{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem;margin:0;padding:0;list-style:none}
+.footer-links li+li::before{content:"•";margin:0 .4rem;color:var(--muted2)}
+.footer-links a{padding:.25rem .4rem;border-radius:8px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--muted2)}
+.footer-links a:hover{color:var(--text);background:var(--hover-bg)}
+
+.back-to-top{
+  position:fixed;left:50%;bottom:28px;z-index:1800;display:inline-flex;align-items:center;justify-content:center;
+  width:46px;height:46px;border-radius:999px;cursor:pointer;color:var(--text);
+  background:var(--frost);border:1px solid var(--border);box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  opacity:0;pointer-events:none;transform:translateX(-50%) translateY(8px);
+  transition:transform .28s var(--ease),opacity .22s ease,background-color .2s ease;
+}
+.back-to-top:hover{color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.back-to-top.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.back-to-top svg{display:block;width:18px;height:18px}
+
+/* ---------- 10. Resume, hover effects, motion ---------- */
+.page-resume .resume-page{padding:3rem 0}
+.page-resume .resume-doc{
+  max-width:900px;margin:0 auto;padding:2.5rem;color:var(--text);
+  background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));
+  border:1px solid var(--border);border-radius:28px;box-shadow:var(--shadow-lg);
+}
+.resume-doc section{margin:1.75rem 0 0;text-align:left}
+.resume-doc section h2{text-align:center}
+.resume-doc section h2::after{margin-left:auto;margin-right:auto}
+.resume-doc h3{margin-top:1rem}
+.resume-doc ul{padding-left:1.2rem}
+.resume-doc li{margin-bottom:.3rem}
+.resume-doc,.resume-doc p,.resume-doc li{color:var(--text)}
+.resume-doc .resume-header{margin-bottom:1rem;text-align:center}
+.resume-doc .resume-header h1{margin-bottom:.4rem}
+.resume-doc .resume-header p{margin:0 0 .25rem}
+.resume-doc .portfolio-link{text-align:center}
+.resume-doc .muted,.resume-doc .meta{color:var(--muted2)}
+/* Visually hidden parts of the LinkedIn URL (kept in the DOM for copy/paste) */
+.resume-doc .link-id,.resume-doc .link-hidden{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(0) scale(.98)}
+  .project:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+  .feature-card:hover{transform:translateY(-4px)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+
+/* ---------- Responsive: desktop menu vs. mobile menu ---------- */
 @media (min-width:900px){
   .popup-menu{top:18px;right:18px}
 }
-
 @media (max-width:899px){
-  /* mobile popup anchored above the mobile button by default; we'll position JS-side when opening to keep it above the button */
+  .nav,.site-header .nav-toggle{display:none}
+  .mobile-nav-toggle{display:inline-flex;top:16px;bottom:auto;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+  .mobile-nav-toggle.bottom{top:70vh;bottom:auto}
+  .menu-tl .site-header .brand{margin-left:auto;flex-direction:row-reverse}
+  .mobile-nav-toggle.dragging{cursor:grabbing;transition:none;opacity:.9}
   .popup-menu{right:18px}
-  .popup-inner{min-width:200px}
+  .popup-inner{width:260px}
 }
 
-/* ------------------ Mobile fixed hamburger ------------------ */
-.mobile-nav-toggle{position:fixed;right:18px;z-index:1700;
-  /* frosted glass look in light mode */
-  background: var(--overlay-frost);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border:1px solid var(--header-border);
-  padding:.6rem .7rem;border-radius:999px;box-shadow:0 8px 24px rgba(2,6,23,0.08);font-size:1.15rem;display:none;color:var(--text)}
-@media (max-width:899px){
-  /* place ~75% down the screen on the lower-right side */
-  .mobile-nav-toggle{display:inline-flex;bottom:25%;transform:translateY(25%)}
-}
-
-/* Dark theme: ensure the mobile hamburger glyph is visible against the darker surface */
-.theme-dark .mobile-nav-toggle{color:var(--text);border-color:rgba(255,255,255,0.06);background:var(--surface)}
-
-/* Support left-handed placement for mobile hamburger */
-.mobile-nav-toggle.left{right:auto;left:18px}
-
-/* side toggle control visible only on mobile popup settings */
-.popup-side-toggle{display:none;align-items:center;gap:.5rem}
-@media (max-width:899px){
-  .popup-side-toggle{display:flex}
-}
-
-/* On small screens hide the header's top-right hamburger so only the floating mobile button is present */
-@media (max-width:899px){
-  .site-header .nav-toggle { display: none; }
-}
-
-/* Make sure header nav-toggle (top-right) remains visible on desktop */
-@media (min-width:900px){
-  .nav-toggle{font-size:1.15rem}
-
-  /* Desktop: make the header hamburger visually match the mobile frosted button */
-  .site-header .nav-toggle{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:44px;height:44px;padding:.4rem;border-radius:999px;
-    background:var(--overlay-frost);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-    border:1px solid var(--header-border);box-shadow:0 8px 24px rgba(2,6,23,0.06);
-    color:var(--text);font-size:1.15rem
-  }
-  .site-header .nav-toggle:hover{background:var(--overlay-link-bg-hover);color:var(--text)}
-  /* dark theme desktop variant */
-  .theme-dark .site-header .nav-toggle{background:var(--surface);border-color:rgba(255,255,255,0.06);color:var(--text)}
-}
-
-
-/* -----------------------------
-   Hero / Intro
-  .hero--large{position:relative;padding:6rem 0 4rem;overflow:hidden}
-  .hero-bg{position:absolute;inset:0;background-image:url('../assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
-  .hero-inner{display:flex;gap:2rem;align-items:stretch}
-  .hero-content{flex:1;max-width:720px}
-  .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
-  /* Light-mode: use the buttons' dark-theme accent gradient for the last name */
-  .display-title .accent{background:linear-gradient(90deg,#9ca3af,#5bd4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .subtitle{color:var(--muted);margin-top:.5rem;font-weight:600}
-  .lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
-  /* ------------------ Hero / Intro ------------------ */
-  .hero--large{position:relative;padding:6rem 0 4rem;overflow:hidden}
-  .hero-bg{position:absolute;inset:0;background-image:url('../assets/hero-ornament.svg');background-repeat:no-repeat;background-position:right center;background-size:contain;opacity:.18;filter:grayscale(10%);transform:translateZ(0)}
-  .hero-inner{display:flex;gap:2rem;align-items:stretch}
-  .hero-content{flex:1;max-width:720px}
-  .display-title{font-size:5rem;line-height:0.9;margin:0;font-weight:800;letter-spacing:-1px}
-  /* Light-mode: use the buttons' dark-theme accent gradient for the last name */
-  .display-title .accent{background:linear-gradient(90deg,#9ca3af,#5bd4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .subtitle{color:var(--muted);margin-top:.5rem;font-weight:600}
-  .lead{margin-top:1rem;color:var(--muted2);font-size:1.05rem}
-
-  /* ------------------ About lead adjustments ------------------ */
-  .about-page .lead{background:transparent;color:var(--text);padding:0;border-radius:0;border:0;font-size:1.05rem}
-  .about-page section{background:transparent}
-
-  .cta{margin-top:1.6rem;display:flex;gap:0.75rem}
-  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1rem;border-radius:10px;text-decoration:none;font-weight:600}
-  .btn-primary{background:linear-gradient(90deg,var(--accent),#5bd4ff);color:#021628;box-shadow:0 8px 30px rgba(119,182,255,0.12)}
-  .btn-outline{border:1px solid rgba(0,0,0,0.08);background:transparent;color:var(--muted)}
-
-  .hero-side{width:320px;display:flex;align-items:flex-start;justify-content:flex-end}
-  .feature-card{background:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.04));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.06);width:260px}
-  .feature-card .muted{color:var(--muted2);font-size:.9rem;margin-top:.2rem}
-  .feature-card .small{font-size:.85rem;color:var(--muted2);margin-top:.6rem}
-
-.hero-side{width:320px;display:flex;align-items:flex-start;justify-content:flex-end}
-.feature-card{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));backdrop-filter:blur(var(--glass-blur));padding:1rem;border-radius:14px;border:1px solid rgba(0,0,0,0.06);width:260px}
-.feature-card h4{margin:0 0 .2rem 0;color:#5bd4ff}
-.feature-card .muted{color:var(--muted2);font-size:.9rem;margin-top:.2rem}
-.feature-card .small{font-size:.85rem;color:var(--muted2);margin-top:.6rem}
-
-
-/* -----------------------------
-   Cards / Lists
-   ----------------------------- */
-.intro-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:2rem}
-.card{padding:1.25rem;border-radius:12px}
-.glass{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border:1px solid rgba(0,0,0,0.06);backdrop-filter:blur(var(--glass-blur))}
-
-/* Intro cards hover animation: subtle lift and scale on hover for interactive affordance */
-.intro-cards .card{transition:transform var(--motion-fast) cubic-bezier(.2,.9,.2,1),box-shadow var(--motion-fast) ease,background-color var(--motion-fast) ease,opacity var(--motion-fast) ease}
-.intro-cards .card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 18px 36px rgba(2,6,23,0.08)}
-.intro-cards .card:active{transform:translateY(-2px) scale(1.01)}
-
-/* Featured project cursor and focus styles */
-#featured-project{cursor:pointer}
-#featured-project:focus{outline:2px solid rgba(11,132,255,0.14);outline-offset:4px}
-#featured-project:hover{transform:translateY(-4px);box-shadow:0 20px 36px rgba(2,6,23,0.12)}
-#featured-project{transition:transform var(--motion-fast) cubic-bezier(.2,.9,.2,1),box-shadow var(--motion-fast) ease,background-color var(--motion-fast) ease,opacity var(--motion-fast) ease}
-
-.skills-list{display:flex;gap:1rem;list-style:none;padding:0;margin:1rem 0;flex-wrap:wrap}
-.skills-list li{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));padding:.5rem .75rem;border-radius:999px;color:var(--muted);font-weight:600}
-/* Make skill items look like interactive pills with hover/focus styles */
-.skills-list li{
-  transition:transform var(--motion-fast) ease,background-color var(--motion-fast) ease,color var(--motion-fast) ease,box-shadow var(--motion-fast) ease;
-  cursor:default;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  white-space:normal; /* allow wrapping for long labels */
-  min-height:44px; /* uniform button height */
-  padding:.5rem .9rem;
-  text-align:center;
-}
-.skills-list li:hover,
-.skills-list li:focus{
-  transform:translateY(-4px);
-  background:linear-gradient(90deg,var(--accent),var(--accent-2));
-  color:#021628; /* light-mode hover color remains dark text */
-  box-shadow:0 10px 30px rgba(2,6,23,0.08);
-}
-/* Dark theme: make hovered pill text the light blue link color for contrast */
-.theme-dark .skills-list li:hover,
-.theme-dark .skills-list li:focus{
-  color: var(--link);
-}
-.skills-list.about-skills li{margin-bottom:0.25rem}
-
-/* Improve grid filling to avoid an orphan item in its own row */
-#skills .skills-list{
-  grid-auto-rows: minmax(44px, auto);
-  grid-auto-flow: dense;
-}
-.about-side .skills-list{
-  grid-auto-rows: minmax(40px, auto);
-}
-
-/* ------------------ Skills layout overrides ------------------ */
-/* Home page: compact, centered grid so pills don't look uneven */
-#skills .skills-list{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:.6rem;
-  align-items:center;
-  justify-items:center;
-  margin-top:1rem;
-}
-#skills .skills-list li{
-  padding:.45rem .7rem;
-  font-size:0.95rem;
-  min-width:110px;
-  text-align:center;
-}
-
-/* About page sidebar: two-column compact list to reduce vertical length */
-.about-side .skills-list{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(120px,1fr));
-  gap:.5rem;
-  align-items:start;
-}
-.about-side .skills-list li{
-  padding:.4rem .6rem;
-  font-size:0.95rem;
-  justify-self:start;
-}
-
-@media (max-width:700px){
-  /* On smaller screens stack home skills into two columns for readability */
-  #skills .skills-list{grid-template-columns:repeat(2,minmax(120px,1fr));}
-  .about-side .skills-list{grid-template-columns:repeat(2,minmax(120px,1fr));}
-}
-
-.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-top:1rem}
-.project{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));padding:1rem;border-radius:12px;border:1px solid rgba(0,0,0,0.06)}
-.meta{color:var(--muted2);font-size:.9rem}
-
-/* Projects page: collapsible sections and project cards */
-.collapsible-section{margin-top:1.5rem;border-radius:12px;padding:0;border:1px solid rgba(0,0,0,0.04);background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));}
-.collapsible-section > summary{list-style:none;cursor:pointer;padding:1rem 1.25rem;font-weight:700}
-.collapsible-section > summary::-webkit-details-marker{display:none}
-.collapsible-section[open]{box-shadow:0 12px 36px rgba(2,6,23,0.06)}
-
-.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;padding:1rem}
-.project-card{background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border-radius:10px;padding:1rem;border:1px solid rgba(0,0,0,0.04)}
-.project-card h3{margin:0 0 .35rem 0}
-.project-card .repo-link{margin-top:.5rem}
-
-.card-details summary{cursor:pointer;padding:.5rem 0;font-weight:600}
-.card-details summary::-webkit-details-marker{display:none}
-.card-body{padding:.5rem 0;border-top:1px dashed rgba(255,255,255,0.02)}
-
-.card-updates h4,.card-gallery h4{margin:0 0 .4rem 0;font-size:1rem}
-.card-updates ul{margin:0 0 1rem 1.1rem}
-
-.card-gallery .thumbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem}
-.thumb{height:90px;background:var(--thumb-bg);display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--muted2)}
-.thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}
-
-/* Project screenshot dark/light variants */
-.proj-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
-.thumb{position:relative;overflow:hidden}
-.img-light{display:block}
-.img-dark{display:none}
-.theme-dark .img-light{display:none}
-.theme-dark .img-dark{display:block}
-
-/* Lightbox styles */
-.lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:2000}
-.lightbox.open{display:flex}
-.lightbox-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6)}
-.lightbox-inner{position:relative;z-index:2;max-width:90vw;max-height:90vh;display:flex;align-items:center;gap:12px}
-.lb-media{width:calc(100vw - 220px);max-width:1200px;max-height:80vh;display:flex;align-items:center;justify-content:center}
-/* Track for horizontal swipe — uses scroll-snap to behave like paging */
-.lb-track{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0;border-radius:8px}
-.lb-track::-webkit-scrollbar{height:8px}
-.lb-track-img{flex:0 0 100%;min-width:100%;width:100%;height:80vh;border-radius:8px;object-fit:contain;scroll-snap-align:start;display:block}
-.lb-img{display:none}
-/* Lightbox controls: circular buttons matching the back-to-top visual style */
-.lb-close,.lb-prev,.lb-next{
-  /* Prev/Next keep the circular affordance; close will be icon-only visually. */
-  border:1px solid rgba(0,0,0,0.06);
-  width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;
-  border-radius:999px;cursor:pointer;color:var(--text);box-shadow:0 6px 20px rgba(2,6,23,0.08);
-}
-.lb-prev,.lb-next{font-size:1.1rem;width:48px;height:48px}
-/* Place the close control in the top-right of the viewport (match overlay/hamburger) */
-.lb-close{position:fixed;top:18px;right:18px;z-index:2100}
-
-/* Make the close control visually icon-only (no filled circle) so the X stands alone.
-  Keep the clickable area for accessibility but remove the visible background and shadow. */
-.lb-close{background:transparent;border:0;padding:6px;width:40px;height:40px}
-.lb-close svg{width:18px;height:18px;display:block}
-
-/* Make inline SVGs inside controls match the back-to-top icon sizing and inherit color */
-.lb-close svg, .lb-prev svg, .lb-next svg{width:18px;height:18px;display:block;stroke:currentColor;fill:none}
-.lb-prev svg, .lb-next svg{width:20px;height:20px}
-
-/* Dark mode: make controls lighter on dark background and use accent color for icons/text */
-.theme-dark .lb-close,
-.theme-dark .lb-prev,
-.theme-dark .lb-next{
-  /* Make the icon itself the visible element in dark mode (white text/icon),
-    don't rely on a bright background color. Keep a subtle border for affordance. */
-  background: transparent;
-  border:1px solid rgba(255,255,255,0.08);
-  color: var(--text); /* --text is light in dark theme (near-white) */
-  box-shadow:none;
-}
-
-/* Explicitly set svg strokes for dark mode controls and the back-to-top so
-   icons render white in dark themes. */
-.theme-dark .lb-prev svg,
-.theme-dark .lb-next svg,
-.theme-dark .lb-close svg,
-.theme-dark .back-to-top svg{
-  stroke: #fff;
-  fill: none;
-}
-
-/* For light mode keep the close icon muted so it remains visible against light backgrounds */
-.lb-close svg{stroke:var(--muted2)}
-.lb-counter{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.95rem}
-/* Ensure counter text is visible in light mode and crisp (no washed shadow) */
-.lb-counter{color:var(--text);text-shadow:none}
-.theme-dark .lb-counter{color:var(--muted)}
-
-/* Show grab cursor and dragging cursor when pointer-dragging the image */
-.lb-media, .lb-img{cursor:grab}
-.lightbox.dragging .lb-media, .lightbox.dragging .lb-img{cursor:grabbing}
-
-@media (max-width:800px){
-  .lb-media{width:calc(100vw - 120px)}
-  .lb-prev,.lb-next{padding:.5rem}
-}
-
-@media (max-width:700px){
-  .projects-grid{grid-template-columns:1fr}
-  .collapsible-section{padding:0}
-}
-
-/* Two-column projects layout */
-.projects-section{margin-top:1.5rem}
-.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;padding:1rem 0}
-
-/* Small vertical space for stacked project cards inside collapsible sections
-  — avoids doubling spacing in grid layouts while giving stacked cards breathing room */
-.collapsible-section .project-card + .project-card{margin-top:.75rem}
-.project-card{margin:0;background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));border-radius:10px;padding:1rem;border:1px solid rgba(0,0,0,0.06)}
-
-
-/* Ensure small screens stack columns */
+/* ---------- Responsive: tablet ---------- */
 @media (max-width:900px){
-  .projects-columns{grid-template-columns:1fr}
-  .project-column{min-height:40vh}
+  .project-grid{grid-template-columns:1fr}
+  .project-filters{flex-direction:column;align-items:stretch;gap:.75rem;margin-top:1.25rem}
+  .filter-tabs,.filter-types{display:grid;gap:.25rem;width:100%;border-radius:22px}
+  .filter-tabs{grid-template-columns:repeat(4,1fr)}
+  .filter-types{grid-template-columns:repeat(3,1fr)}
+  .filter-tab,.filter-chip{min-width:0;padding:.6rem .25rem;font-size:.62rem;letter-spacing:.04em;text-align:center;white-space:nowrap}
+  .hero--large{padding:3.5rem 0 2rem}
+  .about-hero{grid-template-columns:1fr}
+  .about-panel{padding:1.5rem}
+  #skills{grid-template-columns:1fr;gap:1rem;margin-left:1rem;margin-right:1rem;padding:1.5rem}
 }
 
-/* Global link styles (content links). Nav links have their own rules and remain unchanged */
-a{color:var(--link)}
-a:hover{color:var(--link-hover);text-decoration:underline}
-
-
-
-/* -----------------------------
-   Footer
-   ----------------------------- */
-.site-footer{position:relative;z-index:20;padding:2rem 0;color:var(--muted);background-color:var(--footer-solid);border-top: 1px solid var(--header-border)}
-.site-footer .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.site-footer .footer-left{font-size:.95rem;color:var(--muted)}
-.site-footer .footer-right{display:flex;flex-direction:column;gap:.5rem;align-items:flex-end}
-.site-footer .footer-right a{color:var(--muted);text-decoration:none;padding:.4rem .6rem;border-radius:8px}
-.site-footer .footer-right a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
-
-/* Cleaner footer link list */
-.footer-links{display:flex;gap:.25rem;list-style:none;padding:0;margin:0;align-items:center}
-.footer-links li{margin:0;padding:0}
-.footer-links li + li::before{content:"•";margin:0 .5rem;color:var(--muted2)}
-.footer-links a{color:var(--muted2);padding:.25rem .4rem;border-radius:6px;font-size:.95rem}
-.footer-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
-
-/* On small screens show stacked layout */
-.site-footer .footer-right .footer-links{display:flex;gap:.25rem;align-items:center}
-
-@media (max-width:900px){
-  /* keep footer links compact on medium screens */
-  .site-footer .footer-right .footer-links{gap:.5rem}
-}
-
-@media (max-width:600px){
-  .site-footer .footer-inner{flex-direction:column;align-items:flex-start}
-  .footer-right{align-items:flex-start}
-  .footer-links{flex-wrap:wrap;gap:.5rem;margin-top:.25rem}
-  .footer-links li + li::before{content:"";margin:0}
-}
-
-/* Back to top button */
-.back-to-top{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);z-index:1800;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:999px;background:var(--surface);color:var(--text);border:1px solid rgba(0,0,0,0.06);box-shadow:0 6px 20px rgba(2,6,23,0.08);cursor:pointer;opacity:0;pointer-events:none;transition:transform .28s var(--motion-medium),opacity .22s var(--motion-fast)}
-.back-to-top.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
-.back-to-top:focus{box-shadow:0 0 0 4px rgba(10,132,255,0.12)}
-.back-to-top svg{width:18px;height:18px;display:block}
-
+/* ---------- Responsive: phone ---------- */
 @media (max-width:700px){
-  /* Move to bottom-right on smaller screens */
-  .back-to-top{left:auto;right:18px;transform:translateY(8px);translate:none}
+  .back-to-top{left:auto;right:18px;transform:translateY(8px)}
   .back-to-top.visible{transform:translateY(0)}
 }
-
-@media (prefers-reduced-motion: reduce){
-  .back-to-top{transition:none}
-}
-
-/* Resume page: place the resume on a solid surface background
-   - Use --surface so light/dark modes remain consistent
-   - Keep footer as the lighter frosted area below
- */
-.page-resume{background:var(--bg) !important;color:var(--text)}
-.page-resume .resume-page{background:transparent;padding:3rem 0}
-.page-resume .resume-page .container{padding-top:0;padding-bottom:0}
-.page-resume .resume-doc{max-width:900px;margin:0 auto;padding:1.25rem;border-radius:0;background:transparent;color:var(--text)}
-.resume-doc section{margin:0 0 1rem 0}
-
-/* Ensure resume body copy uses the primary text color for contrast */
-.page-resume .resume-doc,
-.page-resume .resume-doc p,
-.page-resume .resume-doc li,
-.page-resume .resume-doc ul,
-.page-resume .resume-doc a{
-  color: var(--text);
-}
-
-/* Keep small metadata muted but readable */
-.page-resume .resume-doc .muted,
-.page-resume .resume-doc .meta{color:var(--muted2)}
-
-/* Email line shown above footer links */
-.footer-email{font-size:.98rem;color:var(--muted);margin-bottom:.25rem}
-.footer-email a{color:var(--muted2);text-decoration:none}
-.footer-email a:hover{color:var(--text);text-decoration:underline}
-
-@media (max-width:600px){
-  .footer-email{margin-top:0.5rem}
-}
-
-@media (max-width:600px){
-  .site-footer .footer-inner{flex-direction:column;align-items:flex-start}
-  .site-footer{padding:1.25rem}
-}
-
-/* Ensure resume page footer uses the same footer background and resume doc surface is consistent */
-/* Allow the page background gradient to show through the footer so the
-  resume background runs to the very bottom. If you prefer a solid band
-  we can reintroduce --footer-solid specifically for other pages. */
-/* Keep footer appearance consistent site-wide using the footer-solid token.
-  Dark-mode value is a solid #0b0b0b; light-mode has a subtle light value. */
-.page-resume .site-footer{background-color:var(--footer-solid)}
-.page-resume .resume-doc{background:transparent;box-shadow:none;border:0}
-
-/* Remove frosted / card-like surfaces inside the resume page to keep a flat, solid look */
-.page-resume .card,
-.page-resume .glass,
-.page-resume .feature-card,
-.page-resume .project,
-.page-resume .intro-cards .card{
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-/* Also make any section-level surfaces transparent on resume */
-.page-resume section{background:transparent !important}
-
-/* Force the resume content area to be flat so the page background shows through
-   - only target the main resume content (leave header/footer alone) */
-.page-resume .resume-page,
-.page-resume .resume-doc,
-.page-resume .resume-doc *,
-.page-resume main,
-.page-resume main * {
-  background: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
-  border-color: transparent !important;
-}
-
-/* Extracted resume layout (migrated from inline styles in resume.html) */
-.page-resume .resume-doc {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1rem;
-  color: var(--text);
-}
-.page-resume .resume-doc > .resume-header {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-.page-resume .resume-doc > .resume-header h1 { margin-bottom: .25rem; }
-.page-resume .resume-doc > .resume-header p { margin: 0 0 .25rem 0; }
-.page-resume .resume-doc section { text-align: left; margin-top: 1.25rem; }
-.page-resume .resume-doc section h2 { text-align: center; }
-.page-resume .resume-doc section:last-of-type { margin-bottom: 1rem; }
-.page-resume .resume-doc .portfolio-link { text-align: center; }
-.page-resume .resume-doc .link-id {
-  /* visually hide the trailing id but keep it in the DOM for copy/paste and screen readers */
-  position: absolute !important;
-  left: -9999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-}
-
-.page-resume .resume-doc .link-hidden {
-  /* visually hide the leading www. while keeping it accessible */
-  position: absolute !important;
-  left: -9999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-}
-
-/* Ensure the resume content is transparent so the page background (gradient) shows
-   through fully down to the footer. This removes boxed/solid panels behind text. */
-.page-resume main,
-.page-resume .resume-doc,
-.page-resume .resume-doc section {
-  background: transparent !important;
-  background-image: none !important;
-}
-
-/* Remove any pseudo-element decorations or background-images applied by components
-   inside the resume page which can create dark boxes or panels. */
-.page-resume *::before,
-.page-resume *::after {
-  background: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
-  content: none !important;
-}
-
-
-
-/* Ensure wrappers and containers are transparent on the resume so the body gradient
-   remains visible between content and footer. */
-.page-resume .container,
-.page-resume .resume-page {
-  background: transparent !important;
-}
-
-
-/* -----------------------------
-   Interactions & Accessibility
-   ----------------------------- */
-/* Base transition for interactive things */
-button, a, .btn, .nav a, .overlay-nav a, .project, .card, .feature-card, .skills-list li, .theme-toggle, .nav-toggle {
-  transition: transform var(--motion-fast) cubic-bezier(.2,.9,.2,1),box-shadow var(--motion-fast) ease,background-color var(--motion-fast) ease,opacity var(--motion-fast) ease;
-  will-change: transform, box-shadow, opacity;
-}
-
-@media (prefers-reduced-motion: reduce){
-  button, a, .btn, .nav a, .overlay-nav a, .project, .card, .feature-card, .skills-list li { transition: none; }
-}
-
-@media (hover: hover) and (pointer: fine){
-  .btn:hover{ transform: translateY(-3px); box-shadow: var(--elevation-shadow); }
-  .btn:active{ transform: translateY(-1px) scale(.995); box-shadow: 0 6px 18px rgba(2,6,23,0.06); }
-  .nav a:hover{ transform: translateY(-2px); color: var(--text); }
-  .overlay-nav a:hover{ transform: scale(1.02); filter:brightness(1.03); }
-  .project:hover{ transform: translateY(-8px); box-shadow: 0 20px 40px rgba(2,6,23,0.12); }
-  .feature-card:hover{ transform: translateY(-6px); box-shadow: 0 18px 36px rgba(2,6,23,0.10); }
-  .skills-list li:hover{ transform: translateY(-3px); background: rgba(0,0,0,0.04); }
-}
-
-:focus{outline:none}
-.btn:focus-visible, .nav a:focus-visible, .overlay-nav a:focus-visible, .theme-toggle:focus-visible, .nav-toggle:focus-visible{box-shadow: 0 0 0 4px rgba(10,132,255,0.12);border-radius:8px}
-
-/* small utility */
-.muted{color:var(--muted2)}
-
-/* Responsive layout adjustments */
-@media (max-width:900px){
-  .hero-inner{flex-direction:column}
-  .hero-side{width:100%;display:block}
-  .feature-card{width:100%}
-  .display-title{font-size:3.25rem}
-  .nav{display:none}
-  .nav.open{display:flex;flex-direction:column;gap:.25rem;background:rgba(255,255,255,0.02);padding:.5rem;border-radius:10px}
-  .nav.open{position:absolute;top:64px;right:1rem;left:1rem;background:var(--surface);backdrop-filter:blur(6px);box-shadow:0 10px 30px rgba(2,6,23,0.35)}
-}
-
-/* Dark-mode: force homepage name and featured heading to the blue accent for emphasis */
-.theme-dark .hero .display-title .accent,
-.theme-dark .feature-card h4 {
-  /* Dark-mode: use the buttons' light-theme gradient for emphasis */
-  background: linear-gradient(90deg,#0a84ff,#5bd4ff);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color: transparent;
-}
-
 @media (max-width:600px){
   .container{padding:1rem}
-  .hero--large{padding:3rem 0 2rem}
-  .hero-bg{display:none}
-  .display-title{font-size:2.25rem}
+  .hero--large{padding:2rem 0 1.5rem}
   .lead{font-size:1rem}
-  .hero-side{order:2;margin-top:1rem}
-  .feature-card{width:100%;padding:.75rem}
-  .header-inner{gap:.5rem}
-  .nav a{padding:.75rem 1rem;border-radius:8px;font-size:1rem}
-  .header-actions{gap:.25rem}
-  .theme-toggle{padding:.5rem;border-radius:10px}
+  .cta .btn{flex:1 1 100%}
+  .feature-card{
+    grid-template-columns:1fr auto;grid-template-areas:"tag arrow" "title arrow" "meta arrow" "desc desc";
+    justify-items:start;row-gap:.35rem;padding:1.25rem;border-radius:22px;
+  }
+  .feature-card::after{justify-self:end;width:44px;height:44px}
+  #skills{margin-left:0;margin-right:0;border-radius:24px}
+  #skills .skills-list{grid-template-columns:repeat(2,1fr)}
+  .project-card{padding:1.2rem}
+  .page-resume .resume-doc{padding:1.25rem;border-radius:20px}
+  .site-footer{padding:1.5rem 0}
+  .footer-inner{flex-direction:column;align-items:flex-start}
+  .footer-right{align-items:flex-start}
+  .footer-links{gap:.4rem}
+  .footer-links li+li::before{content:"";margin:0}
 }
-
-/* -----------------------------
-   About page enhancements
-   ----------------------------- */
-.about-hero{display:grid;grid-template-columns:1fr 320px;gap:2rem;align-items:start;margin-top:1.25rem}
-.about-content{min-width:0}
-.about-callout{margin-top:0;padding:0.85rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));}
-.about-callout p{margin:0}
-
-.about-body{display:grid;grid-template-columns:1fr 320px;gap:2rem;margin-top:1.25rem}
-.about-side{padding:0}
-.about-skills{display:flex;flex-direction:column;gap:.5rem;padding:0;margin:0;list-style:none}
-.about-skills li{padding:.45rem .6rem;border-radius:8px;background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2));font-weight:600}
-
-.mini-card{margin-top:1rem;padding:.75rem;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:linear-gradient(180deg,var(--card-surface),var(--card-surface-2))}
-.mini-card h4{margin:0 0 .4rem 0}
-
-@media (max-width:900px){
-  .about-hero{grid-template-columns:1fr}
-  .about-body{grid-template-columns:1fr}
+@media (max-width:800px){
+  .lb-media{width:calc(100vw - 120px)}
+  .lb-prev,.lb-next{width:40px;height:40px}
 }
-
-/* Focus outlines for keyboard users */
-.nav a:focus, .theme-toggle:focus, .nav-toggle:focus, .btn:focus{outline:2px solid rgba(0,0,0,0.08);outline-offset:2px}
-

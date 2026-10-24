@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const YEAR = new Date().getFullYear();
   qsa('[data-year]').forEach(el => el.textContent = YEAR);
 
+  /* ------------------ Signature (swaps in for the text name once the image is available) ------------------ */
+  qsa('.signature-img').forEach(el => {
+    const probe = new Image();
+    probe.onload = () => el.parentNode.classList.add('has-signature');
+    probe.src = 'assets/signature.png?v=3';
+  });
+
   /* ------------------ Theme system ------------------ */
   const root = document.documentElement;
   const THEME_KEY = 'site-theme';
@@ -60,39 +67,63 @@ document.addEventListener('DOMContentLoaded', () => {
   const popupClose = qs('.popup-close');
   const headerToggles = qsa('.nav-toggle');
   const mobileToggle = qs('.mobile-nav-toggle');
-  const MOBILE_SIDE_KEY = 'mobile-hamburger-side'; // 'right' or 'left'
+  const CORNER_KEY = 'mobile-hamburger-corner'; // tr | tl | br | bl
 
-  // apply stored mobile side preference
-  function applyMobileSide(side) {
+  // Apply a corner to the floating mobile button (classes drive CSS placement)
+  function applyCorner(corner) {
     if (!mobileToggle) return;
-    if (side === 'left') mobileToggle.classList.add('left'); else mobileToggle.classList.remove('left');
-  // remove any inline positioning so CSS can handle it
-  mobileToggle.style.left = '';
-  mobileToggle.style.right = '';
-    // if popup is currently open on mobile, reposition it to remain above the button
-    try {
-      if (popup && popup.classList.contains('open') && window.innerWidth < 900) {
-        const rect = mobileToggle.getBoundingClientRect();
-        const sideLeft = mobileToggle.classList.contains('left');
-        if (sideLeft) {
-          popup.style.left = (rect.left) + 'px';
-          popup.style.right = '';
-        } else {
-          popup.style.right = (window.innerWidth - rect.right) + 'px';
-          popup.style.left = '';
-        }
-        const top = Math.max(12, rect.top - (popup.offsetHeight + 8));
-        popup.style.top = top + 'px';
-      }
-    } catch (e) { /* ignore */ }
+    mobileToggle.classList.toggle('left', corner[1] === 'l');
+    mobileToggle.classList.toggle('bottom', corner[0] === 'b');
+    // brand moves to the right only when the button is at the top-left
+    document.documentElement.classList.toggle('menu-tl', corner === 'tl');
+    mobileToggle.style.left = mobileToggle.style.top = mobileToggle.style.right = mobileToggle.style.bottom = '';
   }
 
-  // initialize side preference
-  (function initMobileSide() {
-    try {
-      const s = localStorage.getItem(MOBILE_SIDE_KEY) || 'right';
-      applyMobileSide(s);
-    } catch (e) {}
+  // Position the popup beside the button: below it at the top, above it at the bottom
+  function placePopup(rect) {
+    const sideLeft = mobileToggle.classList.contains('left');
+    const atBottom = mobileToggle.classList.contains('bottom');
+    if (sideLeft) { popup.style.left = rect.left + 'px'; popup.style.right = ''; }
+    else { popup.style.right = (window.innerWidth - rect.right) + 'px'; popup.style.left = ''; }
+    const top = atBottom ? Math.max(12, rect.top - (popup.offsetHeight + 8)) : rect.bottom + 8;
+    popup.style.top = top + 'px';
+  }
+
+  // Drag (mouse or touch) the button to any corner; it snaps on release
+  (function initDrag() {
+    if (!mobileToggle) return;
+    try { applyCorner(localStorage.getItem(CORNER_KEY) || 'tr'); } catch (e) { applyCorner('tr'); }
+    let start = null, dragged = false;
+    mobileToggle.addEventListener('pointerdown', (e) => {
+      const r = mobileToggle.getBoundingClientRect();
+      start = { x: e.clientX, y: e.clientY, dx: e.clientX - r.left, dy: e.clientY - r.top };
+      dragged = false;
+      mobileToggle.setPointerCapture(e.pointerId);
+    });
+    mobileToggle.addEventListener('pointermove', (e) => {
+      if (!start) return;
+      if (!dragged && Math.hypot(e.clientX - start.x, e.clientY - start.y) < 8) return;
+      if (!dragged) { dragged = true; mobileToggle.classList.add('dragging'); closePopup(); }
+      mobileToggle.style.right = mobileToggle.style.bottom = 'auto';
+      mobileToggle.style.left = (e.clientX - start.dx) + 'px';
+      mobileToggle.style.top = (e.clientY - start.dy) + 'px';
+    });
+    const end = (e) => {
+      if (!start) return;
+      start = null;
+      if (!dragged) return;
+      const r = mobileToggle.getBoundingClientRect();
+      const corner = (r.top + r.height / 2 < window.innerHeight / 2 ? 't' : 'b') +
+                     (r.left + r.width / 2 < window.innerWidth / 2 ? 'l' : 'r');
+      mobileToggle.classList.remove('dragging');
+      applyCorner(corner);
+      try { localStorage.setItem(CORNER_KEY, corner); } catch (err) {}
+      setTimeout(() => { dragged = false; }, 0);
+    };
+    mobileToggle.addEventListener('pointerup', end);
+    mobileToggle.addEventListener('pointercancel', end);
+    // swallow the click that follows a drag
+    mobileToggle.addEventListener('click', (e) => { if (dragged) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   })();
 
   function syncNav() {
@@ -104,32 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (location.pathname === new URL(a.href, location.origin).pathname) a.classList.add('active');
       } catch (e) { /* ignore invalid URLs */ }
     });
-    // If mobile viewport, inject side toggle button into the popup theme row (next to the theme toggle)
-    const settings = qs('.popup-settings', popup);
-    if (settings && window.innerWidth < 900) {
-      const popupTheme = qs('.popup-theme', settings);
-      if (popupTheme && !qs('.side-switch', popupTheme)) {
-        const side = (function(){ try { return localStorage.getItem(MOBILE_SIDE_KEY) || 'right'; } catch(e){ return 'right'; }})();
-        // SVGs: left arrow and right arrow
-        const leftSVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
-        const rightSVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
-        const btn = document.createElement('button');
-        btn.className = 'side-switch';
-        btn.setAttribute('aria-pressed', side === 'left' ? 'true' : 'false');
-        btn.setAttribute('aria-label', 'Move menu side');
-        btn.title = 'Move menu side';
-        btn.innerHTML = side === 'left' ? leftSVG : rightSVG;
-        popupTheme.appendChild(btn);
-        btn.addEventListener('click', () => {
-          const nowLeft = btn.getAttribute('aria-pressed') === 'true';
-          const newSide = nowLeft ? 'right' : 'left';
-          try { localStorage.setItem(MOBILE_SIDE_KEY, newSide); } catch(e){}
-          btn.setAttribute('aria-pressed', String(!nowLeft));
-          btn.innerHTML = newSide === 'left' ? leftSVG : rightSVG;
-          applyMobileSide(newSide);
-        });
-      }
-    }
   }
 
   function openPopup(anchorRect) {
@@ -141,17 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     popup.setAttribute('aria-hidden', 'false');
     // Desktop: anchored top-right via CSS. For mobile we position above the mobile button if provided.
     if (anchorRect && window.innerWidth < 900) {
-      // position popup so it sits above the mobile button; account for left/right placement
-      const sideLeft = mobileToggle && mobileToggle.classList.contains('left');
-      if (sideLeft) {
-        popup.style.left = (anchorRect.left) + 'px';
-        popup.style.right = '';
-      } else {
-        popup.style.right = (window.innerWidth - (anchorRect.right)) + 'px';
-        popup.style.left = '';
-      }
-      const top = Math.max(12, anchorRect.top - (popup.offsetHeight + 8));
-      popup.style.top = top + 'px';
+      placePopup(anchorRect);
     } else {
       // clear inline positioning to allow CSS anchoring
       popup.style.top = '';
@@ -172,7 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Wire header and mobile toggles
-  headerToggles.forEach(b => b.addEventListener('click', (e) => { e.preventDefault(); openPopup(); }));
+  headerToggles.forEach(b => b.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (popup && popup.classList.contains('open')) closePopup(); else openPopup();
+  }));
   if (mobileToggle) {
     mobileToggle.addEventListener('click', (e) => {
       e.preventDefault();
@@ -196,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return; // clicks inside popup shouldn't close unless on a link or close button
     }
     // ignore clicks on toggles that open it
-    if (target.closest && target.closest('.nav-toggle')) return;
+    if (target.closest && target.closest('.nav-toggle, .mobile-nav-toggle')) return;
     closePopup();
   }, true);
 
@@ -244,26 +242,45 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(check);
   })();
 
-  /* ------------------ Projects columns: per-column scroll recall & top buttons ------------------ */
+  /* ------------------ Projects: filter by status tab + type ------------------ */
   (function () {
-    // Persist scroll position for each project-list so the column remembers where you left off
-    ['public-list','private-list'].forEach(id => {
-      const list = qs(`#${id}`);
-      if (!list) return;
-      const key = `scroll-pos:${id}`;
-      try {
-        const val = sessionStorage.getItem(key);
-        if (val) list.scrollTop = parseInt(val, 10);
-      } catch (e) {}
-      let t = null;
-      list.addEventListener('scroll', () => {
-        if (t) clearTimeout(t);
-        t = setTimeout(() => { try { sessionStorage.setItem(key, String(list.scrollTop)); } catch (e) {} }, 150);
-      }, { passive: true });
-    });
-  })();
+    const grid = qs('#project-grid');
+    if (!grid) return;
+    const cards = qsa('.project-card', grid);
+    const empty = qs('.project-empty', grid);
+    const state = { status: 'all', type: 'all' };
 
-  /* project-list column containment removed — projects are now simple lists */
+    function apply() {
+      let shown = 0;
+      cards.forEach(c => {
+        const ok = (state.status === 'all' || c.dataset.status === state.status) &&
+                   (state.type === 'all' || c.dataset.type === state.type);
+        c.hidden = !ok;
+        if (ok) shown++;
+      });
+      if (empty) empty.hidden = shown > 0;
+    }
+
+    qsa('[data-filter-status]').forEach(btn => btn.addEventListener('click', () => {
+      state.status = btn.dataset.filterStatus;
+      qsa('[data-filter-status]').forEach(b => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', String(on));
+      });
+      apply();
+    }));
+
+    qsa('[data-filter-type]').forEach(btn => btn.addEventListener('click', () => {
+      state.type = btn.dataset.filterType;
+      qsa('[data-filter-type]').forEach(b => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      apply();
+    }));
+  })();
 
   /* ------------------ Featured project on home page ------------------ */
   (function () {
@@ -281,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Prefer the manually-picked featured project by id, otherwise fall back to first public project
       let firstProject = document.getElementById('project-tannersteeber-dev');
       if (!firstProject) {
-        const publicList = qs('#public-list');
+        const publicList = qs('#project-grid');
         if (publicList) firstProject = publicList.querySelector('article.project-card');
       }
       if (firstProject) {
@@ -348,9 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
   (function () {
     const lightbox = qs('#lightbox');
     if (!lightbox) return;
-  // lbImg was used for single-image lightbox; the carousel uses a track instead
-  // Keep reference for legacy fallbacks if needed (unused currently)
-  const lbImg = qs('.lb-img', lightbox);
     const lbPrev = qs('.lb-prev', lightbox);
     const lbNext = qs('.lb-next', lightbox);
     const lbClose = qs('.lb-close', lightbox);
@@ -574,7 +588,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return track;
     }
 
-  // mouse/drag handlers removed — rely on native scroll-snap behavior
 
     // Scroll to a specific index in the track (centers the child)
     function scrollToIndex(i, behavior = 'smooth') {
