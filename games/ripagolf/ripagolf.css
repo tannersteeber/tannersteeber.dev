@@ -165,3 +165,101 @@ html{overflow:hidden;scrollbar-gutter:auto}.rg-game{margin:0;overflow:hidden;ove
  .rg-touch-layout .rg-shot{bottom:auto;max-height:min(calc(100svh - 340px),calc(100% - 82px - var(--game-ui-bottom)))}
  .rg-touch-layout .rg-flight{bottom:calc(12px + var(--game-ui-bottom))}
 }
+
+/* Full-bleed course; the camera frames play into the clear area between overlays. */
+.rg-viewport{inset:0!important}
+.rg-camera-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;pointer-events:auto}
+.rg-camera-tools .rg-button{min-height:30px;padding:5px 9px;font-size:.68rem;background:color-mix(in srgb,var(--rg-surface) 76%,transparent)}
+.rg-camera-tools .rg-button[aria-pressed=true]{border-color:var(--rg-accent);color:var(--rg-accent)}
+.rg-camera-tools .rg-button:last-child{grid-column:1/-1;min-height:24px;font-size:.6rem}
+.rg-top{gap:10px}.rg-top .rg-small-brand{margin-right:auto}
+.rg-contour-key{position:absolute;top:var(--rg-ui-top,86px);left:50%;transform:translateX(-50%);margin:0;padding:4px 9px;border-radius:7px;background:linear-gradient(90deg,#3985cad9,#f4b64dd9);font-size:.62rem;font-weight:800;color:#10271c;pointer-events:none;z-index:3;white-space:nowrap}
+.rg-slider{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:0 4px}
+.rg-slider .rg-slider-heading{grid-column:2;grid-row:1;display:flex;justify-content:center;align-items:center;gap:5px;width:auto}
+.rg-slider .rg-slider-heading>span{width:auto}.rg-slider output{width:auto}
+.rg-slider>.rg-button{grid-row:1;padding:0;min-height:36px;font-size:1.05rem}
+.rg-slider>.rg-button:nth-child(2){grid-column:1}.rg-slider>.rg-button:last-child{grid-column:3}
+.rg-slider>input{grid-column:1/-1;grid-row:2;width:100%;height:36px;min-width:0;margin:0;touch-action:pan-y}
+.rg-slider input::-webkit-slider-thumb{width:26px;height:26px}.rg-slider input::-moz-range-thumb{width:26px;height:26px}
+.rg-inspecting .rg-shot,.rg-inspecting .rg-swing-dock{visibility:hidden;pointer-events:none}
+.rg-inspecting .rg-hud{visibility:hidden}
+.rg-touch-layout .rg-top{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:6px}
+.rg-touch-layout .rg-small-brand{display:none}
+.rg-touch-layout .rg-camera-tools{justify-self:center;min-width:120px}
+.rg-touch-layout .rg-camera-tools .rg-button{font-size:.6rem;padding:5px 6px}
+.rg-touch-layout .rg-shot{top:var(--rg-ui-top,90px);width:174px;background:color-mix(in srgb,var(--rg-surface) 65%,transparent);padding:7px}
+.rg-touch-layout .rg-adjustments{display:block!important;min-height:0}
+.rg-touch-layout .rg-adjustments>summary{display:none!important}
+.rg-touch-layout .rg-slider{margin:0 0 5px;gap:0 3px;font-size:.7rem}
+.rg-touch-layout .rg-slider>.rg-button{min-height:40px}
+.rg-touch-layout .rg-slider>input{height:36px}
+.rg-touch-layout .rg-slider-heading{flex-direction:column;gap:0;line-height:1.1}
+.rg-touch-layout .rg-slider output{font-weight:800;font-size:.85rem}
+.rg-touch-layout .rg-hud{position:absolute;top:var(--rg-ui-top,90px);left:200px;right:176px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;pointer-events:auto;background:color-mix(in srgb,var(--rg-surface) 64%,transparent);border-radius:10px;padding:5px;box-sizing:border-box}
+.rg-touch-layout .rg-hud .rg-shot-header{grid-column:1/-1;display:flex;margin-bottom:3px}
+.rg-touch-layout .rg-hud .rg-stat{display:none!important}
+.rg-touch-layout .rg-hud .rg-stat:nth-of-type(3),.rg-touch-layout .rg-hud .rg-stat:nth-of-type(4),.rg-touch-layout .rg-hud .rg-stat:nth-of-type(5),.rg-touch-layout .rg-hud .rg-stat:nth-of-type(6),.rg-touch-layout .rg-hud .rg-stat:nth-of-type(7){display:flex!important;padding:3px}
+.rg-touch-layout .rg-hud .rg-stat strong{font-size:.65rem;white-space:nowrap}
+.rg-touch-layout .rg-hud .rg-stat>span{font-size:.44rem}
+.rg-touch-layout .rg-active-prediction{font-size:.5rem;padding:3px;line-height:1.2}
+.rg-touch-layout .rg-shot .rg-preview-label{display:none}
+.rg-touch-layout .rg-swing-dock{top:var(--rg-ui-top,90px);width:152px}
+.rg-touch-layout .rg-flight{top:calc(var(--rg-ui-top,90px) + 100px);left:50%;right:auto;bottom:auto;max-width:calc(100% - 380px);transform:translateX(-50%);flex-direction:column}
+@media(orientation:portrait){
+ .rg-touch-layout .rg-hud{left:12px;right:12px;top:var(--rg-ui-top,90px)}
+ .rg-touch-layout .rg-shot{top:auto;bottom:var(--game-ui-bottom);left:8px;width:calc(50% - 14px);height:206px;max-height:none;overflow-y:auto}
+ .rg-touch-layout .rg-swing-dock{top:auto;bottom:var(--game-ui-bottom);right:8px;width:calc(50% - 14px);height:206px}
+ .rg-touch-layout .rg-swing-zone{min-height:150px}
+ .rg-touch-layout .rg-flight{top:auto;bottom:calc(var(--game-ui-bottom) + 218px);left:50%;right:auto;max-width:calc(100% - 24px);flex-direction:row}
+ .rg-touch-layout .rg-contour-key{top:calc(var(--rg-ui-top,90px) + 96px)}
+}
+@media(max-height:360px) and (orientation:landscape){
+ .rg-touch-layout .rg-camera-tools .rg-button{min-height:25px;padding:3px 5px}
+ .rg-touch-layout .rg-swing-zone{min-height:100px}
+}
+.rg-slider>input{touch-action:none}
+.rg-touch-layout .rg-camera-tools{min-width:0;width:100%;max-width:170px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.rg-touch-layout .rg-camera-tools .rg-button{min-width:0}
+@media(orientation:portrait){
+ .rg-touch-layout .rg-shot{left:max(8px,var(--rg-safe-left,env(safe-area-inset-left)));width:calc((100% - max(8px,var(--rg-safe-left,env(safe-area-inset-left))) - max(8px,var(--rg-safe-right,env(safe-area-inset-right))) - 12px)/2)}
+ .rg-touch-layout .rg-swing-dock{right:max(8px,var(--rg-safe-right,env(safe-area-inset-right)));width:calc((100% - max(8px,var(--rg-safe-left,env(safe-area-inset-left))) - max(8px,var(--rg-safe-right,env(safe-area-inset-right))) - 12px)/2)}
+ .rg-touch-layout .rg-hud{left:max(12px,var(--rg-safe-left,env(safe-area-inset-left)));right:max(12px,var(--rg-safe-right,env(safe-area-inset-right)))}
+}
+.rg-touch-layout .rg-hud .rg-stat{grid-column:auto!important}
+.rg-hud .rg-shot-header select{font:700 .75rem var(--font);min-height:36px;padding:7px 10px;background:var(--rg-felt);color:var(--rg-text);border:1px solid var(--rg-border);border-radius:8px}
+.rg-touch-layout .rg-swing-dock>.rg-flight{position:static;transform:none;max-width:100%;margin:auto 0;padding:10px 7px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;background:color-mix(in srgb,var(--rg-surface) 65%,transparent)}
+.rg-touch-layout .rg-swing-dock>.rg-flight .rg-button{width:100%;min-height:44px;white-space:normal;line-height:1.4}
+
+.rg-contour-key{max-width:calc(100% - 24px);white-space:normal;text-align:center;box-sizing:border-box}
+
+/* All shot adjustments stay visible in the existing mobile control area. */
+.rg-choice-buttons{display:none}
+.rg-putter-options-hint{font-size:.7rem;line-height:1.5;color:var(--rg-muted);margin:5px 0}
+.rg-touch-layout .rg-shot{overflow:hidden;gap:0;padding:4px}
+.rg-touch-layout .rg-adjustments{display:grid!important;gap:3px}
+.rg-touch-layout .rg-slider{grid-template-columns:28px minmax(0,1fr) 28px;margin:0;gap:0 2px;position:relative}
+.rg-touch-layout .rg-slider .rg-slider-heading{grid-column:1/-1;grid-row:1;flex-direction:row;justify-content:space-between;padding:0 3px;font-size:.64rem;line-height:16px;pointer-events:none}
+.rg-touch-layout .rg-slider output{font-size:.7rem}
+.rg-touch-layout .rg-slider>input{grid-column:2;grid-row:2;height:32px}
+.rg-touch-layout .rg-slider>.rg-button{grid-row:2;min-height:32px;font-size:.9rem}
+.rg-touch-layout .rg-shot-options{display:grid;gap:2px;padding-top:2px}
+.rg-touch-layout .rg-shot-options .rg-option{display:grid;grid-template-columns:29px minmax(0,1fr);align-items:center;gap:2px;margin:0;min-height:28px;font-size:.55rem}
+.rg-touch-layout .rg-shot-options .rg-option>span{width:auto}
+.rg-touch-layout .rg-shot-options select{display:none}
+.rg-touch-layout .rg-choice-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px}
+.rg-touch-layout .rg-choice-buttons .rg-button{min-width:0;min-height:28px;padding:2px 0;font-size:.55rem;border-radius:5px;line-height:1.15}
+.rg-choice-buttons .rg-button[aria-pressed=true]{color:var(--rg-accent);border-color:var(--rg-accent);background:color-mix(in srgb,var(--rg-accent) 16%,var(--rg-surface))}
+.rg-touch-layout .rg-last-shot,.rg-touch-layout .rg-shot-summary{display:none}
+@media(orientation:landscape){
+ .rg-touch-layout .rg-slider .rg-slider-heading{position:absolute;top:-12px;left:30px;right:30px;padding:0;font-size:.55rem}
+ .rg-touch-layout .rg-slider{margin-top:11px}
+ .rg-touch-layout .rg-slider>input,.rg-touch-layout .rg-slider>.rg-button{grid-row:1}
+ .rg-touch-layout .rg-shot-options .rg-option,.rg-touch-layout .rg-choice-buttons .rg-button{min-height:26px}
+ .rg-touch-layout .rg-adjustments{gap:1px}
+}
+
+.rg-top{top:var(--arcade-toolbar-top);left:var(--arcade-toolbar-left);right:var(--arcade-toolbar-right)}
+.rg-touch-layout .rg-top{top:var(--arcade-toolbar-top);left:max(var(--arcade-toolbar-left),var(--rg-safe-left,0px));right:max(var(--arcade-toolbar-right),var(--rg-safe-right,0px))}
+.rg-back,.rg-icon{box-sizing:border-box;height:44px;min-height:44px}
+
+@media(orientation:landscape){.rg-touch-layout .rg-shot{padding:2px}}

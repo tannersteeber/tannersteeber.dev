@@ -1,5 +1,5 @@
 import { mulberry32,smoothstep } from '../shared/engine/RoadGenerator.js';
-import {clamp} from './rules.js?v=20261025-physics-2';
+import {clamp} from './rules.js?v=20261025-controls-7';
 export const SURFACES=['rough','fairway','green','sand','water','tee'];
 export class Course {
   constructor(seed,index=1) {

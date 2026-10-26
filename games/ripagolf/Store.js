@@ -1,6 +1,6 @@
-import {MILESTONES,predictionWon,reward,scoreName} from './rules.js?v=20261025-physics-2';
+import {MILESTONES,predictionWon,reward,scoreName} from './rules.js?v=20261025-controls-7';
 const KEY='tsd.ripagolf.v1';
-const DEFAULTS={graphics:'medium',swingSensitivity:1,cameraSensitivity:1,effects:.65,music:.12,muted:false,reducedMotion:false,puttingGuide:true};
+const DEFAULTS={graphics:'medium',swingSensitivity:1,cameraSensitivity:1,effects:.65,music:.12,muted:false,reducedMotion:false,puttingGuide:true,greenHeightmap:false};
 const STATS={bestStreak:0,highestScore:0,lifetimePoints:0,holes:0,strokes:0,birdies:0,eagles:0,aces:0,won:0,lost:0,relativeTotal:0,achievements:[]};
 export class GolfStore {
   constructor(){

@@ -1,4 +1,4 @@
-import {clamp} from './rules.js?v=20261025-physics-2';
+import {clamp} from './rules.js?v=20261025-controls-7';
 // Normalized coordinates and seconds make gesture behavior independent of pixels and refresh rate.
 export class SwingGesture {
   constructor(x,y,time){this.points=[{x,y,time}];this.start=this.points[0];this.maxTravel=0;this.feedback={power:0,error:0,canceled:false,armed:false,speed:0};}

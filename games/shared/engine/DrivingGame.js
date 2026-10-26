@@ -12,9 +12,9 @@ import { AssetManager } from './AssetManager.js';
 import { VehicleController, VEHICLE_PRESETS } from './VehicleController.js';
 import { CameraController, CAMERA_MODES } from './CameraController.js';
 import { Environment, getPalette } from './Environment.js';
-import { GameMenu } from '../ui/GameMenu.js';
-import { GameHUD } from '../ui/GameHUD.js';
-import { SettingsPanel } from '../ui/SettingsPanel.js';
+import { GameMenu } from '../ui/GameMenu.js?v=20261025-toolbar-1';
+import { GameHUD } from '../ui/GameHUD.js?v=20261025-toolbar-1';
+import { SettingsPanel } from '../ui/SettingsPanel.js?v=20261025-toolbar-1';
 import { h } from '../ui/dom.js';
 
 export class DrivingGame {
@@ -110,7 +110,7 @@ export class DrivingGame {
       title: cfg.title, tagline: cfg.tagline, blurb: cfg.blurb, backHref: cfg.backHref, controlsExtra: cfg.controlsExtra
     }, hooks));
     this.hud = new GameHUD(this.root, cfg.hudFields, {
-      onPause: () => this.pause(),
+      onPause: () => this._togglePause(),
       onPedal: (v) => { this.input.pedal = v; }
     });
     this.panel = new SettingsPanel(this.root, this.settings, this.input, this._fields(), {
@@ -219,9 +219,10 @@ export class DrivingGame {
   }
 
   _togglePause() {
-    if (this.panel.isOpen) return;
+    if (this.panel.isOpen) { this.panel.close(); return; }
     if (this.state === 'playing') this.pause();
     else if (this.state === 'paused') this.resume();
+    else if (this.state === 'title' || this.state === 'over') this.menu.toggleTools(this.state === 'title');
   }
 
   /** Called by subclasses when the run ends. */

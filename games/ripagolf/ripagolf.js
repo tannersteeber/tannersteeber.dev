@@ -2,18 +2,18 @@ import * as THREE from '../vendor/three.module.js';
 import {GameRenderer,webglAvailable} from '../shared/engine/Renderer.js';
 import {GameEngine} from '../shared/engine/GameEngine.js';
 import {h} from '../shared/ui/dom.js';
-import {Course} from './Course.js?v=20261025-physics-2';
-import {BallPhysics} from './BallPhysics.js?v=20261025-physics-2';
-import {GolfWorld} from './GolfWorld.js?v=20261025-physics-2';
-import {GolfStore} from './Store.js?v=20261025-physics-2';
-import {ThemeAdapter} from './ThemeAdapter.js?v=20261025-physics-2';
-import {GolfControls} from './Controls.js?v=20261025-physics-2';
-import {GolfUI} from './UI.js?v=20261025-physics-2';
-import {GolfAudio} from './Audio.js?v=20261025-physics-2';
-import {CLUBS,predictions,clamp,recommend,yards,puttPower} from './rules.js?v=20261025-physics-2';
+import {Course} from './Course.js?v=20261025-controls-7';
+import {BallPhysics} from './BallPhysics.js?v=20261025-controls-7';
+import {GolfWorld} from './GolfWorld.js?v=20261025-controls-7';
+import {GolfStore} from './Store.js?v=20261025-controls-7';
+import {ThemeAdapter} from './ThemeAdapter.js?v=20261025-controls-7';
+import {GolfControls} from './Controls.js?v=20261025-controls-7';
+import {GolfUI} from './UI.js?v=20261025-controls-7';
+import {GolfAudio} from './Audio.js?v=20261025-controls-7';
+import {CLUBS,predictions,clamp,recommend,yards,puttPower} from './rules.js?v=20261025-controls-7';
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 export default class RipaGolf {
-  constructor(){this.phase='title';this.time=0;this.windTime=0;this.club=4;this.aim=0;this.power=.8;this.spin=0;this.shape=0;this.loft=0;this.zoom=1;this.pitch=.2;this.dirty=true;this.previewWait=0;this.saveWait=0;}
+  constructor(){this.phase='title';this.time=0;this.windTime=0;this.club=4;this.aim=0;this.power=.8;this.spin=0;this.shape=0;this.loft=0;this.zoom=1;this.pitch=.2;this.dirty=true;this.previewWait=0;this.saveWait=0;this.playbackRate=1;this.cameraView='main';}
   async init(root){
     this.root=root;this.store=new GolfStore();this.audio=new GolfAudio(this.store);
     if(!webglAvailable()) {this.fatal('This browser does not support the WebGL graphics needed to play RipaGolf.');return;}
@@ -25,7 +25,7 @@ export default class RipaGolf {
     this.controls=new GolfControls(this.gr.canvas,this.ui.swingZone,{
       pause:()=>this.togglePause(),timing:()=>this.timing(),club:i=>this.chooseClub(i),
       aim:delta=>this.changeAim(delta),pitch:delta=>{this.pitch=clamp(this.pitch+delta,0,1);},zoom:delta=>{this.zoom=clamp(this.zoom+delta,.6,2.7);},
-      canSwing:()=>this.phase==='aim'&&this.ui.modal.hidden,clubIndex:()=>this.club,gesture:(gesture,released)=>{if(gesture?.points.length===1&&!released){this.audio.unlock();this.audio.click();}this.ui.gesture(gesture,released);},
+      canSwing:()=>this.phase==='aim'&&this.cameraView==='main'&&this.ui.modal.hidden,clubIndex:()=>this.club,gesture:(gesture,released)=>{if(gesture?.points.length===1&&!released){this.audio.unlock();this.audio.click();}this.ui.gesture(gesture,released);},
       charge:value=>this.ui.charge(value),swing:(power,error)=>this.shoot(power,error)
     },this.store.settings);
     this.engine=new GameEngine(this.gr);this.engine.update=dt=>this.update(dt);this.engine.onHidden=()=>{this.pause();this.capture();this.audio.pause();};
@@ -45,10 +45,10 @@ export default class RipaGolf {
     if(!this.run||(!first&&!this.hole?.result?.won))return;
     if(!first)this.run.holeIndex++;
     const seed=(this.run.seed+Math.imul(this.run.holeIndex,0x9e3779b9))>>>0;
-    this.course=new Course(seed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.onBounce=(impact,lie)=>{if(!this.skipping)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(!this.skipping)this.audio.rim();};
+    this.course=new Course(seed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.onBounce=(impact,lie)=>{if(this.playbackRate===1)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(this.playbackRate===1)this.audio.rim();};
     this.world.build(this.course);
     this.hole=this.run.hole={courseSeed:seed,par:this.course.par,strokes:0,prediction:null,locked:false,result:null,phase:'overview'};
-    this.ui.lastShot.hidden=true;this.selection=null;this.windTime=0;this.spin=this.shape=this.loft=0;this.zoom=1;this.phase='overview';this.overviewTime=0;
+    this.playbackRate=1;this.cameraView='main';this.ui.lastShot.hidden=true;this.selection=null;this.windTime=0;this.spin=this.shape=this.loft=0;this.zoom=1;this.phase='overview';this.overviewTime=0;
     this.prepareLie();this.ui.hud.hidden=false;this.ui.update();this.ui.overview();this.capture();
     if(this.store.settings.reducedMotion)this.openPredictions();
   }
@@ -67,10 +67,10 @@ export default class RipaGolf {
   setAim(delta){if(this.phase!=='aim'||this.controls?.swipe)return;this.aim=wrap(this.aimBase+delta);this.dirty=true;this.ui.syncShot();}
   chooseClub(index){if(this.phase!=='aim'||this.controls?.swipe||!CLUBS[index])return;this.club=index;const d=this.course.distance(this.ball.p.x,this.ball.p.z);this.power=index===8?puttPower(d):clamp(d/CLUBS[index].carry,.005,1);this.dirty=true;this.ui.syncShot();}
   setPower(value){if(this.phase!=='aim'||this.controls?.swipe)return;this.power=clamp(value,.005,1);this.dirty=true;this.ui.syncShot();}
-  setShotOption(key,value){if(this.phase!=='aim'||this.controls?.swipe)return;if(!['spin','shape','loft'].includes(key)||!Number.isFinite(value))return;this[key]=value;this.dirty=true;}
+  setShotOption(key,value){if(this.phase!=='aim'||this.controls?.swipe)return;if(!['spin','shape','loft'].includes(key)||!Number.isFinite(value))return;this[key]=value;this.dirty=true;this.ui.syncShot();}
   shotSpec(power=this.power,error=0){return {club:this.club,power,aim:this.aim,error,spin:this.spin,shape:this.shape,loft:this.club===8?0:this.loft};}
   timing(){
-    if(this.controls.swipe)return;
+    if(this.controls.swipe)return;this.setCameraView('main');
     if(this.phase==='aim'){this.audio.unlock();this.phase='timing';this.timingTime=0;this.timingValue=-1;this.ui.syncShot();}
     else if(this.phase==='timing')this.shoot(this.power,this.timingValue);
   }
@@ -78,13 +78,13 @@ export default class RipaGolf {
     if(!['aim','timing'].includes(this.phase)||!this.hole?.locked||this.ball.status!=='rest')return;
     this.audio.unlock();this.audio.active=true;
     if(!this.ball.launch(this.shotSpec(power,error)))return;
-    this.hole.strokes++;this.store.stroke();this.phase='flight';this.audio.hit(this.club===8);this.controls.reset();this.ui.inFlight();this.ui.update();this.capture();
+    this.playbackRate=1;this.setCameraView('main');this.hole.strokes++;this.store.stroke();this.phase='flight';this.audio.hit(this.club===8);this.controls.reset();this.ui.inFlight();this.ui.update();this.capture();
   }
   preview(){
     const sim=new BallPhysics(this.course);sim.reset(this.ball.p);sim.launch(this.shotSpec());
     const points=[{...sim.p}];let event=null;
     for(let i=0;i<5400;i++){event=sim.update(1/60,this.windTime+1/60);if(i%8===0)points.push({...sim.p});if(event?.type==='penalty'||['rest','holed'].includes(sim.status))break;}
-    points.push({...sim.p});this.world.setPreview(points);
+    points.push({...sim.p});this.world.setPreview(points,this.aim,this.ball.p);
     const distance=Math.hypot(sim.p.x-this.ball.p.x,sim.p.z-this.ball.p.z);
     this.ui.plan.textContent=`${this.club===8?'Putt':'Shot'} preview · ${yards(distance)} yd at ${Math.round(this.power*100)}%${event?.type==='penalty'?' · hazard risk':''}`;
   }
@@ -92,12 +92,13 @@ export default class RipaGolf {
     this.time+=dt;
     if(this.phase==='paused'||this.ui.kind==='settings')return;
     this.controls.update(dt);
-    if(this.phase!=='title'){this.windTime+=dt;this.audio.update(dt);}
+    if(this.phase!=='title'){if(this.phase!=='flight')this.windTime+=dt;this.audio.update(dt);}
     if(this.phase==='overview'){this.overviewTime+=dt;if(this.overviewTime>2.3)this.openPredictions();}
     if(this.phase==='timing'){this.timingTime+=dt;this.timingValue=-Math.cos(this.timingTime*3.4);this.ui.updateTiming(this.timingValue);}
-    if(this.phase==='flight'){
-      const event=this.ball.update(dt,this.windTime);
-      if(this.ball.status==='rolling')this.audio.roll(Math.hypot(this.ball.v.x,this.ball.v.z),this.course.surface(this.ball.p.x,this.ball.p.z),dt);
+    const rate=this.phase==='flight'?this.playbackRate:1;
+    for(let step=0;step<rate&&this.phase==='flight';step++){
+      this.windTime+=dt;const event=this.ball.update(dt,this.windTime);
+      if(rate===1&&this.ball.status==='rolling')this.audio.roll(Math.hypot(this.ball.v.x,this.ball.v.z),this.course.surface(this.ball.p.x,this.ball.p.z),dt);
       if(event?.type==='cup-entry')this.audio.cup();
       if(event?.type==='penalty'){this.hole.strokes+=event.penalty;this.store.stroke(event.penalty);this.ui.announce(event.reason);this.readyAfterShot(event.summary);}
       else if(event?.type==='rest'){this.readyAfterShot();}
@@ -105,23 +106,21 @@ export default class RipaGolf {
     }
     this.previewWait-=dt;
     if(this.dirty&&this.phase==='aim'&&this.previewWait<=0){this.preview();this.dirty=false;this.previewWait=.18;}
-    this.world.update(dt,this.phase,this.ball,this.aim,this.zoom,this.pitch,this.time,this.store.settings.reducedMotion,{putting:this.club===8,puttingGuide:this.store.settings.puttingGuide,swinging:!!this.controls.swipe});
+    this.world.update(dt,this.phase,this.ball,this.aim,this.zoom,this.pitch,this.time,this.store.settings.reducedMotion,{putting:this.club===8,puttingGuide:this.store.settings.puttingGuide,swinging:!!this.controls.swipe,cameraView:this.cameraView,safeView:this.ui.safeView(),greenHeightmap:this.store.settings.greenHeightmap});
     this.hudTime=(this.hudTime||0)+dt;if(this.hudTime>.1){this.hudTime=0;this.ui.update();}
     this.saveWait+=dt;if(this.saveWait>2){this.saveWait=0;this.capture();}
   }
-  readyAfterShot(summary=this.ball.summary()){this.phase='aim';this.prepareLie();this.ui.ready();this.ui.shotSummary(summary);this.ui.update();this.capture();}
-  skipShot(){
-    if(this.phase!=='flight')return;this.skipping=true;
-    for(let i=0;i<10800&&this.phase==='flight';i++){
-      this.windTime+=1/60;const event=this.ball.update(1/60,this.windTime);
-      if(event?.type==='penalty'){this.hole.strokes+=event.penalty;this.store.stroke(event.penalty);this.ui.announce(event.reason);this.readyAfterShot(event.summary);}
-      else if(event?.type==='rest')this.readyAfterShot();else if(event?.type==='holed')this.finishHole();
-    }
-    this.skipping=false;
+  readyAfterShot(summary=this.ball.summary()){this.playbackRate=1;this.cameraView='main';this.phase='aim';this.prepareLie();this.ui.ready();this.ui.shotSummary(summary);this.ui.update();this.capture();}
+  speedUpShot(){
+    if(this.phase!=='flight')return;this.playbackRate=this.playbackRate===1?8:1;this.ui.syncPlayback();
+  }
+  setCameraView(view){
+    if(!['main','hole','overview'].includes(view)||this.controls?.swipe)return;
+    this.cameraView=view;this.ui?.syncCamera();
   }
   finishHole(){
     if(this.hole.result)return;
-    const result=this.store.settle(this.hole);this.phase=result.won?'result':'lost';this.ui.result(result);this.ui.update();this.audio.result(result.won,result.milestone);this.capture();
+    this.playbackRate=1;const result=this.store.settle(this.hole);this.phase=result.won?'result':'lost';this.ui.result(result);this.ui.update();this.audio.result(result.won,result.milestone);this.capture();
   }
   capture(){
     if(!this.run||!this.hole||this.run.hole!==this.hole)return;
@@ -130,8 +129,8 @@ export default class RipaGolf {
     this.hole.spin=this.spin;this.hole.shape=this.shape;this.hole.loft=this.loft;this.hole.windTime=this.windTime;this.hole.selection=this.selection;this.store.save();
   }
   resumeSaved(){
-    this.run=this.store.run;this.hole=this.run?.hole;if(!this.hole)return;
-    this.course=new Course(this.hole.courseSeed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.restore(this.hole.ball);this.ball.onBounce=(impact,lie)=>{if(!this.skipping)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(!this.skipping)this.audio.rim();};this.world.build(this.course);
+    this.playbackRate=1;this.cameraView='main';this.run=this.store.run;this.hole=this.run?.hole;if(!this.hole)return;
+    this.course=new Course(this.hole.courseSeed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.restore(this.hole.ball);this.ball.onBounce=(impact,lie)=>{if(this.playbackRate===1)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(this.playbackRate===1)this.audio.rim();};this.world.build(this.course);
     this.prepareLie();this.aim=Number.isFinite(this.hole.aim)?this.hole.aim:this.aim;this.club=CLUBS[this.hole.club]?this.hole.club:this.club;this.power=this.hole.power||this.power;
     this.spin=this.hole.spin||0;this.shape=this.hole.shape||0;this.loft=this.hole.loft||0;this.windTime=this.hole.windTime||0;this.selection=this.hole.selection||this.hole.prediction;this.audio.unlock();this.audio.active=true;this.ui.hud.hidden=false;
     if(this.hole.result){this.phase=this.hole.result.won?'result':'lost';this.ui.result(this.hole.result);}
@@ -161,7 +160,7 @@ export default class RipaGolf {
     const kind=this.settingsKind;this.ui.close();
     if(this.phase==='paused')this.ui.pause();else if(this.phase==='title')this.ui.title();else if(['result','lost'].includes(this.phase))this.ui.result(this.hole.result);else this.returnScreen();
   }
-  setting(key,value){this.store.set(key,value);this.audio.volume();if(key==='graphics')this.gr.setQuality(this.store.settings.graphics);this.root.classList.toggle('rg-reduced',this.store.settings.reducedMotion);}
+  setting(key,value){this.store.set(key,value);this.audio.volume();if(key==='graphics')this.gr.setQuality(this.store.settings.graphics);this.root.classList.toggle('rg-reduced',this.store.settings.reducedMotion);this.ui.syncCamera();}
   returnScreen(){if(this.phase==='title')this.ui.title();else if(this.phase==='paused')this.ui.pause();else if(this.hole?.result)this.ui.result(this.hole.result);else this.ui.ready();}
   abandon(){if(this.run)this.run.status='abandoned';this.capture();this.mainMenu();}
   mainMenu(){this.capture();this.phase='title';this.ui.flight.hidden=true;this.ui.shot.hidden=true;this.ui.title();this.audio.active=false;}

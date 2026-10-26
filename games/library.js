@@ -58,7 +58,8 @@ Arcade.register({
     updates: [{ title: 'Gameplay improvements', items: [
       'Feature — Recessed cups with swept ball entry, rim deflections and a physical drop before scoring.',
       'Update — Shared terrain collision, rolling hills, bunker depressions, air-relative flight and surface-specific bounce and roll.',
-      'Update — Live swipe trails, cancelable gestures, left/right mobile controls, putting guides, camera framing and shot summaries.'
+      'Update — Live swipe trails, usable mobile aim/power controls, full-screen scenery and Main/Hole/Course cameras.',
+      'Update — Green contours and runoff arrows, distinct surface textures, restrained green rollout and animated 8× shot playback.'
     ] }, { title: 'First release', items: [
       'Feature — Procedural golf, fixed-step shot physics, nine clubs and precision putting.',
       'Feature — Prediction chips, streak rewards, local statistics and milestone badges.',

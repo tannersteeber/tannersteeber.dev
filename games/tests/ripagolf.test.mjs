@@ -134,6 +134,15 @@ test('camera frames the ball, cup and landing target across narrow and wide safe
  }
 });
 
+test('Hole camera fits the entire green and fringe at phone and desktop sizes',async()=>{
+ const THREE=await import('../vendor/three.module.js'),{GolfCamera}=await import('../ripagolf/GolfCamera.js');
+ for(const [w,h]of [[390,780],[667,320],[1060,700]]){
+  const course=new Course(12),ball=new BallPhysics(course),camera=new THREE.PerspectiveCamera(62,w/h,.04,2600),control=new GolfCamera(camera),safe={left:12,right:w-12,top:100,bottom:h-70,fullWidth:w,fullHeight:h};
+  control.update(1/60,{course,ball,position:ball.p,phase:'aim',aim:0,zoom:1,pitch:.2,time:0,reduced:true,cameraView:'hole',safeView:safe});
+  for(let i=0;i<16;i++){const angle=i*Math.PI/8,x=course.pin.x+Math.cos(angle)*(course.greenRadius+2),z=course.pin.z+Math.sin(angle)*(course.greenRadius+2),p=new THREE.Vector3(x,course.height(x,z),z).project(camera),px=(p.x+1)*w/2,py=(1-p.y)*h/2;assert.ok(px>=safe.left&&px<=safe.right&&py>=safe.top&&py<=safe.bottom,`whole green remains in clear view ${w}x${h}: ${px},${py}`);}
+ }
+});
+
 test('generated par 3, 4 and 5 holes can be completed from the tee using the actual shot simulation',async()=>{
  const {planShot}=await import('./golf-shot-planner.mjs'),pars=[];
  for(const seed of [1,2,7]){
@@ -151,4 +160,10 @@ test('mid-drop saves resume inside the cup, and legacy ball saves keep their lie
  for(let i=0;i<120&&a.status!=='cupping';i++)a.update(1/120);
  assert.equal(a.status,'cupping');const b=new BallPhysics(c);b.restore(a.snapshot());advance(a,2);advance(b,2);assert.equal(b.status,'holed');assert.deepEqual(b.p,a.p);
  const legacy=new BallPhysics(c);legacy.restore({p:{x:2,y:20,z:3},v:{x:0,y:-3,z:1},status:'flight'});assert.equal(legacy.status,'rest');assert.equal(legacy.p.x,2);assert.equal(legacy.p.z,3);assert.equal(legacy.p.y,BALL_RADIUS);
+});
+test('full shots check up on greens while ordinary putts retain their distance calibration',()=>{
+ const fairway=simulate(flat('fairway'),{club:4,power:1}),green=simulate(flat('green'),{club:4,power:1}),wedge=simulate(flat('green'),{club:7,power:1});
+ assert.ok(green.ball.p.z-green.impact.z<(fairway.ball.p.z-fairway.impact.z)*.45,'green absorbs a full-shot landing');
+ assert.ok(wedge.ball.p.z-wedge.impact.z<4,'wedge has restrained green rollout');
+ const putt=simulate(flat('green',{pin:{x:0,z:3}}),{club:8,power:puttPower(3)});assert.equal(putt.ball.status,'holed','putting calibration remains useful');
 });

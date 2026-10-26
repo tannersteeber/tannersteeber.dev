@@ -13,6 +13,17 @@ for(const game of ['ripagolf','cruise','cutup'])for(const [width,height]of [[106
   assert(!root.querySelector('.g-start-error,.rg-error'),root.dataset.startupError||root.querySelector('.g-start-error,.rg-error')?.textContent||'startup failed');
   assert(root.querySelector('canvas.g-canvas'),'WebGL canvas exists');assert(root.querySelector('button'),'game menu exists');
   if(game==='ripagolf')assert(doc.body.dataset.gameVersion&&doc.querySelector('script[type="module"]').src.includes(doc.body.dataset.gameVersion),'versioned real boot path');
+  const arcade=root.querySelector('.rg-back,.g-arcade-back'),pause=root.querySelector('[aria-label="Pause game"]');
+  const reachable=el=>{const r=el.getBoundingClientRect();return r.width>0&&el.contains(doc.elementFromPoint(r.left+r.width/2,r.top+r.height/2));};
+  assert(reachable(arcade)&&reachable(pause),'persistent Arcade and Pause receive clicks on title');
+  const left=arcade.getBoundingClientRect(),right=pause.getBoundingClientRect();
+  assert(Math.abs(left.top-right.top)<1&&right.width===44&&right.height===44,'aligned 44px toolbar');
+  pause.click();assert(reachable(arcade)&&reachable(pause),'toolbar stays reachable over menu');
+  if(game!=='ripagolf'){
+    assert(!root.querySelector('.g-menu [aria-label="Game menu"]').hidden,'title Pause opens menu');pause.click();
+    root.querySelector('.g-title .g-btn-primary').click();assert(reachable(arcade)&&reachable(pause),'toolbar visible during driving');pause.click();
+    assert(!root.querySelector('.g-pause-screen[aria-label="Pause menu"]').hidden,'Pause opens during driving');assert(reachable(arcade)&&reachable(pause),'toolbar visible while paused');pause.click();
+  }
   report.append(Object.assign(document.createElement('p'),{textContent:`PASS ${game} ${width}×${height}: actual index, boot, saved preferences and title menu`}));
  }catch(error){failures++;report.append(Object.assign(document.createElement('p'),{textContent:`FAIL ${game} ${width}×${height}: ${error.message}`}));}
  finally{frame?.remove();}

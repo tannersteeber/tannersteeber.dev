@@ -67,6 +67,10 @@ export class GameMenu {
         h('div', { class: 'g-actions g-actions-col' },
           this._btn('Drive again', c.onRestart, true), this._btn('Settings', c.onSettings),
           h('a', { class: 'g-btn', href: c.backHref, text: 'Return to Arcade' }))));
+    this.toolsPlay=this._btn('Play',c.onPlay,true);
+    this.screens.tools=h('section',{class:'g-screen g-pause-screen',hidden:true,'aria-label':'Game menu'},
+      h('div',{class:'g-card g-pause-card'},h('h2',{class:'g-h2',text:c.title}),
+        h('div',{class:'g-actions g-actions-col'},this.toolsPlay,this._btn('Settings',c.onSettings),this._btn('Close menu',()=>this.toggleTools()),h('a',{class:'g-btn',href:c.backHref,text:'Return to Arcade'}))));
     Object.values(this.screens).forEach(s => this.layer.append(s));
   }
 
@@ -84,6 +88,10 @@ export class GameMenu {
     this.tiltBtn.hidden = !showTilt;
     this.controlsBox.replaceChildren(...this.controlsList().map(([k, t]) => h('li', null, h('kbd', { text: k }), h('span', { text: t }))));
     this._show('title');
+  }
+  toggleTools(title=false) {
+    if(this.current==='tools'){this._show(this.toolsReturn);return;}
+    this.toolsReturn=this.current;this.toolsPlay.textContent=title?'Play':'Drive again';this._show('tools');
   }
   showPause() { this._show('pause'); }
   showOver({ title, score, lines, primary }) {

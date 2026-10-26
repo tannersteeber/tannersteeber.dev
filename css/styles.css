@@ -848,3 +848,7 @@ body[data-game] #game-root{
 @supports(height:100svh){
   body[data-game] #game-root{--game-ui-clearance:clamp(64px,10svh,96px)}
 }
+
+/* Consistent persistent navigation across every Arcade game. */
+body[data-game] #game-root{--arcade-toolbar-top:max(14px,env(safe-area-inset-top));--arcade-toolbar-left:max(20px,env(safe-area-inset-left));--arcade-toolbar-right:max(20px,env(safe-area-inset-right))}
+@media(pointer:coarse),(max-width:900px){body[data-game] #game-root{--arcade-toolbar-top:max(12px,env(safe-area-inset-top));--arcade-toolbar-left:max(12px,env(safe-area-inset-left));--arcade-toolbar-right:max(12px,env(safe-area-inset-right))}}

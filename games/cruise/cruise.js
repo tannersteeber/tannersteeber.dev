@@ -2,7 +2,7 @@ import { PartPickups } from './PartPickups.js';
 import { mph, miles } from '../shared/engine/Units.js';
 /* Cruise — endless, relaxing drive along winding procedural backroads. */
 import * as THREE from '../vendor/three.module.js';
-import { DrivingGame } from '../shared/engine/DrivingGame.js';
+import { DrivingGame } from '../shared/engine/DrivingGame.js?v=20261025-toolbar-1';
 import { RoadGenerator, smoothstep } from '../shared/engine/RoadGenerator.js';
 import { color } from '../shared/engine/MeshBuilder.js';
 import { addPine, addRound, addBush, addRock, addHouse } from '../shared/engine/Scenery.js';

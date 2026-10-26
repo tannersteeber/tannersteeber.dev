@@ -1,4 +1,4 @@
-import {SwingGesture} from './SwingGesture.js?v=20261025-physics-2';
+import {SwingGesture} from './SwingGesture.js?v=20261025-controls-7';
 export class GolfControls {
   constructor(canvas,swingZone,hooks,settings){
     this.hooks=hooks;this.settings=settings;this.keys=new Set();this.off=[];
@@ -12,7 +12,7 @@ export class GolfControls {
       this.keys.add(e.code);
     });on(window,'keyup',e=>this.keys.delete(e.code));on(window,'blur',()=>{this.keys.clear();this.drag=null;this.swipe=null;hooks.gesture?.(null);hooks.charge(0);});
     on(canvas,'pointerdown',e=>{if(this.swipe||this.drag)return;this.drag={id:e.pointerId,x:e.clientX,y:e.clientY};try{canvas.setPointerCapture(e.pointerId);}catch{}});
-    on(canvas,'pointermove',e=>{if(!this.drag||this.drag.id!==e.pointerId)return;hooks.aim(-(e.clientX-this.drag.x)*.004*this.settings.cameraSensitivity);hooks.pitch((e.clientY-this.drag.y)*.005*this.settings.cameraSensitivity);this.drag.x=e.clientX;this.drag.y=e.clientY;});
+    on(canvas,'pointermove',e=>{if(!this.drag||this.drag.id!==e.pointerId)return;hooks.aim(-(e.clientX-this.drag.x)*.0015*(e.shiftKey?.25:1)*this.settings.cameraSensitivity);hooks.pitch((e.clientY-this.drag.y)*.005*this.settings.cameraSensitivity);this.drag.x=e.clientX;this.drag.y=e.clientY;});
     const endDrag=()=>{this.drag=null;};on(canvas,'pointerup',endDrag);on(canvas,'pointercancel',endDrag);on(canvas,'wheel',e=>{e.preventDefault();hooks.zoom(e.deltaY*.001*this.settings.cameraSensitivity);},{passive:false});
     const normalized=e=>{const r=swingZone.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height,time:(Number.isFinite(e.timeStamp)?e.timeStamp:performance.now())/1000};};
     on(swingZone,'pointerdown',e=>{
@@ -35,7 +35,7 @@ export class GolfControls {
     on(swingZone,'pointercancel',cancel);on(swingZone,'lostpointercapture',()=>{if(this.swipe)cancel();});on(window,'resize',cancel);
     on(swingZone,'contextmenu',e=>e.preventDefault());
   }
-  update(dt){if(this.swipe)return;const k=this.keys,left=k.has('KeyA')||k.has('ArrowLeft'),right=k.has('KeyD')||k.has('ArrowRight');if(left||right)this.hooks.aim((Number(right)-Number(left))*dt*.55);}
+  update(dt){if(this.swipe)return;const k=this.keys,left=k.has('KeyA')||k.has('ArrowLeft'),right=k.has('KeyD')||k.has('ArrowRight');if(left||right)this.hooks.aim((Number(right)-Number(left))*dt*(k.has('ShiftLeft')||k.has('ShiftRight')?.07:.32));}
   reset(){this.keys.clear();this.drag=this.swipe=null;this.hooks.gesture?.(null);}
   destroy(){this.off.forEach(off=>off());this.reset();}
 }

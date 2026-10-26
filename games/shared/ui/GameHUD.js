@@ -16,7 +16,7 @@ export class GameHUD {
     this.el.append(bar, this.timerBar);
     this.toastEl = h('div', { class: 'g-toast', 'aria-live': 'polite' });
     this.flashEl = h('div', { class: 'g-flash' });
-    this.pauseBtn = h('button', { class: 'g-pause-toggle', type: 'button', 'aria-label': 'Pause', 'data-ui': '', text: 'II', onclick: () => hooks.onPause() });
+    this.pauseBtn = h('button', { class: 'g-pause-toggle', type: 'button', 'aria-label': 'Pause game', 'data-ui': '', text: 'II', onclick: () => hooks.onPause() });
     this.arcadeLink = h('a', { class: 'g-arcade-back', href: '../../arcade.html', 'data-ui': '', text: '← Arcade' });
     this.pedals = h('div', { class: 'g-pedals', 'data-ui': '', hidden: true },
       this._pedal('Brake', -1, hooks), this._pedal('Gas', 1, hooks));
@@ -33,7 +33,7 @@ export class GameHUD {
     return b;
   }
 
-  show(on) { this.el.hidden = !on; this.pauseBtn.hidden = !on; if (!on) this.pedals.hidden = true; }
+  show(on) { this.el.hidden = !on; this.pauseBtn.hidden = false; if (!on) this.pedals.hidden = true; }
   set(id, text) { const v = this.vals[id]; if (v && v.textContent !== text) v.textContent = text; }
   showPedals(on) { this.pedals.hidden = !on; }
 

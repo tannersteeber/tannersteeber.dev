@@ -97,3 +97,8 @@
  .g-panel-inner{max-height:100%}
  .g-screen:not(.g-pause-screen){align-items:safe center}
 }
+
+.g-arcade-back,.g-pause-toggle{top:var(--arcade-toolbar-top);z-index:20;height:44px;min-height:44px;box-sizing:border-box}
+.g-arcade-back{left:var(--arcade-toolbar-left)}
+.g-pause-toggle{right:var(--arcade-toolbar-right);width:44px}
+.g-pause-screen{padding-top:calc(var(--arcade-toolbar-top) + 60px);padding-right:var(--arcade-toolbar-right)}

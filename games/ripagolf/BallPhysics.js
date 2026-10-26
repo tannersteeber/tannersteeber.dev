@@ -1,8 +1,8 @@
-import {CLUBS,clamp} from './rules.js?v=20261025-physics-2';
-import {surfacePhysics} from './SurfacePhysics.js?v=20261025-physics-2';
-import {airAcceleration} from './Aerodynamics.js?v=20261025-physics-2';
-import {BALL_RADIUS,CUP_DEPTH,CUP_CLEARANCE,cupContact} from './CupPhysics.js?v=20261025-physics-2';
-export {BALL_RADIUS} from './CupPhysics.js?v=20261025-physics-2';
+import {CLUBS,clamp} from './rules.js?v=20261025-controls-7';
+import {surfacePhysics} from './SurfacePhysics.js?v=20261025-controls-7';
+import {airAcceleration} from './Aerodynamics.js?v=20261025-controls-7';
+import {BALL_RADIUS,CUP_DEPTH,CUP_CLEARANCE,cupContact} from './CupPhysics.js?v=20261025-controls-7';
+export {BALL_RADIUS} from './CupPhysics.js?v=20261025-controls-7';
 const STEP=1/120;
 const contactHeight=(course,x,z)=>{const s=course.slope(x,z);return course.height(x,z)+BALL_RADIUS*Math.hypot(1,s.x,s.z);};
 export class BallPhysics {
@@ -58,7 +58,7 @@ export class BallPhysics {
       const s=c.slope(p.x,p.z),mat=surfacePhysics(c.surface(p.x,p.z)),den=1+s.x*s.x+s.z*s.z;
       const gx=-9.81*s.x/den,gz=-9.81*s.z/den,slopeForce=Math.hypot(gx,gz),speed=Math.hypot(v.x,v.z);
       if(speed<.018&&slopeForce<mat.grip){v.x=v.z=0;this.restTime+=dt;}
-      else{this.restTime=0;v.x+=gx*dt;v.z+=gz*dt;const moving=Math.hypot(v.x,v.z),deceleration=mat.rolling+moving*.012+(mat.speedDrag||0)*moving*moving,f=Math.max(0,1-deceleration*dt/(moving||1));v.x*=f;v.z*=f;}
+      else{this.restTime=0;v.x+=gx*dt;v.z+=gz*dt;const moving=Math.hypot(v.x,v.z),deceleration=mat.rolling+moving*.012+((mat.speedDrag||0)+(this.shot?.club<8?mat.landingDrag||0:0))*moving*moving,f=Math.max(0,1-deceleration*dt/(moving||1));v.x*=f;v.z*=f;}
       v.y=0;
       if(this.restTime>.15){this.status='rest';return {type:'rest'};}
     }
