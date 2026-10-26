@@ -55,7 +55,11 @@ Arcade.register({
       'Free virtual points only, with no money, purchases or prizes. Your statistics, milestone badges, settings and current run are saved in this browser. Website themes transform the table and course accents without resetting play.'
     ],
     controls: 'On mobile, swipe upward in the dedicated swing zone. On desktop, set Power and use Time swing / Space and strike at the center. A/D aim, 1–9 select clubs, drag the course to adjust the view, and use the mouse wheel to zoom. Escape pauses.',
-    updates: [{ title: 'First release', items: [
+    updates: [{ title: 'Gameplay improvements', items: [
+      'Feature — Recessed cups with swept ball entry, rim deflections and a physical drop before scoring.',
+      'Update — Shared terrain collision, rolling hills, bunker depressions, air-relative flight and surface-specific bounce and roll.',
+      'Update — Live swipe trails, cancelable gestures, left/right mobile controls, putting guides, camera framing and shot summaries.'
+    ] }, { title: 'First release', items: [
       'Feature — Procedural golf, fixed-step shot physics, nine clubs and precision putting.',
       'Feature — Prediction chips, streak rewards, local statistics and milestone badges.',
       'Update — Live website themes, mobile swipe controls and saved-run resume.'

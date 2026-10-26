@@ -16,7 +16,7 @@ Builds before the new scheme are kept in the update history as alpha (0.6 - 0.8)
 
 ## Arcade
 
-Cruise and Cutup are original browser driving games built with a shared vanilla JavaScript/Three.js engine. No build is required. See [game setup, controls and testing](games/README.md).
+Cruise and Cutup are original browser driving games built with a shared vanilla JavaScript/Three.js engine. RipaGolf adds procedural golf, gesture swings and virtual-point predictions. No build is required. See [game setup, controls and testing](games/README.md).
 
 ## Fonts
 

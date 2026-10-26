@@ -1,19 +1,20 @@
 import {h} from '../shared/ui/dom.js';
-import {CLUBS,predictions,PREDICTIONS,yards} from './rules.js';
-import {PAGE_THEMES} from './ThemeAdapter.js';
+import {CLUBS,predictions,PREDICTIONS,yards} from './rules.js?v=20261025-physics-2';
+import {PAGE_THEMES} from './ThemeAdapter.js?v=20261025-physics-2';
 export function wordmark(){
   const mark=h('span',{class:'rg-brandmark','aria-hidden':'true'});
   mark.innerHTML='<svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="3" stroke-dasharray="8 5"/><circle cx="32" cy="32" r="21" stroke="currentColor"/><path d="M26 46V16l19 7-19 7" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M17 47h30" stroke="currentColor" stroke-width="2"/><circle cx="37" cy="41" r="5" fill="currentColor"/></svg>';
   return mark;
 }
 const num=n=>Math.floor(n).toLocaleString();
+const distanceLabel=m=>m<9.144?`${(m/.3048).toFixed(1)} ft`:`${yards(m)} yd`;
 export class GolfUI {
   constructor(root,game){
     this.game=game;this.root=root;this.fields={};
     this.layer=h('div',{class:'rg-ui'});
     this.top=h('header',{class:'rg-top'},h('a',{class:'rg-back',href:'../../arcade.html',text:'← Arcade'}),h('span',{class:'rg-small-brand'},wordmark(),'RipaGolf'),h('button',{class:'rg-icon',type:'button','aria-label':'Pause game',text:'Ⅱ',onclick:()=>game.togglePause()}));
     this.hud=h('div',{class:'rg-hud',hidden:true});
-    for(const [key,label] of [['hole','Hole'],['par','Par'],['strokes','Strokes'],['pin','To pin'],['wind','Wind'],['streak','Streak'],['score','Run score']]){
+    for(const [key,label] of [['hole','Hole'],['par','Par'],['strokes','Strokes'],['pin','To pin'],['wind','Wind'],['streak','Streak'],['score','Run score'],['club','Club'],['carry','Est. carry'],['lie','Lie'],['slope','Green slope']]){
       const value=h('strong',{text:'0'});this.fields[key]=value;this.hud.append(h('div',{class:'rg-stat '+(key==='streak'?'rg-jackpot':'')},h('span',{text:label}),value));
     }
     this.predictionLabel=h('p',{class:'rg-active-prediction'});this.hud.append(this.predictionLabel);
@@ -25,7 +26,7 @@ export class GolfUI {
     this.shot.append(h('div',{class:'rg-shot-header'},this.club,this.lie));
     this.shot.append(h('p',{class:'rg-preview-label rg-range-hint',text:'Approx. full-power range · varies with conditions.'}));
     this.aim=this.range('Aim',-100,100,1,v=>game.setAim(Number(v)*Math.PI/180));
-    this.power=this.range('Power',2,100,1,v=>game.setPower(Number(v)/100));
+    this.power=this.range('Power',.5,100,.5,v=>game.setPower(Number(v)/100));
     this.plan=h('p',{class:'rg-preview-label'});this.shot.append(this.plan);
     const options=h('details',{class:'rg-shot-options'},h('summary',{text:'Shot shape & trajectory'}));
     this.spin=this.select('Spin',[['0','Standard spin'],['1','Backspin'],['-1','Topspin']],v=>game.setShotOption('spin',Number(v)));
@@ -35,17 +36,26 @@ export class GolfUI {
     this.adjustments=h('details',{class:'rg-adjustments',open:true},h('summary',{text:'Adjust shot'}),this.aim.closest('label'),this.power.closest('label'),this.plan,options);
     this.shot.append(this.adjustments);
     this.swingZone=h('div',{class:'rg-swing-zone',role:'group','aria-label':'Swipe upward here to swing'},h('span',{class:'rg-swipe-arrow',text:'↑'}),h('span',{text:'Swipe up to swing'}),h('small',{text:'Length = power · speed = intensity'}));
+    const svgNS='http://www.w3.org/2000/svg';this.trail=document.createElementNS(svgNS,'svg');this.trail.setAttribute('viewBox','0 0 100 100');this.trail.setAttribute('preserveAspectRatio','none');this.trail.setAttribute('aria-hidden','true');this.trail.classList.add('rg-gesture-trail');
+    this.trailPath=document.createElementNS(svgNS,'path');this.trail.append(this.trailPath);this.swingZone.append(this.trail);
+    this.swingFeedback=h('strong',{class:'rg-swipe-feedback',text:'Swipe up'});this.swingDetails=h('small',{class:'rg-swipe-details',text:'Start at ring · return or leave edge to cancel'});this.swingZone.append(this.swingFeedback,this.swingDetails);
+    this.lastShot=h('p',{class:'rg-shot-summary',hidden:true});this.shot.append(this.lastShot);
     this.chargeFill=h('i');this.swingZone.append(h('div',{class:'rg-charge'},this.chargeFill));this.shot.append(this.swingZone);
     this.needle=h('i');this.timingBar=h('div',{class:'rg-timing',hidden:true},h('span'),this.needle);
     this.swingButton=this.button('Time swing · Space',()=>game.timing(),true);
     this.shot.append(this.timingBar,this.swingButton);
+    this.swingDock=h('aside',{class:'rg-swing-dock',hidden:true,'aria-label':'Swing controls'});
     this.mobile=matchMedia('(pointer:coarse), (max-width:650px), (max-width:900px) and (max-height:520px)');
-    this.onLayout=()=>{root.classList.toggle('rg-touch-layout',this.mobile.matches);this.adjustments.open=!this.mobile.matches;this.resizeDock();};
+    this.onLayout=()=>{
+      game.controls?.reset();root.classList.toggle('rg-touch-layout',this.mobile.matches);this.adjustments.open=!this.mobile.matches;
+      if(this.mobile.matches){this.shot.insertBefore(this.hud,this.adjustments);this.swingDock.append(this.swingZone,this.timingBar,this.swingButton);}
+      else{this.layer.insertBefore(this.hud,this.flight);this.shot.append(this.swingZone,this.timingBar,this.swingButton);}
+      this.resizeDock();
+    };
     this.mobile.addEventListener('change',this.onLayout);
     this.dockObserver=new ResizeObserver(()=>this.resizeDock());this.dockObserver.observe(this.shot);
-    this.onLayout();
     this.modal=h('div',{class:'rg-modal',hidden:true});
-    this.layer.append(this.top,this.hud,this.flight,this.shot,this.toast,this.modal);root.append(this.layer);
+    this.layer.append(this.top,this.hud,this.flight,this.shot,this.swingDock,this.toast,this.modal);root.append(this.layer);this.onLayout();
     this.onKey=e=>{
       if(this.modal.hidden||e.code!=='Tab')return;
       const focus=[...this.top.querySelectorAll('button, a'),...this.modal.querySelectorAll('button, a, input, select')].filter(el=>!el.disabled&&el.getClientRects().length);
@@ -57,7 +67,7 @@ export class GolfUI {
   resizeDock(){
     const height=Math.ceil(this.shot.getBoundingClientRect().height);
     const value=`${height}px`;if(this.root.style.getPropertyValue('--rg-dock-height')!==value)this.root.style.setProperty('--rg-dock-height',value);
-    this.root.classList.toggle('rg-aiming',!this.shot.hidden);
+    this.root.classList.toggle('rg-aiming',!this.shot.hidden);this.swingDock.hidden=this.shot.hidden||!this.mobile.matches;
   }
   button(text,action,primary=false){return h('button',{class:'rg-button'+(primary?' rg-primary':''),type:'button',text,onclick:()=>{this.game.audio.unlock();this.game.audio.click();action();}});}
   range(label,min,max,step,fn){
@@ -107,25 +117,40 @@ export class GolfUI {
     x.fillStyle='#fff';x.beginPath();x.arc(X(0),Y(0),4,0,7);x.fill();x.fillStyle=p.accent.getStyle();x.beginPath();x.arc(X(c.pin.z),Y(c.pin.x),4,0,7);x.fill();
   }
   ready(){this.close();this.flight.hidden=true;this.hud.hidden=false;this.shot.hidden=false;this.syncShot();}
+  lockShotInputs(locked){for(const input of [this.club,this.aim,this.power,...this.adjustments.querySelectorAll('select')])input.disabled=locked||(this.game.club===8&&input.tagName==='SELECT'&&input!==this.club);}
   syncShot(){
-    this.resizeDock();
+    this.lockShotInputs(this.game.phase!=='aim');this.resizeDock();
     const g=this.game;this.club.value=String(g.club);this.lie.textContent=g.course.surface(g.ball.p.x,g.ball.p.z);
     this.aim.value=String(g.relativeAim()*180/Math.PI);this.aim.output.textContent=Math.round(g.relativeAim()*180/Math.PI)+'°';
-    this.power.value=String(Math.round(g.power*100));this.power.output.textContent=Math.round(g.power*100)+'%';
+    this.power.value=String(g.power*100);this.power.output.textContent=(g.power*100).toFixed(g.power<.1?1:0)+'%';
+    this.swingButton.disabled=!['aim','timing'].includes(g.phase);
     if(g.phase==='timing')this.updateTiming(g.timingValue);
     this.timingBar.hidden=g.phase!=='timing';this.swingZone.hidden=g.phase==='timing';this.swingButton.textContent=(g.phase==='timing'?'Strike':'Time swing')+(this.mobile.matches?'':' · Space');
     for(const [key,el]of [['spin',this.spin],['shape',this.shape],['loft',this.loft]])el.querySelector('select').value=String(g[key]);
   }
   update(){
     const g=this.game;if(!g.run||!g.course)return;
-    const values={hole:g.run.holeIndex,par:g.course.par,strokes:g.hole.strokes,pin:`${yards(g.course.distance(g.ball.p.x,g.ball.p.z))} yd`,wind:`${this.windArrow()} ${(g.course.wind.speed*2.23694).toFixed(0)} mph`,streak:g.run.streak,score:num(g.run.score)};
+    const values={hole:g.run.holeIndex,par:g.course.par,strokes:g.hole.strokes,pin:distanceLabel(g.course.distance(g.ball.p.x,g.ball.p.z)),wind:`${this.windArrow()} ${(Math.hypot(...Object.values(g.course.windAt(g.windTime)))*2.23694).toFixed(0)} mph`,streak:g.run.streak,score:num(g.run.score)};
+    const slope=g.course.slope(g.ball.p.x,g.ball.p.z);values.club=CLUBS[g.club].name;values.carry=`${yards(CLUBS[g.club].carry)} yd`;this.fields.carry.previousElementSibling.textContent=g.club===8?'Est. roll':'Est. carry';values.lie=g.course.surface(g.ball.p.x,g.ball.p.z);const cross=slope.x*Math.cos(g.aim)-slope.z*Math.sin(g.aim),up=slope.x*Math.sin(g.aim)+slope.z*Math.cos(g.aim);values.slope=Math.hypot(slope.x,slope.z)<.001?'Level':`${(Math.hypot(slope.x,slope.z)*100).toFixed(1)}% · ${Math.abs(cross)>.002?(cross>0?'left':'right'):(up>0?'uphill':'downhill')}`;
     for(const [key,value]of Object.entries(values))this.fields[key].textContent=value;
     const prediction=PREDICTIONS.find(p=>p.id===g.hole.prediction);this.predictionLabel.textContent=prediction?`${prediction.name} · ${prediction.mult}× reward · Par ${g.course.par} / ${yards(g.course.length)} yd`:'';
   }
   updateTiming(value){this.needle.style.transform=`translate3d(${(value+1)*50}%,0,0)`;}
   windArrow(){return ['↑','↗','→','↘','↓','↙','←','↖'][Math.round(this.game.course.wind.angle/(Math.PI/4))%8];}
   charge(value){this.chargeFill.style.transform=`scaleX(${value})`;}
-  inFlight(){this.shot.hidden=true;this.resizeDock();this.flight.hidden=false;this.flight.replaceChildren(h('strong',{text:this.game.club===8?'Reading the green…':'Ball in flight…'}));}
+  inFlight(){this.shot.hidden=!this.mobile.matches;this.resizeDock();this.syncShot();this.flight.hidden=false;this.flight.replaceChildren(h('strong',{text:this.game.club===8?'Reading the green…':'Ball in flight…'}),this.button('Skip to rest',()=>this.game.skipShot()));}
+  shotSummary(summary){if(!summary)return;this.lastShot.hidden=false;this.lastShot.textContent=`Last shot · carry ${yards(summary.carry||0)} yd · total ${yards(summary.total)} yd · ${summary.lie} · ${distanceLabel(summary.remaining)} left`;}
+  gesture(gesture,released=false){
+    if(!gesture){this.lockShotInputs(this.game.phase!=='aim');if(this.trailReleased)return;this.swingZone.classList.remove('rg-swiping','rg-swipe-canceled');this.trailPath.setAttribute('d','');this.swingFeedback.textContent='Swipe up';this.swingDetails.textContent='Start at ring · return or leave edge to cancel';return;}
+    this.lockShotInputs(!released||this.game.phase!=='aim');clearTimeout(this.trailTimer);this.trailReleased=released;
+    const points=gesture.points,f=gesture.feedback;let d=`M ${points[0].x*100} ${points[0].y*100}`;
+    for(let i=1;i<points.length;i++){const p=points[i],next=points[i+1];d+=next?` Q ${p.x*100} ${p.y*100} ${(p.x+next.x)*50} ${(p.y+next.y)*50}`:` L ${p.x*100} ${p.y*100}`;}
+    this.trailPath.setAttribute('d',d);this.swingZone.classList.toggle('rg-swiping',!released);this.swingZone.classList.toggle('rg-swipe-canceled',f.canceled);this.swingZone.classList.toggle('rg-trail-released',released);
+    const club=this.game.club,power=f.power||0,estimate=CLUBS[club].carry*Math.pow(power,club===8?1.4:1);
+    this.swingFeedback.textContent=f.canceled?'Cancel swing':`${Math.round(power*100)}% power`;
+    this.swingDetails.textContent=f.canceled?'Release to cancel':`${Math.abs(f.error)<.12?'Straight':f.error<0?'Left deviation':'Right deviation'} · ~${yards(estimate)} yd · ${f.speed.toFixed(1)}× speed`;
+    if(released)this.trailTimer=setTimeout(()=>{this.trailReleased=false;this.swingZone.classList.remove('rg-trail-released');this.gesture(null);},360);
+  }
   titleMenu(){this.panel('title-menu','Menu',[h('div',{class:'rg-actions'},this.button('Back to main menu',()=>this.title(),true),this.button('Settings',()=>this.game.openSettings()),this.button('How to Play',()=>this.help()),this.button('Statistics',()=>this.statistics()),h('a',{class:'rg-button',href:'../../arcade.html',text:'Return to Arcade'}))]);}
   pause(){this.panel('pause','Paused',[h('div',{class:'rg-actions'},this.button('Resume',()=>this.game.resume(),true),this.button('Settings',()=>this.game.openSettings()),this.button('End run',()=>this.game.abandon()),h('a',{class:'rg-button',href:'../../arcade.html',text:'Return to Arcade'}))]);}
   result(result){
@@ -149,7 +174,7 @@ export class GolfUI {
     h('ol',{class:'rg-instructions'},[
       'Review each seeded par 3, 4 or 5. Choose a prediction and lock it before taking a shot.',
       'Choose a club, adjust aim and planned power. The dotted path previews that shot in current conditions.',
-      'On mobile, swipe upward in the swing zone: length controls power, speed adds intensity and sideways motion affects accuracy.',
+      'On mobile, start at the right-side ring and swipe upward. The trail shows power and accuracy. Return to the start or leave the edge before release to cancel. Short swipes give finer putting control.',
       'On desktop, set the Power slider and use Time swing / Space, then strike when the needle reaches the center. A/D aim, number keys select clubs, canvas drag rotates the view and mouse wheel zooms.',
       'Use the putter on the green. Reduce power for precision. Ground slope, lie, bounce, spin and wind affect every shot.',
       'Finish the hole. A matching prediction earns virtual points and extends the streak. A failed prediction ends the run.'
@@ -164,7 +189,7 @@ export class GolfUI {
       const out=h('output',{text:key.includes('Sensitivity')?s[key].toFixed(2)+'×':Math.round(s[key]*100)+'%'});
       row(label,h('span',{class:'rg-setting-range'},h('input',{type:'range',min,max,step,value:s[key],'aria-label':label,oninput:e=>{const v=Number(e.target.value);g.setting(key,v);out.textContent=key.includes('Sensitivity')?v.toFixed(2)+'×':Math.round(v*100)+'%';}}),out));
     }
-    for(const [key,label]of [['muted','Mute all audio'],['reducedMotion','Reduced motion']])row(label,h('input',{type:'checkbox',checked:s[key],'aria-label':label,onchange:e=>g.setting(key,e.target.checked)}));
+    for(const [key,label]of [['muted','Mute all audio'],['reducedMotion','Reduced motion'],['puttingGuide','Putting slope grid']])row(label,h('input',{type:'checkbox',checked:s[key],'aria-label':label,onchange:e=>g.setting(key,e.target.checked)}));
     const themes=PAGE_THEMES.slice(),current=document.documentElement.dataset.pageTheme||'signature';if(!themes.some(t=>t.id===current))themes.push({id:current,label:current});
     row('Website theme',h('select',{'aria-label':'Website theme',onchange:e=>{g.theme.setPage(e.target.value);this.settings();}},themes.map(t=>h('option',{value:t.id,selected:t.id===current,text:t.label}))));
     if(current==='signature')row('Appearance',h('select',{'aria-label':'Appearance',onchange:e=>g.theme.setDark(e.target.value==='dark')},[['light','Light'],['dark','Dark']].map(([v,t])=>h('option',{value:v,selected:document.documentElement.classList.contains('theme-dark')===(v==='dark'),text:t}))));
@@ -172,5 +197,5 @@ export class GolfUI {
     this.panel('settings','Table settings',[body,this.button('Done',()=>g.closeSettings(),true)]);
   }
   announce(text){clearTimeout(this.toastTimer);this.toast.textContent=text;this.toast.classList.add('visible');this.toastTimer=setTimeout(()=>this.toast.classList.remove('visible'),2600);}
-  destroy(){this.dockObserver.disconnect();this.mobile.removeEventListener('change',this.onLayout);clearTimeout(this.toastTimer);cancelAnimationFrame(this.countRaf);window.removeEventListener('keydown',this.onKey,true);this.layer.remove();}
+  destroy(){clearTimeout(this.trailTimer);this.dockObserver.disconnect();this.mobile.removeEventListener('change',this.onLayout);clearTimeout(this.toastTimer);cancelAnimationFrame(this.countRaf);window.removeEventListener('keydown',this.onKey,true);this.layer.remove();}
 }

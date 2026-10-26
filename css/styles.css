@@ -838,3 +838,13 @@ body[data-game],body[data-game] *{
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   -webkit-user-drag:none;
 }
+
+/* Leave browser-toolbar room below mobile game UI, even with zero safe-area inset. */
+body[data-game] #game-root{
+  --game-ui-clearance:64px;
+  --game-ui-bottom:calc(var(--game-ui-clearance) + var(--game-safe-bottom,env(safe-area-inset-bottom)));
+}
+
+@supports(height:100svh){
+  body[data-game] #game-root{--game-ui-clearance:clamp(64px,10svh,96px)}
+}

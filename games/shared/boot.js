@@ -8,13 +8,17 @@ root.addEventListener('selectstart', event => event.preventDefault());
 root.addEventListener('dragstart', event => event.preventDefault());
 const game = document.body.dataset.game;
 try {
-  const { default: Game } = await import(`../${game}/${game}.js`);
+  const version = document.body.dataset.gameVersion;
+  const moduleUrl = new URL(`../${game}/${game}.js`, import.meta.url);
+  if (version) moduleUrl.searchParams.set('v', version);
+  const { default: Game } = await import(moduleUrl.href);
   const instance = new Game();
   await instance.init(root);
   // Keep the current run for browser back/forward cache; pause and save on departure.
   window.addEventListener('pagehide', () => instance.pause());
 } catch (error) {
   console.error('Game startup failed:', error);
+  root.dataset.startupError = error instanceof Error ? error.message : String(error);
   root.classList.add('ready');
   const message = document.createElement('p');
   message.className = 'g-start-error';

@@ -1,14 +1,15 @@
+import {SURFACE_PHYSICS} from './SurfacePhysics.js?v=20261025-physics-2';
 // Scoring is independent of rendering, physics and prediction selection.
 export const CLUBS = [
-  { id:'driver', name:'Driver', speed:72, loft:14, spin:2300, accuracy:7, carry:283 },
-  { id:'wood', name:'Fairway wood', speed:64, loft:19, spin:3200, accuracy:6, carry:265 },
-  { id:'hybrid', name:'Hybrid', speed:57, loft:23, spin:4000, accuracy:5, carry:231 },
-  { id:'long', name:'Long iron', speed:51, loft:28, spin:4700, accuracy:4.5, carry:211 },
-  { id:'mid', name:'Mid iron', speed:44, loft:34, spin:5600, accuracy:4, carry:175 },
-  { id:'short', name:'Short iron', speed:37, loft:41, spin:6600, accuracy:3.5, carry:130 },
-  { id:'pitch', name:'Pitching wedge', speed:30, loft:48, spin:7600, accuracy:3, carry:86 },
-  { id:'sand', name:'Sand wedge', speed:24, loft:56, spin:8400, accuracy:2.5, carry:50 },
-  { id:'putter', name:'Putter', speed:6.8, loft:0, spin:0, accuracy:2, carry:60 }
+  { id:'driver', name:'Driver', speed:75, loft:16, spin:2400, accuracy:7, carry:246 },
+  { id:'wood', name:'Fairway wood', speed:64, loft:19, spin:3200, accuracy:6, carry:228 },
+  { id:'hybrid', name:'Hybrid', speed:57, loft:23, spin:4000, accuracy:5, carry:218 },
+  { id:'long', name:'Long iron', speed:51, loft:28, spin:4700, accuracy:4.5, carry:201 },
+  { id:'mid', name:'Mid iron', speed:44, loft:34, spin:5600, accuracy:4, carry:161 },
+  { id:'short', name:'Short iron', speed:37, loft:41, spin:6600, accuracy:3.5, carry:117 },
+  { id:'pitch', name:'Pitching wedge', speed:30, loft:48, spin:7600, accuracy:3, carry:77 },
+  { id:'sand', name:'Sand wedge', speed:24, loft:56, spin:8400, accuracy:2.5, carry:47 },
+  { id:'putter', name:'Putter', speed:4.4, loft:0, spin:0, accuracy:2, carry:40 }
 ];
 export const PREDICTIONS = [
   { id:'bogey', name:'Bogey or better', mult:.5, delta:1, exact:false },
@@ -45,4 +46,11 @@ export function recommend(distance,lie) {
   const limit=lie==='rough'?2:0;
   for(let i=7;i>=limit;i--)if(CLUBS[i].carry>=distance*.95)return i;
   return limit;
+}
+
+export function puttPower(distance){
+  const a=SURFACE_PHYSICS.green.rolling,k=.012,roll=v=>v/k-a/(k*k)*Math.log1p(k*v/a),target=roll(.45)+Math.max(0,distance);
+  let low=0,high=CLUBS[8].speed;
+  for(let i=0;i<24;i++){const mid=(low+high)/2;if(roll(mid)<target)low=mid;else high=mid;}
+  return clamp(Math.pow(high/CLUBS[8].speed,1/.7),.005,1);
 }

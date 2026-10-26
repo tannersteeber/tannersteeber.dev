@@ -2,15 +2,15 @@ import * as THREE from '../vendor/three.module.js';
 import {GameRenderer,webglAvailable} from '../shared/engine/Renderer.js';
 import {GameEngine} from '../shared/engine/GameEngine.js';
 import {h} from '../shared/ui/dom.js';
-import {Course} from './Course.js';
-import {BallPhysics} from './BallPhysics.js';
-import {GolfWorld} from './GolfWorld.js';
-import {GolfStore} from './Store.js';
-import {ThemeAdapter} from './ThemeAdapter.js';
-import {GolfControls} from './Controls.js';
-import {GolfUI} from './UI.js';
-import {GolfAudio} from './Audio.js';
-import {CLUBS,predictions,clamp,recommend,yards} from './rules.js';
+import {Course} from './Course.js?v=20261025-physics-2';
+import {BallPhysics} from './BallPhysics.js?v=20261025-physics-2';
+import {GolfWorld} from './GolfWorld.js?v=20261025-physics-2';
+import {GolfStore} from './Store.js?v=20261025-physics-2';
+import {ThemeAdapter} from './ThemeAdapter.js?v=20261025-physics-2';
+import {GolfControls} from './Controls.js?v=20261025-physics-2';
+import {GolfUI} from './UI.js?v=20261025-physics-2';
+import {GolfAudio} from './Audio.js?v=20261025-physics-2';
+import {CLUBS,predictions,clamp,recommend,yards,puttPower} from './rules.js?v=20261025-physics-2';
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 export default class RipaGolf {
   constructor(){this.phase='title';this.time=0;this.windTime=0;this.club=4;this.aim=0;this.power=.8;this.spin=0;this.shape=0;this.loft=0;this.zoom=1;this.pitch=.2;this.dirty=true;this.previewWait=0;this.saveWait=0;}
@@ -25,6 +25,7 @@ export default class RipaGolf {
     this.controls=new GolfControls(this.gr.canvas,this.ui.swingZone,{
       pause:()=>this.togglePause(),timing:()=>this.timing(),club:i=>this.chooseClub(i),
       aim:delta=>this.changeAim(delta),pitch:delta=>{this.pitch=clamp(this.pitch+delta,0,1);},zoom:delta=>{this.zoom=clamp(this.zoom+delta,.6,2.7);},
+      canSwing:()=>this.phase==='aim'&&this.ui.modal.hidden,clubIndex:()=>this.club,gesture:(gesture,released)=>{if(gesture?.points.length===1&&!released){this.audio.unlock();this.audio.click();}this.ui.gesture(gesture,released);},
       charge:value=>this.ui.charge(value),swing:(power,error)=>this.shoot(power,error)
     },this.store.settings);
     this.engine=new GameEngine(this.gr);this.engine.update=dt=>this.update(dt);this.engine.onHidden=()=>{this.pause();this.capture();this.audio.pause();};
@@ -44,10 +45,10 @@ export default class RipaGolf {
     if(!this.run||(!first&&!this.hole?.result?.won))return;
     if(!first)this.run.holeIndex++;
     const seed=(this.run.seed+Math.imul(this.run.holeIndex,0x9e3779b9))>>>0;
-    this.course=new Course(seed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.onBounce=impact=>this.audio.bounce(impact);
+    this.course=new Course(seed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.onBounce=(impact,lie)=>{if(!this.skipping)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(!this.skipping)this.audio.rim();};
     this.world.build(this.course);
     this.hole=this.run.hole={courseSeed:seed,par:this.course.par,strokes:0,prediction:null,locked:false,result:null,phase:'overview'};
-    this.selection=null;this.windTime=0;this.spin=this.shape=this.loft=0;this.zoom=1;this.phase='overview';this.overviewTime=0;
+    this.ui.lastShot.hidden=true;this.selection=null;this.windTime=0;this.spin=this.shape=this.loft=0;this.zoom=1;this.phase='overview';this.overviewTime=0;
     this.prepareLie();this.ui.hud.hidden=false;this.ui.update();this.ui.overview();this.capture();
     if(this.store.settings.reducedMotion)this.openPredictions();
   }
@@ -59,16 +60,17 @@ export default class RipaGolf {
   prepareLie(){
     const d=this.course.distance(this.ball.p.x,this.ball.p.z),lie=this.course.surface(this.ball.p.x,this.ball.p.z);
     this.aimBase=Math.atan2(this.course.pin.x-this.ball.p.x,this.course.pin.z-this.ball.p.z);this.aim=this.aimBase;
-    this.club=recommend(d,lie);this.power=clamp(d/(this.club===8?64:CLUBS[this.club].carry),.025,1);this.dirty=true;this.previewWait=0;
+    this.club=recommend(d,lie);this.power=this.club===8?puttPower(d):clamp(d/CLUBS[this.club].carry,.005,1);this.dirty=true;this.previewWait=0;
   }
   relativeAim(){return wrap(this.aim-this.aimBase);}
-  changeAim(delta){if(this.phase!=='aim')return;this.aim=wrap(this.aim+delta);this.dirty=true;this.ui.syncShot();}
-  setAim(delta){if(this.phase!=='aim')return;this.aim=wrap(this.aimBase+delta);this.dirty=true;this.ui.syncShot();}
-  chooseClub(index){if(this.phase!=='aim'||!CLUBS[index])return;this.club=index;const d=this.course.distance(this.ball.p.x,this.ball.p.z);this.power=clamp(d/(index===8?64:CLUBS[index].carry),.025,1);this.dirty=true;this.ui.syncShot();}
-  setPower(value){if(this.phase!=='aim')return;this.power=clamp(value,.02,1);this.dirty=true;this.ui.syncShot();}
-  setShotOption(key,value){if(this.phase!=='aim')return;if(!['spin','shape','loft'].includes(key)||!Number.isFinite(value))return;this[key]=value;this.dirty=true;}
+  changeAim(delta){if(this.phase!=='aim'||this.controls?.swipe)return;this.aim=wrap(this.aim+delta);this.dirty=true;this.ui.syncShot();}
+  setAim(delta){if(this.phase!=='aim'||this.controls?.swipe)return;this.aim=wrap(this.aimBase+delta);this.dirty=true;this.ui.syncShot();}
+  chooseClub(index){if(this.phase!=='aim'||this.controls?.swipe||!CLUBS[index])return;this.club=index;const d=this.course.distance(this.ball.p.x,this.ball.p.z);this.power=index===8?puttPower(d):clamp(d/CLUBS[index].carry,.005,1);this.dirty=true;this.ui.syncShot();}
+  setPower(value){if(this.phase!=='aim'||this.controls?.swipe)return;this.power=clamp(value,.005,1);this.dirty=true;this.ui.syncShot();}
+  setShotOption(key,value){if(this.phase!=='aim'||this.controls?.swipe)return;if(!['spin','shape','loft'].includes(key)||!Number.isFinite(value))return;this[key]=value;this.dirty=true;}
   shotSpec(power=this.power,error=0){return {club:this.club,power,aim:this.aim,error,spin:this.spin,shape:this.shape,loft:this.club===8?0:this.loft};}
   timing(){
+    if(this.controls.swipe)return;
     if(this.phase==='aim'){this.audio.unlock();this.phase='timing';this.timingTime=0;this.timingValue=-1;this.ui.syncShot();}
     else if(this.phase==='timing')this.shoot(this.power,this.timingValue);
   }
@@ -81,7 +83,7 @@ export default class RipaGolf {
   preview(){
     const sim=new BallPhysics(this.course);sim.reset(this.ball.p);sim.launch(this.shotSpec());
     const points=[{...sim.p}];let event=null;
-    for(let i=0;i<1500;i++){event=sim.update(1/60,this.windTime);if(i%8===0)points.push({...sim.p});if(event?.type==='penalty'||['rest','holed'].includes(sim.status))break;}
+    for(let i=0;i<5400;i++){event=sim.update(1/60,this.windTime+1/60);if(i%8===0)points.push({...sim.p});if(event?.type==='penalty'||['rest','holed'].includes(sim.status))break;}
     points.push({...sim.p});this.world.setPreview(points);
     const distance=Math.hypot(sim.p.x-this.ball.p.x,sim.p.z-this.ball.p.z);
     this.ui.plan.textContent=`${this.club===8?'Putt':'Shot'} preview · ${yards(distance)} yd at ${Math.round(this.power*100)}%${event?.type==='penalty'?' · hazard risk':''}`;
@@ -95,17 +97,28 @@ export default class RipaGolf {
     if(this.phase==='timing'){this.timingTime+=dt;this.timingValue=-Math.cos(this.timingTime*3.4);this.ui.updateTiming(this.timingValue);}
     if(this.phase==='flight'){
       const event=this.ball.update(dt,this.windTime);
-      if(event?.type==='penalty'){this.hole.strokes+=event.penalty;this.store.stroke(event.penalty);this.ui.announce(event.reason);this.readyAfterShot();}
+      if(this.ball.status==='rolling')this.audio.roll(Math.hypot(this.ball.v.x,this.ball.v.z),this.course.surface(this.ball.p.x,this.ball.p.z),dt);
+      if(event?.type==='cup-entry')this.audio.cup();
+      if(event?.type==='penalty'){this.hole.strokes+=event.penalty;this.store.stroke(event.penalty);this.ui.announce(event.reason);this.readyAfterShot(event.summary);}
       else if(event?.type==='rest'){this.readyAfterShot();}
       else if(event?.type==='holed'){this.finishHole();}
     }
     this.previewWait-=dt;
     if(this.dirty&&this.phase==='aim'&&this.previewWait<=0){this.preview();this.dirty=false;this.previewWait=.18;}
-    this.world.update(dt,this.phase,this.ball,this.aim,this.zoom,this.pitch,this.time,this.store.settings.reducedMotion);
+    this.world.update(dt,this.phase,this.ball,this.aim,this.zoom,this.pitch,this.time,this.store.settings.reducedMotion,{putting:this.club===8,puttingGuide:this.store.settings.puttingGuide,swinging:!!this.controls.swipe});
     this.hudTime=(this.hudTime||0)+dt;if(this.hudTime>.1){this.hudTime=0;this.ui.update();}
     this.saveWait+=dt;if(this.saveWait>2){this.saveWait=0;this.capture();}
   }
-  readyAfterShot(){this.phase='aim';this.prepareLie();this.ui.ready();this.ui.update();this.capture();}
+  readyAfterShot(summary=this.ball.summary()){this.phase='aim';this.prepareLie();this.ui.ready();this.ui.shotSummary(summary);this.ui.update();this.capture();}
+  skipShot(){
+    if(this.phase!=='flight')return;this.skipping=true;
+    for(let i=0;i<10800&&this.phase==='flight';i++){
+      this.windTime+=1/60;const event=this.ball.update(1/60,this.windTime);
+      if(event?.type==='penalty'){this.hole.strokes+=event.penalty;this.store.stroke(event.penalty);this.ui.announce(event.reason);this.readyAfterShot(event.summary);}
+      else if(event?.type==='rest')this.readyAfterShot();else if(event?.type==='holed')this.finishHole();
+    }
+    this.skipping=false;
+  }
   finishHole(){
     if(this.hole.result)return;
     const result=this.store.settle(this.hole);this.phase=result.won?'result':'lost';this.ui.result(result);this.ui.update();this.audio.result(result.won,result.milestone);this.capture();
@@ -118,12 +131,12 @@ export default class RipaGolf {
   }
   resumeSaved(){
     this.run=this.store.run;this.hole=this.run?.hole;if(!this.hole)return;
-    this.course=new Course(this.hole.courseSeed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.restore(this.hole.ball);this.ball.onBounce=impact=>this.audio.bounce(impact);this.world.build(this.course);
+    this.course=new Course(this.hole.courseSeed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.restore(this.hole.ball);this.ball.onBounce=(impact,lie)=>{if(!this.skipping)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(!this.skipping)this.audio.rim();};this.world.build(this.course);
     this.prepareLie();this.aim=Number.isFinite(this.hole.aim)?this.hole.aim:this.aim;this.club=CLUBS[this.hole.club]?this.hole.club:this.club;this.power=this.hole.power||this.power;
     this.spin=this.hole.spin||0;this.shape=this.hole.shape||0;this.loft=this.hole.loft||0;this.windTime=this.hole.windTime||0;this.selection=this.hole.selection||this.hole.prediction;this.audio.unlock();this.audio.active=true;this.ui.hud.hidden=false;
     if(this.hole.result){this.phase=this.hole.result.won?'result':'lost';this.ui.result(this.hole.result);}
     else if(!this.hole.locked){this.phase='prediction';this.ui.predictions(this.selection);}
-    else{this.phase='paused';this.pausedFrom=this.ball.status==='flight'||this.ball.status==='rolling'?'flight':'aim';this.ui.pause();}
+    else{this.phase='paused';this.pausedFrom=['flight','rolling','cupping'].includes(this.ball.status)?'flight':'aim';this.ui.pause();}
     this.ui.update();
   }
   pause(){

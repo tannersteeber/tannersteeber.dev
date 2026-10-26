@@ -84,33 +84,84 @@ html{overflow:hidden;scrollbar-gutter:auto}.rg-game{margin:0;overflow:hidden;ove
 
 .rg-shot-header select{flex:1;min-width:0}.rg-shot-header .rg-lie{flex-shrink:0}
 
-/* Keep the course in its own viewport; touch controls never cover the ball. */
-.rg-viewport{position:absolute;inset:0;bottom:var(--rg-control-space,0px);right:var(--rg-control-side,0px);overflow:hidden}
+
+/* Aiming uses safe viewing zones, independent of the physics scene. */
+.rg-viewport{position:absolute;inset:var(--rg-scene-top,0px) var(--rg-control-side,0px) var(--rg-control-space,0px) var(--rg-control-left,0px);overflow:hidden}
+.rg-aiming:not(.rg-touch-layout){--rg-control-side:380px;--rg-scene-top:155px}
+.rg-hud .rg-stat:nth-child(n+8){display:none}
+.rg-aiming:not(.rg-touch-layout) .rg-hud{max-width:calc(100% - 405px);right:400px}
 .rg-swing-zone{display:none}
 .rg-adjustments>summary{display:none}
-.rg-touch-layout.rg-aiming{--rg-control-space:var(--rg-dock-height,230px)}
-.rg-touch-layout .rg-shot{left:0;right:0;bottom:0;width:auto;height:clamp(200px,30svh,260px);max-height:none;overflow:hidden;padding:12px 12px max(12px,env(safe-area-inset-bottom));border-radius:18px 18px 0 0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:8px 12px}
-.rg-touch-layout .rg-shot-header{grid-column:1;grid-row:1;margin:0;gap:5px;flex-wrap:wrap}
-.rg-touch-layout .rg-shot-header select{font-size:.68rem;width:100%;flex-basis:100%;min-height:36px}
-.rg-touch-layout .rg-range-hint{display:none}
-.rg-touch-layout .rg-adjustments{grid-column:1;grid-row:2;overflow-y:auto;overscroll-behavior:contain;font-size:.72rem;min-height:0}
-.rg-touch-layout .rg-adjustments>summary{display:flex;align-items:center;min-height:38px;cursor:pointer;color:var(--rg-accent);font-weight:700}
+.rg-swing-dock{position:absolute;z-index:3;pointer-events:auto;box-sizing:border-box}
+.rg-gesture-trail{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.rg-gesture-trail path{fill:none;stroke:var(--rg-accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 3px var(--rg-accent));transition:opacity .3s}
+.rg-swing-zone::before{content:'';position:absolute;left:50%;bottom:10%;width:28px;height:28px;border:2px dashed var(--rg-accent);border-radius:50%;transform:translateX(-50%);opacity:.7}
+.rg-swing-zone>span,.rg-swing-zone>small:not(.rg-swipe-details){display:none}
+.rg-swipe-feedback,.rg-swipe-details{position:relative;pointer-events:none;z-index:1}
+.rg-swipe-feedback{font-size:.85rem;color:var(--rg-accent)}
+.rg-swipe-details{font-size:.6rem!important;color:var(--rg-muted);line-height:1.5;max-width:100%}
+.rg-swiping .rg-gesture-trail path{stroke-width:2.7}
+.rg-trail-released .rg-gesture-trail path{opacity:0}
+.rg-swipe-canceled{border-color:var(--rg-failure)!important}
+.rg-swipe-canceled .rg-gesture-trail path{stroke:var(--rg-failure)}
+.rg-swipe-canceled .rg-swipe-feedback{color:var(--rg-failure)}
+.rg-shot-summary{font-size:.65rem;line-height:1.5;border-top:1px solid var(--rg-border);padding-top:8px;color:var(--rg-muted);margin:8px 0 0}
+.rg-flight{top:auto;bottom:12px;transform:translateX(-50%);font-size:.7rem;padding:8px 12px;gap:10px}
+.rg-flight .rg-button{min-height:34px;padding:6px 10px;font-size:.68rem}
+/* Landscape: readable information left, thumb gesture right, course in the center. */
+.rg-touch-layout.rg-aiming{--rg-control-space:12px;--rg-control-left:calc(max(12px,var(--rg-safe-left,env(safe-area-inset-left))) + 164px);--rg-control-side:calc(max(12px,var(--rg-safe-right,env(safe-area-inset-right))) + 164px);--rg-scene-top:max(70px,calc(var(--rg-safe-top,env(safe-area-inset-top)) + 54px))}
+.rg-touch-layout .rg-shot{display:flex;flex-direction:column;gap:6px;left:max(12px,var(--rg-safe-left,env(safe-area-inset-left)));right:auto;top:max(70px,calc(var(--rg-safe-top,env(safe-area-inset-top)) + 54px));bottom:max(12px,var(--rg-safe-bottom,env(safe-area-inset-bottom)));width:152px;height:auto;max-height:none;overflow-y:auto;padding:9px;border-radius:14px;background:color-mix(in srgb,var(--rg-surface) 75%,transparent);box-shadow:none;backdrop-filter:blur(4px)}
+.rg-touch-layout .rg-shot-header{margin:0;gap:4px;flex-wrap:wrap}
+.rg-touch-layout .rg-shot-header select{width:100%;flex-basis:100%;font-size:.67rem;min-height:36px;padding:6px}
+.rg-touch-layout .rg-lie,.rg-touch-layout .rg-range-hint{display:none}
+.rg-touch-layout .rg-hud{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:none;margin:0;gap:0;filter:none;pointer-events:none}
+.rg-touch-layout .rg-hud .rg-stat{display:flex;min-width:0;padding:5px;border:0;border-bottom:1px solid var(--rg-border);border-radius:0!important;background:transparent;gap:2px}
+.rg-touch-layout .rg-hud .rg-stat:nth-child(7),.rg-touch-layout .rg-hud .rg-stat:nth-child(8){display:none}
+.rg-touch-layout .rg-hud .rg-stat:nth-child(11){grid-column:1/-1}
+.rg-touch-layout .rg-stat>span{font-size:.48rem;letter-spacing:.02em}
+.rg-touch-layout .rg-stat strong{font-size:.73rem;white-space:normal;line-height:1.25}
+.rg-touch-layout .rg-active-prediction{display:block;grid-column:1/-1;background:transparent;border:0;padding:6px 3px;font-size:.58rem;line-height:1.4}
+.rg-touch-layout .rg-adjustments{min-height:38px;flex-shrink:0;font-size:.68rem}
+.rg-touch-layout .rg-adjustments>summary{display:flex;min-height:38px;align-items:center;color:var(--rg-accent);font-weight:700;cursor:pointer}
 .rg-touch-layout .rg-adjustments>summary::after{content:'＋';margin-left:auto}
 .rg-touch-layout .rg-adjustments[open]>summary::after{content:'−'}
-.rg-touch-layout .rg-adjustments .rg-option{flex-wrap:wrap}
-.rg-touch-layout .rg-swing-zone{display:flex;grid-column:2;grid-row:1/4;align-self:stretch;height:auto;margin:0;padding:10px;text-align:center;min-height:0;background:var(--rg-felt);box-sizing:border-box}
-.rg-touch-layout .rg-swing-zone>span:nth-child(2){font-size:.85rem}
-.rg-touch-layout .rg-swing-zone small{font-size:.65rem;line-height:1.5}
-.rg-touch-layout .rg-shot>.rg-button{grid-column:1;grid-row:3;margin:0;font-size:.7rem;min-height:40px;padding:8px}
-.rg-touch-layout .rg-timing{grid-column:2;grid-row:1/4;align-self:center;margin:0;height:40px}
-.rg-touch-layout .rg-hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));max-width:500px;gap:0}
-.rg-touch-layout .rg-hud .rg-stat:nth-child(2),.rg-touch-layout .rg-hud .rg-stat:nth-child(6),.rg-touch-layout .rg-hud .rg-stat:nth-child(7){display:none}
-.rg-touch-layout .rg-stat{min-width:0;padding:7px;border:1px solid var(--rg-border);border-radius:0!important}
-.rg-touch-layout .rg-stat strong{font-size:.85rem}
-.rg-touch-layout .rg-active-prediction{grid-column:1/-1;font-size:.58rem;padding:6px 8px}
-@media(orientation:landscape){
- .rg-touch-layout.rg-aiming{--rg-control-space:0px;--rg-control-side:324px}
- .rg-touch-layout .rg-shot{left:auto;right:12px;top:74px;bottom:12px;width:300px;height:auto;border-radius:16px;padding:10px;gap:8px}
- .rg-touch-layout .rg-hud{right:336px;max-width:none;grid-template-columns:repeat(3,minmax(0,1fr))}
- .rg-touch-layout .rg-hud .rg-stat:first-child,.rg-touch-layout .rg-active-prediction{display:none}
+.rg-touch-layout .rg-option{flex-wrap:wrap}
+.rg-touch-layout .rg-swing-dock{right:max(12px,var(--rg-safe-right,env(safe-area-inset-right)));top:max(70px,calc(var(--rg-safe-top,env(safe-area-inset-top)) + 54px));bottom:max(12px,var(--rg-safe-bottom,env(safe-area-inset-bottom)));width:152px;display:flex;flex-direction:column;gap:8px}
+.rg-touch-layout .rg-swing-zone{display:flex;flex:1;height:auto;min-height:150px;margin:0;padding:12px 8px;box-sizing:border-box;text-align:center;background:color-mix(in srgb,var(--rg-felt) 45%,transparent);border:1px dashed var(--rg-border);box-shadow:none;justify-content:flex-start;gap:8px}
+.rg-touch-layout .rg-swing-dock>.rg-button{min-height:38px;padding:8px;font-size:.68rem}
+.rg-touch-layout .rg-timing{margin:10px 0;height:36px;flex-shrink:0}
+.rg-touch-layout .rg-swing-dock:has(.rg-timing:not([hidden])){justify-content:center}
+.rg-touch-layout .rg-flight{left:50%;bottom:12px;flex-direction:row;max-width:calc(100% - 360px);gap:6px;background:var(--rg-surface)}
+@media(orientation:portrait){
+ .rg-touch-layout.rg-aiming{--rg-control-left:0px;--rg-control-side:0px;--rg-control-space:calc(238px + max(12px,var(--rg-safe-bottom,env(safe-area-inset-bottom))));--rg-scene-top:70px}
+ .rg-touch-layout .rg-shot{left:max(8px,var(--rg-safe-left,env(safe-area-inset-left)));top:max(70px,calc(var(--rg-safe-top,env(safe-area-inset-top)) + 54px));bottom:auto;width:122px;max-height:calc(100svh - 340px);padding:7px}
+ .rg-touch-layout .rg-shot-header select{font-size:.6rem}
+ .rg-touch-layout .rg-stat strong{font-size:.65rem}
+ .rg-touch-layout .rg-swing-dock{top:auto;bottom:max(12px,var(--rg-safe-bottom,env(safe-area-inset-bottom)));width:min(44vw,175px);height:226px}
+ .rg-touch-layout .rg-swing-zone{min-height:174px}
+ .rg-touch-layout .rg-flight{left:12px;right:calc(min(44vw,175px) + 28px);bottom:24px;max-width:none;transform:none;flex-direction:column}
+}
+@media(max-height:360px) and (orientation:landscape){
+ .rg-touch-layout .rg-swing-zone{min-height:120px}
+ .rg-touch-layout .rg-stat strong{font-size:.65rem}
+}
+
+@media(max-height:360px) and (orientation:landscape){
+ .rg-touch-layout .rg-hud .rg-stat{padding:3px;gap:1px}
+ .rg-touch-layout .rg-stat>span{font-size:.42rem;line-height:1.1}
+ .rg-touch-layout .rg-stat strong{font-size:.62rem;line-height:1.1}
+ .rg-touch-layout .rg-active-prediction{font-size:.5rem;padding:4px 2px;line-height:1.2}
+}
+
+.rg-touch-layout .rg-top{left:max(12px,var(--rg-safe-left,env(safe-area-inset-left)));right:max(12px,var(--rg-safe-right,env(safe-area-inset-right)))}
+
+/* Share the Arcade's toolbar clearance; reserve the same space in the course view. */
+.rg-touch-layout{--game-safe-bottom:var(--rg-safe-bottom,env(safe-area-inset-bottom))}
+.rg-touch-layout.rg-aiming{--rg-control-space:var(--game-ui-bottom)}
+.rg-touch-layout .rg-shot,.rg-touch-layout .rg-swing-dock,.rg-touch-layout .rg-flight,.rg-touch-layout .rg-modal{bottom:var(--game-ui-bottom)}
+.rg-touch-layout .rg-modal .rg-panel{max-height:100%}
+@media(orientation:portrait){
+ .rg-touch-layout.rg-aiming{--rg-control-space:calc(238px + var(--game-ui-bottom))}
+ .rg-touch-layout .rg-shot{bottom:auto;max-height:min(calc(100svh - 340px),calc(100% - 82px - var(--game-ui-bottom)))}
+ .rg-touch-layout .rg-flight{bottom:calc(12px + var(--game-ui-bottom))}
 }

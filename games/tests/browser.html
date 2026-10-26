@@ -36,6 +36,10 @@ if(!name){
   const {default:Game}=await import(`../${name}/${name}.js`);
   g=new Game();await g.init(root);assert(g.state==='title','title screen');g.engine.stop();
   for(const [key,value]of Object.entries({desktopMode:'keyboard',invert:false,sensitivity:1,'cruise.autoSpeed':true,'cruise.speed':22,'cruise.assist':false}))g.settings.set(key,value);
+  const mobile=matchMedia('(pointer:coarse), (max-width:900px)').matches;
+  const clearance=()=>Math.max(64,Math.min(96,innerHeight*.1));
+  const clearBottom=(el,label)=>{if(mobile)assert(el.getBoundingClientRect().bottom<=innerHeight-clearance()+1,label+' clears browser toolbar');};
+  clearBottom(g.menu.layer,'title menu');
   const back=g.hud.arcadeLink;
   const backReachable=()=>{const r=back.getBoundingClientRect();assert(!back.hidden&&r.left>=0&&r.top>=0&&r.right<=innerWidth,'Arcade link fits');assert(back.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)),'Arcade link receives clicks');assert(new URL(back.href).pathname.endsWith('/arcade.html'),'Arcade link destination');};
   backReachable();
@@ -58,12 +62,13 @@ if(!name){
   root.dispatchEvent(new PointerEvent('pointerdown',{pointerId:7,pointerType:'touch',clientX:1,bubbles:true,cancelable:true}));g.input.update(.1);assert(g.input.steer<0,'touch steers left');
   root.dispatchEvent(new PointerEvent('pointerdown',{pointerId:8,pointerType:'touch',clientX:innerWidth-1,bubbles:true,cancelable:true}));for(let i=0;i<30;i++)g.input.update(.05);assert(g.input.steer===0,'opposite touches cancel');
   root.dispatchEvent(new PointerEvent('pointercancel',{pointerId:7,bubbles:true}));root.dispatchEvent(new PointerEvent('pointerup',{pointerId:8,bubbles:true}));assert(g.input.holds.size===0,'touch cleanup');g.settings.controlMode=originalMode;
-  backReachable();g.pause();backReachable();assert(g.state==='paused'&&!g.input.enabled,'pause disables input');
+  const pedalsWereHidden=g.hud.pedals.hidden;g.hud.showPedals(true);clearBottom(g.hud.pedals,'driving pedals');g.hud.showPedals(!pedalsWereHidden);
+  backReachable();g.pause();clearBottom(g.menu.layer,'pause menu');backReachable();assert(g.state==='paused'&&!g.input.enabled,'pause disables input');
   const pauseBox=g.menu.screens.pause.querySelector('.g-pause-card').getBoundingClientRect();
   assert(pauseBox.width>=240&&pauseBox.width<=282&&pauseBox.height>200,'pause panel has popup dimensions');
   assert(pauseBox.left>=0&&pauseBox.right<=innerWidth+1&&pauseBox.bottom<=innerHeight+1,'pause menu fits viewport');
   assert(getComputedStyle(g.menu.screens.pause.querySelector('.g-pause-card')).backdropFilter==='none','pause popup has no magnifying blur');const pausedAt=g.vehicle.s;step();assert(g.vehicle.s===pausedAt,'pause freezes road');
-  g.panel.open();backReachable();assert(!g.panel.el.hidden,'settings opens');const box=g.panel.el.querySelector('.g-card').getBoundingClientRect();assert(box.left>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,'settings fits viewport');g.panel.close();
+  g.panel.open();backReachable();clearBottom(g.panel.el,'settings panel');clearBottom(g.panel.el.querySelector('.g-actions'),'settings actions');assert(!g.panel.el.hidden,'settings opens');const box=g.panel.el.querySelector('.g-card').getBoundingClientRect();assert(box.left>=0&&box.right<=innerWidth+1&&box.bottom<=innerHeight+1,'settings fits viewport');g.panel.close();
   for(const appearance of ['light','dark']){SiteTheme.setPageTheme('signature');SiteTheme.setAppearance(appearance);g.applyPalette();assert(g.palette.night===(appearance==='dark'),'appearance updates scene');g.settings.set('carColor','#d94662');assert(g.car.paintHex===0xd94662,'Signature paint applies immediately');}
   for(const theme of ['retro','rain']){SiteTheme.setPageTheme(theme);g.applyPalette();assert(g.palette.page===theme,'theme updates world');assert(g.car.paintHex===g.palette.accent.getHex(),'theme paint takes precedence');
    if(theme==='rain'){g.env.update(1/60,g.vehicle.position.y);assert(g.env.binaryRain.every(points=>points.visible&&points.material.map),'binary glyph rain is active');assert(!g.env.rainLines.visible,'binary theme replaces streaks');for(const points of g.env.binaryRain)assert([...points.geometry.attributes.position.array].every(Number.isFinite),'binary particle positions');}}

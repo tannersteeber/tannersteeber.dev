@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Game startup checks</title>
+<style>body{margin:20px;font:15px/1.5 system-ui}iframe{position:fixed;inset:0;border:0;max-width:100%;z-index:5}</style></head><body><h1>Actual game-page startup checks</h1><div id="results"></div>
+<script type="module">
+const report=document.getElementById('results');let frame,failures=0;
+const assert=(ok,message)=>{if(!ok)throw Error(message);};
+for(const game of ['ripagolf','cruise','cutup'])for(const [width,height]of [[1060,700],[390,780]]){
+ try{
+  frame=document.createElement('iframe');frame.width=width;frame.height=height;frame.title=`${game} startup ${width}×${height}`;
+  const loaded=new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=reject;});
+  frame.src=`../${game}/?startup-check=${Date.now()}`;document.body.append(frame);await loaded;
+  const doc=frame.contentDocument,root=doc.getElementById('game-root');assert(root,'game root exists');
+  await new Promise((resolve,reject)=>{const start=performance.now();const check=()=>root.classList.contains('ready')?resolve():performance.now()-start>12000?reject(Error('startup timed out')):setTimeout(check,30);check();});
+  assert(!root.querySelector('.g-start-error,.rg-error'),root.dataset.startupError||root.querySelector('.g-start-error,.rg-error')?.textContent||'startup failed');
+  assert(root.querySelector('canvas.g-canvas'),'WebGL canvas exists');assert(root.querySelector('button'),'game menu exists');
+  if(game==='ripagolf')assert(doc.body.dataset.gameVersion&&doc.querySelector('script[type="module"]').src.includes(doc.body.dataset.gameVersion),'versioned real boot path');
+  report.append(Object.assign(document.createElement('p'),{textContent:`PASS ${game} ${width}×${height}: actual index, boot, saved preferences and title menu`}));
+ }catch(error){failures++;report.append(Object.assign(document.createElement('p'),{textContent:`FAIL ${game} ${width}×${height}: ${error.message}`}));}
+ finally{frame?.remove();}
+}
+document.title=failures?`FAIL ${failures} game startup checks`:'PASS 6 game startup checks';report.append(Object.assign(document.createElement('p'),{textContent:'DONE'}));
+</script></body></html>

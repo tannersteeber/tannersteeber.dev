@@ -12,7 +12,10 @@ export class GolfAudio {
   click(){this.tone(720,.07,.1,'triangle');}
   lock(){this.tone(440,.1,.12,'triangle');this.tone(880,.2,.09,'sine',false,.07);}
   hit(putt=false){this.tone(putt?280:95,putt?.07:.14,.22,'triangle');this.tone(putt?1000:1700,.035,.07,'sine');}
-  bounce(impact){this.tone(180,.06,Math.min(.14,impact*.008),'triangle');}
+  bounce(impact,lie='fairway'){this.tone(lie==='sand'?80:180,lie==='sand'?.11:.06,Math.min(.14,impact*.008),'triangle');}
+  roll(speed,lie,dt){if(!this.ctx||this.store.settings.muted||speed<.15)return;this.rollTick=(this.rollTick||0)-dt;if(this.rollTick>0)return;this.rollTick=.14;this.tone(lie==='sand'?65:100+speed*8,.065,Math.min(.012,speed*.002),'triangle');}
+  rim(){this.tone(950,.05,.05,'triangle');}
+  cup(){this.tone(430,.09,.12,'triangle');this.tone(230,.16,.1,'sine',false,.055);}
   result(won,milestone){(won?[523,659,784,1047]:[330,247,165]).forEach((n,i)=>this.tone(n,.35,.14,'sine',false,i*.12));if(milestone)this.tone(1568,.7,.12,'triangle',false,.55);}
   update(dt){
     if(!this.ctx||!this.active)return;this.tick-=dt;if(this.tick>0)return;this.tick=2.4;

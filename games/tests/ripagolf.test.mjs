@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Course} from '../ripagolf/Course.js';
 import {BallPhysics} from '../ripagolf/BallPhysics.js';
-import {CLUBS,predictions,predictionWon,scoreName,reward} from '../ripagolf/rules.js';
+import {CLUBS,predictions,predictionWon,scoreName,reward,puttPower} from '../ripagolf/rules.js';
 import {GolfStore} from '../ripagolf/Store.js';
 const saved=new Map();globalThis.localStorage={getItem:k=>saved.get(k)??null,setItem:(k,v)=>saved.set(k,v)};
 function flat(lie='fairway',options={}){return {tee:{x:0,z:0},pin:{x:0,z:2000},height:()=>0,surface:()=>lie,slope:()=>({x:0,z:0}),windAt:()=>({x:0,z:0}),inBounds:()=>true,relief:()=>({x:0,z:0}),trees:[],...options};}
@@ -30,11 +30,11 @@ test('wind, spin, lie and slope affect shots without prediction-dependent manipu
 });
 test('putts can find the cup; fast balls can roll past it',()=>{
  const course=flat('green',{tee:{x:0,z:7},pin:{x:0,z:10}});
- const putt=simulate(course,{club:8,power:.05,aim:0});assert.equal(putt.ball.status,'holed');assert.equal(putt.ball.p.z,10);
+ const putt=simulate(course,{club:8,power:puttPower(3),aim:0});assert.equal(putt.ball.status,'holed');assert.ok(Math.abs(putt.ball.p.z-10)<.033);
  const fast=simulate(course,{club:8,power:1,aim:0});assert.notEqual(fast.ball.status,'holed');assert.ok(fast.ball.p.z>11);
 });
 test('water applies relief and out of bounds returns to the previous lie',()=>{
- const water=flat('fairway',{surface:(x,z)=>z>2&&z<4?'water':'fairway'});const wet=simulate(water,{club:8,power:.3});assert.equal(wet.event.type,'penalty');assert.equal(wet.event.penalty,1);assert.equal(wet.ball.p.z,0);assert.equal(wet.ball.status,'rest');
+ const water=flat('fairway',{surface:(x,z)=>z>2&&z<4?'water':'fairway'});const wet=simulate(water,{club:8,power:1});assert.equal(wet.event.type,'penalty');assert.equal(wet.event.penalty,1);assert.equal(wet.ball.p.z,0);assert.equal(wet.ball.status,'rest');
  const ob=simulate(flat('fairway',{inBounds:(x,z)=>z<8}),{club:0,power:1});assert.equal(ob.event.type,'penalty');assert.equal(ob.ball.p.z,0);
 });
 test('golf classifications and exact versus or-better predictions include official strokes',()=>{
@@ -53,4 +53,102 @@ test('settlement is idempotent, builds milestones, resets a lost streak and pers
 test('ball snapshots preserve active flight and corrupt saves fail safely',()=>{
  const c=flat(),a=new BallPhysics(c);a.launch({club:2,power:.8,aim:.2});a.update(.1);const b=new BallPhysics(c);b.restore(a.snapshot());for(let i=0;i<200;i++){a.update(1/60);b.update(1/60);}assert.ok(Math.abs(a.p.x-b.p.x)<1e-8);assert.ok(Math.abs(a.p.z-b.p.z)<1e-8);
  saved.set('tsd.ripagolf.v1','broken');assert.equal(new GolfStore().stats.holes,0);const store=new GolfStore();store.set('graphics','broken');assert.equal(store.settings.graphics,'medium');
+});
+
+// Physics fixtures use real metre-scale cups and deliberately varied input paths.
+const {BALL_RADIUS,CUP_RADIUS,CUP_DEPTH,CUP_CLEARANCE,cupSweep}=await import('../ripagolf/CupPhysics.js');
+const {SwingGesture}=await import('../ripagolf/SwingGesture.js');
+const {terrainGeometry,cupSurroundGeometry}=await import('../ripagolf/TerrainGeometry.js');
+function advance(ball,seconds=30,dt=1/120){const events=[];for(let i=0;i<seconds/dt&&!['rest','holed'].includes(ball.status);i++){const e=ball.update(dt,i*dt);if(e)events.push(e.type);}return events;}
+function rollingBall(course,start,velocity){const b=new BallPhysics(course);b.reset(start);b.status='rolling';b.v={x:0,y:0,z:0,...velocity};return b;}
+test('cup has regulation-inspired scale, swept entry, a falling state and an interior resting position',()=>{
+ assert.equal(BALL_RADIUS*2,.04267);assert.equal(CUP_RADIUS*2,.108);assert.equal(CUP_DEPTH,.1016);
+ assert.ok(cupSweep({x:0,z:-1},{x:0,z:1},{x:0,z:0}));
+ const c=flat('green',{pin:{x:0,z:0}}),b=rollingBall(c,{x:0,z:-.08},{z:.45});
+ let entry=false;for(let i=0;i<100;i++){const e=b.update(1/120);if(e?.type==='cup-entry'){entry=true;assert.equal(b.status,'cupping');assert.ok(b.p.y>-CUP_DEPTH);break;}}
+ assert.ok(entry);assert.notEqual(b.status,'holed');advance(b,2);assert.equal(b.status,'holed');assert.ok(Math.abs(b.p.y-(-CUP_DEPTH+BALL_RADIUS))<1e-8);assert.ok(Math.hypot(b.p.x,b.p.z)<=CUP_CLEARANCE+.00001);
+});
+test('fast central putts pass over, glancing rim contacts deflect and nearby misses never award a hole',()=>{
+ const c=flat('green',{pin:{x:0,z:0}});
+ const fast=rollingBall(c,{x:0,z:-.2},{z:4});advance(fast,1);assert.notEqual(fast.status,'holed');assert.ok(fast.p.z>.2);
+ const miss=rollingBall(c,{x:.09,z:-.2},{z:.8});advance(miss,3);assert.notEqual(miss.status,'holed');assert.equal(miss.p.x,.09);
+ const rim=rollingBall(c,{x:.043,z:-.15},{z:1.3});let hits=0;rim.onRim=()=>hits++;advance(rim,3);assert.ok(hits>0);assert.ok(Math.abs(rim.p.x-.043)>.005);assert.notEqual(rim.status,'holed');
+});
+test('descending chips enter the actual opening; an adjacent chip lands on the green',()=>{
+ const c=flat('green',{pin:{x:0,z:0}});
+ for(const [x,shouldHole]of [[0,true],[.12,false]]){
+  const b=new BallPhysics(c);b.p={x,y:.32,z:0};b.previous={...b.p};b.v={x:0,y:-2,z:0};b.status='flight';const events=advance(b,4);
+  assert.equal(b.status==='holed',shouldHole);assert.equal(events.includes('cup-entry'),shouldHole);
+ }
+});
+test('ground contact responds to uphill, downhill and cross-slope forces without micro bouncing',()=>{
+ const slope=(sx,sz)=>flat('green',{height:(x,z)=>x*sx+z*sz,slope:()=>({x:sx,z:sz})});
+ const down=rollingBall(slope(0,-.04),{x:0,z:0},{z:.2});advance(down,2);assert.ok(down.v.z>.2);
+ const uphill=rollingBall(slope(0,.05),{x:0,z:0},{z:.65});advance(uphill,3);assert.ok(uphill.v.z<0,'steep uphill putt rolls backward');
+ const side=rollingBall(slope(.025,0),{x:0,z:0},{z:1.5});advance(side,3);assert.ok(side.p.x<-.1);
+ const still=rollingBall(slope(.008,.006),{x:0,z:0},{});advance(still,3);assert.equal(still.status,'rest');assert.ok(Math.abs(still.p.y/Math.hypot(1,.008,.006)-BALL_RADIUS)<1e-10,'sphere rests one radius normal to the slope');
+});
+test('club flight has distinct height/carry and wind acts on relative airflow',()=>{
+ function flight(club,wind){const c=flat('fairway',{windAt:()=>wind}),b=new BallPhysics(c);b.launch({club,power:1});let apex=0;for(let i=0;i<5000&&b.status!=='rest';i++){b.update(1/120);apex=Math.max(apex,b.p.y);}return {b,apex};}
+ const driver=flight(0,{x:0,z:0}),wedge=flight(7,{x:0,z:0});assert.ok(driver.b.shot.carry>wedge.b.shot.carry*3);assert.ok(wedge.apex/wedge.b.shot.carry>driver.apex/driver.b.shot.carry);
+ const head=flight(4,{x:0,z:-6}),tail=flight(4,{x:0,z:6});assert.ok(head.b.shot.carry<tail.b.shot.carry);
+ const bounceFair=simulate(flat('fairway'),{club:4,power:.65}),bounceSand=simulate(flat('sand'),{club:4,power:.65});assert.ok(bounceFair.ball.p.z-bounceFair.impact.z>bounceSand.ball.p.z-bounceSand.impact.z);
+});
+test('mesh triangles and physics heights agree, the cup is open, bunkers are depressed and seeds validate',()=>{
+ for(const seed of [1,3,12,48]){
+  const c=new Course(seed),mesh=terrainGeometry(c),p=mesh.geometry.attributes.position,index=mesh.geometry.index;assert.ok(c.validation.valid);
+  for(let k=0;k<index.count;k+=Math.max(3,Math.floor(index.count/180/3)*3)){
+   const ids=[index.getX(k),index.getX(k+1),index.getX(k+2)],x=ids.reduce((s,i)=>s+p.getX(i),0)/3,z=ids.reduce((s,i)=>s+p.getZ(i),0)/3,y=ids.reduce((s,i)=>s+p.getY(i),0)/3;
+   assert.ok(Math.abs(c.height(x,z)-y)<.00002,'triangle centroid equals collision surface');
+  }
+  const sand=c.hazards.find(h=>h.type==='sand');assert.ok(c.height(sand.x,sand.z)<c.baseHeight(sand.x,sand.z)+.5,'bunker has a depression');
+  const ring=cupSurroundGeometry(c),positions=ring.attributes.position;
+  for(let i=0;i<96;i++)assert.ok(Math.abs(Math.hypot(positions.getX(i)-c.pin.x,positions.getZ(i)-c.pin.z)-CUP_RADIUS)<.00004);
+  assert.ok(c.height(0,0)>c.baseHeight(0,0)+.4,'elevated tee');mesh.geometry.dispose();ring.dispose();
+ }
+});
+test('gesture power is progressive, repeatable, bounded and has putting finesse',()=>{
+ function gesture(endY,time,club=4,hz=60,dx=0){const g=new SwingGesture(.5,.9,0);for(let i=1;i<=Math.ceil(time*hz);i++){const f=Math.min(1,i/(time*hz));g.move(.5+dx*f,.9+(endY-.9)*f,time*f,club);}return g.release(.5+dx,endY,time,club);}
+ assert.ok(gesture(.1,.25).power>gesture(.6,.25).power);assert.ok(gesture(.2,.2).power>gesture(.2,1).power);
+ assert.ok(gesture(-.1,.01).power<=1);assert.ok(gesture(.75,.3,8).power<gesture(.75,.3,4).power);
+ assert.ok(Math.abs(gesture(.15,.4,4,30).power-gesture(.15,.4,4,120).power)<1e-8);
+ assert.equal(gesture(.89,.1).canceled,true);assert.ok(gesture(.2,.4,4,60,.12).error>0);assert.ok(gesture(.2,.4,4,60,-.12).error<0);
+ const cancel=new SwingGesture(.5,.9,0);cancel.move(.5,.3,.2);assert.equal(cancel.release(.5,.89,.4).canceled,true);
+ const outside=new SwingGesture(.5,.9,0);assert.equal(outside.release(1.4,.2,.2).canceled,true);
+ const erratic=new SwingGesture(.5,.9,0);erratic.move(.8,.65,.1);erratic.move(.2,.4,.2);const f=erratic.release(.5,.15,.3);assert.ok(Math.abs(f.error)>.05);
+});
+test('putting power spans tap-ins and long rolls, with smaller powers providing useful fine control',()=>{
+ for(const distance of [.2,1,3,10,20]){const c=flat('green',{pin:{x:0,z:distance}}),b=new BallPhysics(c);b.launch({club:8,power:puttPower(distance)});advance(b,40);assert.equal(b.status,'holed',`${distance}m controlled putt`);}
+ assert.ok(puttPower(.2)<puttPower(1)&&puttPower(1)<puttPower(10));
+});
+test('camera frames the ball, cup and landing target across narrow and wide safe viewing zones',async()=>{
+ const THREE=await import('../vendor/three.module.js'),{GolfCamera}=await import('../ripagolf/GolfCamera.js');
+ for(const aspect of [.65,1.1,1.8])for(const seed of [1,12,48]){
+  const course=new Course(seed),ball=new BallPhysics(course),camera=new THREE.PerspectiveCamera(62,aspect,.04,2600),control=new GolfCamera(camera);
+  const aim=Math.atan2(course.pin.x,course.pin.z),landing={x:course.pin.x,z:course.pin.z};
+  control.update(1/60,{course,ball,position:ball.p,phase:'aim',aim,zoom:1,pitch:.2,time:0,reduced:false,putting:false,landing});
+  camera.updateProjectionMatrix();for(const point of [ball.p,{...course.pin,y:course.height(course.pin.x,course.pin.z)},landing]){
+    const projected=new THREE.Vector3(point.x,point.y??course.height(point.x,point.z),point.z).project(camera);assert.ok(Math.abs(projected.x)<1&&Math.abs(projected.y)<1,'camera framing');
+  }
+  const initial=camera.position.clone();control.update(.1,{course,ball,position:ball.p,phase:'aim',aim:aim+.5,zoom:1,pitch:.5,time:0,reduced:false,putting:false,landing,swinging:true});assert.deepEqual(camera.position,initial);
+ }
+});
+
+test('generated par 3, 4 and 5 holes can be completed from the tee using the actual shot simulation',async()=>{
+ const {planShot}=await import('./golf-shot-planner.mjs'),pars=[];
+ for(const seed of [1,2,7]){
+  const course=new Course(seed),ball=new BallPhysics(course);pars.push(course.par);let strokes=0,time=0;
+  while(ball.status!=='holed'&&strokes<8){
+   const shot=planShot(course,ball.p,time);assert.ok(shot.cost<1000,'reachable landing');ball.launch(shot);strokes++;
+   for(let i=0;i<5400&&!['rest','holed'].includes(ball.status);i++){time+=1/60;const event=ball.update(1/60,time);assert.notEqual(event?.type,'penalty');}
+  }
+  assert.equal(ball.status,'holed',`seed ${seed} completed through normal shots`);assert.ok(strokes<=course.par+1);
+ }
+ assert.deepEqual(pars.sort(),[3,4,5]);
+});
+test('mid-drop saves resume inside the cup, and legacy ball saves keep their lie without an extra stroke',()=>{
+ const c=flat('green',{pin:{x:0,z:0}}),a=rollingBall(c,{x:0,z:-.08},{z:.45});
+ for(let i=0;i<120&&a.status!=='cupping';i++)a.update(1/120);
+ assert.equal(a.status,'cupping');const b=new BallPhysics(c);b.restore(a.snapshot());advance(a,2);advance(b,2);assert.equal(b.status,'holed');assert.deepEqual(b.p,a.p);
+ const legacy=new BallPhysics(c);legacy.restore({p:{x:2,y:20,z:3},v:{x:0,y:-3,z:1},status:'flight'});assert.equal(legacy.status,'rest');assert.equal(legacy.p.x,2);assert.equal(legacy.p.z,3);assert.equal(legacy.p.y,BALL_RADIUS);
 });
