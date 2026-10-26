@@ -23,15 +23,20 @@ if(!isCase){
   const clearBottom=(el,label)=>{if(game.ui.mobile.matches)assert(el.getBoundingClientRect().bottom<=innerHeight-Math.max(64,Math.min(96,innerHeight*.1))+1,label+' clears browser toolbar');};
   assert(game.phase==='title','main menu');clearBottom(game.ui.modal,'main menu');assert(getComputedStyle(root).userSelect==='none','game text selection disabled');assert(getComputedStyle(game.ui.modal.querySelector('.rg-panel')).backgroundImage!=='none','panel felt background renders');assert(fits(game.ui.modal.querySelector('.rg-panel')),'title fits');
   const topLink=game.ui.top.querySelector('a'),topPause=game.ui.top.querySelector('[aria-label="Pause game"]');
+  const toolbarCorners=()=>{
+    const header=game.ui.top.getBoundingClientRect(),back=topLink.getBoundingClientRect(),pause=topPause.getBoundingClientRect();
+    assert(Math.abs(back.left-header.left)<1&&Math.abs(pause.right-header.right)<1,'Arcade and Pause remain in opposite toolbar corners');
+    assert(['flex','inline-flex'].includes(getComputedStyle(topLink).display)&&getComputedStyle(topLink).alignItems==='center'&&getComputedStyle(topLink).justifyContent==='center','Arcade text centered in its button');
+  };toolbarCorners();
   const reachable=el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2));};
   assert(reachable(topLink)&&reachable(topPause),'main menu header receives pointer clicks');
   const compactMenu=()=>{const panel=game.ui.modal.querySelector('.rg-panel'),r=panel.getBoundingClientRect();assert(r.width<=280&&r.top>=70&&r.top<=90&&innerWidth-r.right<=24,'compact menu anchored upper right');assert(getComputedStyle(game.ui.modal.querySelector('.rg-actions')).flexDirection==='column','stacked menu actions');};
-  topPause.click();compactMenu();assert(game.ui.kind==='title-menu'&&game.phase==='title','title pause button opens menu without starting a run');
+  topPause.click();toolbarCorners();compactMenu();assert(game.ui.kind==='title-menu'&&game.phase==='title','title pause button opens menu without starting a run');
   assert(reachable(topLink)&&reachable(topPause),'menu header remains clickable');
   topPause.click();assert(game.ui.kind==='title','title menu toggles closed');
   game.ui.help();assert(game.ui.modal.textContent.includes('Space'),'controls help');game.returnScreen();
   game.newRun();assert(game.phase==='overview'||game.phase==='prediction','hole overview');if(game.phase==='overview')game.openPredictions();assert(game.phase==='prediction','prediction board');assert(reachable(topLink)&&reachable(topPause),'prediction header remains clickable');assert(fits(game.ui.modal.querySelector('.rg-panel')),'prediction board fits');
-  const chip=game.ui.chips.querySelector('[data-prediction="exact-par"]');chip.click();game.ui.lockButton.click();assert(game.hole.locked&&game.phase==='aim','prediction locks');const locked=game.hole.prediction;game.selection='bogey';game.lockPrediction();assert(game.hole.prediction===locked,'locked chip immutable');
+  const chip=game.ui.chips.querySelector('[data-prediction="exact-par"]');chip.click();game.ui.lockButton.click();assert(game.hole.locked&&game.phase==='aim','prediction locks');toolbarCorners();const locked=game.hole.prediction;game.selection='bogey';game.lockPrediction();assert(game.hole.prediction===locked,'locked chip immutable');
   game.ui.hud.hidden=false;game.ui.update();assert(fits(game.ui.shot),'shot controls fit');assert(fits(game.ui.hud),'HUD fits');
   game.controls.keys.add('KeyA');const initialAim=game.aim;game.controls.update(.1);game.controls.reset();assert(game.aim<initialAim,'keyboard aim');
   game.setAim(0);game.setPower(.35);const zone=game.ui.swingZone,rect=zone.getBoundingClientRect();

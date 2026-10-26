@@ -263,3 +263,11 @@ html{overflow:hidden;scrollbar-gutter:auto}.rg-game{margin:0;overflow:hidden;ove
 .rg-back,.rg-icon{box-sizing:border-box;height:44px;min-height:44px}
 
 @media(orientation:landscape){.rg-touch-layout .rg-shot{padding:2px}}
+
+/* Keep toolbar corners stable when the camera controls are hidden on menus. */
+.rg-top{align-items:flex-start}
+.rg-top>.rg-back{display:inline-flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap}
+.rg-top>.rg-icon{margin-left:auto;flex-shrink:0;align-self:start}
+.rg-touch-layout .rg-top>.rg-back{grid-column:1;grid-row:1}
+.rg-touch-layout .rg-top>.rg-camera-tools{grid-column:2;grid-row:1}
+.rg-touch-layout .rg-top>.rg-icon{grid-column:3;grid-row:1;justify-self:end}

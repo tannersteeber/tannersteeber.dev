@@ -1,5 +1,6 @@
 /* GameHUD — minimal, readable heads-up display (stats, toasts, flash, pause button, pedals). */
 import { h } from './dom.js';
+import {gameLogo} from './GameLogo.js?v=20261026-brand-1';
 
 export class GameHUD {
   /** fields: [{ id, label, big? }] */
@@ -18,10 +19,11 @@ export class GameHUD {
     this.flashEl = h('div', { class: 'g-flash' });
     this.pauseBtn = h('button', { class: 'g-pause-toggle', type: 'button', 'aria-label': 'Pause game', 'data-ui': '', text: 'II', onclick: () => hooks.onPause() });
     this.arcadeLink = h('a', { class: 'g-arcade-back', href: '../../arcade.html', 'data-ui': '', text: '← Arcade' });
+    this.brand=h('span',{class:'g-small-brand'},gameLogo(hooks.id),h('span',{text:hooks.title}));
     this.pedals = h('div', { class: 'g-pedals', 'data-ui': '', hidden: true },
       this._pedal('Brake', -1, hooks), this._pedal('Gas', 1, hooks));
     this.hooks = hooks;
-    root.append(this.el, this.toastEl, this.flashEl, this.pauseBtn, this.arcadeLink, this.pedals);
+    root.append(this.el, this.toastEl, this.flashEl, this.pauseBtn, this.arcadeLink, this.brand, this.pedals);
   }
 
   _pedal(label, dir, hooks) {

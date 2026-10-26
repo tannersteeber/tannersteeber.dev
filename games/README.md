@@ -96,3 +96,13 @@ Open `games/tests/startup.html` to exercise the actual game HTML and shared boot
 RipaGolf also has Main, Hole and Course camera buttons. Main uses a low position near the ball; Hole frames the whole green and fringe; Course shows the whole hole without changing the shot. The Contours toggle adds an elevation tint, 8 cm contour bands and downhill arrows over the green and its runoffs. It is also available in Settings. Texture maps distinguish rough grass, mown fairway, fine green grain, raked sand and water. Full shots lose more energy on green contact; the original putting rolling resistance and calibrated short-putt response remain. `SurfaceTextures.js` generates reusable detail maps without downloads or new dependencies.
 
 All games keep Arcade at the upper left and a 44px Pause button at the upper right, including title, pause and settings screens. On driving title/results screens, Pause opens a compact game menu. `games/tests/ripagolf.html?ui=1` runs the responsive UI checks without repeating the longer tee-to-cup shot search.
+
+Cruise and Cutup each use a theme-colored SVG logo on the title screen and in the compact header: a winding scenic road for Cruise and a car with lane and speed accents for Cutup. `shared/ui/GameLogo.js` owns these marks.
+
+Cruise shows the shared Gas and Brake hold buttons during play on desktop and mobile, in every camera and with automatic or manual speed. Automatic mode uses them to adjust cruising speed; manual mode accelerates or brakes directly.
+
+Standalone games use `shared/ui/GameTouch.js` and a fixed game document to suppress browser page panning, pinch gestures, long-press callouts, dragging and text selection. Buttons, sliders, native pickers and vertical scrolling inside game menus remain usable; menu edges do not chain into page scrolling. The Arcade library and other portfolio pages keep normal browser behavior.
+
+## Update ownership
+
+Maintain each game’s About, Controls and newest-first `info.updates` in `games/library.js`. The first entry is shown as Recent update; older entries live under Update history. Use Feature / Update / Patch labels and ISO dates only when known. Keep game controls, physics, cameras, visuals, saves and shared game fixes in the affected game cards. Website releases in `projects.html` cover site pages and the Arcade library interface only; game history does not inherit website version numbers.

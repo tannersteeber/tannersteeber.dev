@@ -12,9 +12,9 @@ import { AssetManager } from './AssetManager.js';
 import { VehicleController, VEHICLE_PRESETS } from './VehicleController.js';
 import { CameraController, CAMERA_MODES } from './CameraController.js';
 import { Environment, getPalette } from './Environment.js';
-import { GameMenu } from '../ui/GameMenu.js?v=20261025-toolbar-1';
-import { GameHUD } from '../ui/GameHUD.js?v=20261025-toolbar-1';
-import { SettingsPanel } from '../ui/SettingsPanel.js?v=20261025-toolbar-1';
+import { GameMenu } from '../ui/GameMenu.js?v=20261026-brand-1';
+import { GameHUD } from '../ui/GameHUD.js?v=20261026-brand-1';
+import { SettingsPanel } from '../ui/SettingsPanel.js?v=20261026-brand-1';
 import { h } from '../ui/dom.js';
 
 export class DrivingGame {
@@ -107,9 +107,10 @@ export class DrivingGame {
       onEnableTilt: async () => { await this.input.tilt.enable(); this._showTitle(); this.panel.refresh(); }
     };
     this.menu = new GameMenu(this.root, this.settings, Object.assign({
-      title: cfg.title, tagline: cfg.tagline, blurb: cfg.blurb, backHref: cfg.backHref, controlsExtra: cfg.controlsExtra
+      id: cfg.id, title: cfg.title, tagline: cfg.tagline, blurb: cfg.blurb, backHref: cfg.backHref, controlsExtra: cfg.controlsExtra
     }, hooks));
     this.hud = new GameHUD(this.root, cfg.hudFields, {
+      id: cfg.id, title: cfg.title,
       onPause: () => this._togglePause(),
       onPedal: (v) => { this.input.pedal = v; }
     });

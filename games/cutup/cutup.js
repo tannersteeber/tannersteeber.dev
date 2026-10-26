@@ -1,7 +1,7 @@
 import { mph, miles } from '../shared/engine/Units.js';
 /* Cutup — fast highway traffic weaving with near-miss scoring. */
 import * as THREE from '../vendor/three.module.js';
-import { DrivingGame } from '../shared/engine/DrivingGame.js?v=20261025-toolbar-1';
+import { DrivingGame } from '../shared/engine/DrivingGame.js?v=20261026-brand-1';
 import { RoadGenerator, smoothstep } from '../shared/engine/RoadGenerator.js';
 import { color } from '../shared/engine/MeshBuilder.js';
 import { addPine, addRound, addBush, addRock, addCactus, addBuilding, addLamp, addSegment } from '../shared/engine/Scenery.js';

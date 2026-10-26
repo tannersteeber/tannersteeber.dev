@@ -813,7 +813,7 @@ details>summary::-webkit-details-marker{display:none}
 .arcade-info summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:48px;padding:.6rem 0;color:var(--link);font-size:.82rem;font-weight:800;letter-spacing:.04em;cursor:pointer;list-style:none}
 .arcade-info summary::-webkit-details-marker{display:none}
 .arcade-info summary::after{content:'+';font-size:1.3rem;font-weight:500}
-.arcade-info[open] summary::after{content:'−'}
+.arcade-info[open]>summary::after{content:'−'}
 .arcade-info summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
 .arcade-info-body{padding:.5rem 0 .25rem;color:var(--muted);font-size:.85rem;line-height:1.65;overflow-wrap:anywhere}
 .arcade-info-body h4{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin:1.1rem 0 .5rem;color:var(--text)}
@@ -852,3 +852,21 @@ body[data-game] #game-root{
 /* Consistent persistent navigation across every Arcade game. */
 body[data-game] #game-root{--arcade-toolbar-top:max(14px,env(safe-area-inset-top));--arcade-toolbar-left:max(20px,env(safe-area-inset-left));--arcade-toolbar-right:max(20px,env(safe-area-inset-right))}
 @media(pointer:coarse),(max-width:900px){body[data-game] #game-root{--arcade-toolbar-top:max(12px,env(safe-area-inset-top));--arcade-toolbar-left:max(12px,env(safe-area-inset-left));--arcade-toolbar-right:max(12px,env(safe-area-inset-right))}}
+
+/* Lock only standalone game documents; game menus keep their own scrolling. */
+html.arcade-game-document{height:100%;overflow:hidden;overscroll-behavior:none;scrollbar-gutter:auto}
+body[data-game]{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+body[data-game],body[data-game] *{user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important;-webkit-user-drag:none!important}
+body[data-game] #game-root{touch-action:manipulation}
+body[data-game] :is(.g-canvas,.g-hud,.g-pedals,.g-pedal,.rg-hud,.rg-shot,.rg-swing-dock,.rg-swing-zone){touch-action:none}
+body[data-game] :is(button,a,summary){touch-action:manipulation}
+body[data-game] :is(.g-pedal,input[type=range]){touch-action:none}
+body[data-game] :is(.g-screen,.g-panel-body,.rg-panel){overscroll-behavior:contain}
+
+.arcade-update{padding:.1rem 0 .5rem}
+.arcade-update time{display:block;color:var(--muted);font-size:.72rem;font-variant-numeric:tabular-nums;margin:.15rem 0 .6rem}
+.arcade-change-type{font-size:.78rem;color:var(--text)}
+.arcade-update-history{margin-top:.75rem;border-top:1px solid var(--border)}
+.arcade-update-history>summary{font-size:.76rem;min-height:44px}
+.arcade-update-history[open]>summary::after{content:'−'}
+.arcade-update-history>.arcade-update+.arcade-update{border-top:1px solid var(--border);padding-top:.75rem}

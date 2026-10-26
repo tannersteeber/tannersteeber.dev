@@ -1,6 +1,6 @@
 import {h} from '../shared/ui/dom.js';
-import {CLUBS,predictions,PREDICTIONS,yards} from './rules.js?v=20261025-controls-7';
-import {PAGE_THEMES} from './ThemeAdapter.js?v=20261025-controls-7';
+import {CLUBS,predictions,PREDICTIONS,yards} from './rules.js?v=20261026-touch-9';
+import {PAGE_THEMES} from './ThemeAdapter.js?v=20261026-touch-9';
 export function wordmark(){
   const mark=h('span',{class:'rg-brandmark','aria-hidden':'true'});
   mark.innerHTML='<svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="3" stroke-dasharray="8 5"/><circle cx="32" cy="32" r="21" stroke="currentColor"/><path d="M26 46V16l19 7-19 7" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M17 47h30" stroke="currentColor" stroke-width="2"/><circle cx="37" cy="41" r="5" fill="currentColor"/></svg>';

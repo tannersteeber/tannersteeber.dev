@@ -1,8 +1,8 @@
 import * as THREE from '../vendor/three.module.js';
-import {BALL_RADIUS,CUP_RADIUS,CUP_DEPTH} from './CupPhysics.js?v=20261025-controls-7';
-import {terrainGeometry,cupSurroundGeometry} from './TerrainGeometry.js?v=20261025-controls-7';
-import {surfaceTextures,terrainMaterials} from './SurfaceTextures.js?v=20261025-controls-7';
-import {GolfCamera} from './GolfCamera.js?v=20261025-controls-7';
+import {BALL_RADIUS,CUP_RADIUS,CUP_DEPTH} from './CupPhysics.js?v=20261026-touch-9';
+import {terrainGeometry,cupSurroundGeometry} from './TerrainGeometry.js?v=20261026-touch-9';
+import {surfaceTextures,terrainMaterials} from './SurfaceTextures.js?v=20261026-touch-9';
+import {GolfCamera} from './GolfCamera.js?v=20261026-touch-9';
 export class GolfWorld {
   constructor(renderer){
     this.cameraCtl=new GolfCamera(renderer.camera);

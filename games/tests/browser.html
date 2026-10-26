@@ -75,6 +75,16 @@ if(!name){
   for(const quality of ['low','medium','high']){g.settings.set('graphics',quality);assert(g.gr.quality===quality,'quality applies');}
   for(const camera of ['close','far','hood','first']){g.settings.set(name+'.camera',camera);assert(g.cameraCtl.mode===camera,'camera applies');}
   g.resume();step();assert(g.state==='playing','resume');
+  if(name==='cruise'){
+    for(const auto of [true,false])for(const camera of ['close','far','hood','first']){
+      g.settings.set('cruise.autoSpeed',auto);g.settings.set('cruise.camera',camera);step(2);
+      assert(!g.hud.pedals.hidden,'Cruise pedals visible in every camera and speed mode');clearBottom(g.hud.pedals,'Cruise pedals');
+      for(const [index,expected]of [[1,1],[0,-1]]){
+        const pedal=g.hud.pedals.children[index];pedal.dispatchEvent(new PointerEvent('pointerdown',{pointerId:31,pointerType:'touch',bubbles:true,cancelable:true}));step(2);assert(g.input.throttle===expected,'held Cruise pedal controls throttle');pedal.dispatchEvent(new PointerEvent('pointerup',{pointerId:31,pointerType:'touch',bubbles:true}));step(2);assert(g.input.throttle===0,'released Cruise pedal clears throttle');
+      }
+    }
+    g.settings.set('cruise.autoSpeed',true);
+  }
   g.vehicle.s=3000;g.road.update(3000,g.view,110,Infinity);g.startRun();assert(g.vehicle.s===0,'restart after road pruning');step();
   if(name==='cutup'){
    const c=g.traffic.cars[0];c.active=true;c.s=g.vehicle.s;c.d=g.vehicle.d;c.speed=g.vehicle.speed;c.lane=1;

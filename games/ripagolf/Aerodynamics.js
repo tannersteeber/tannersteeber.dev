@@ -1,5 +1,5 @@
 // Air-relative drag and simplified Magnus lift; no prediction or theme enters here.
-import {BALL_RADIUS as RADIUS} from './CupPhysics.js?v=20261025-controls-7';
+import {BALL_RADIUS as RADIUS} from './CupPhysics.js?v=20261026-touch-9';
 export function airAcceleration(v,wind,spin,sideSpin=0){
   const x=v.x-wind.x,y=v.y,z=v.z-wind.z,speed=Math.hypot(x,y,z),horizontal=Math.hypot(x,z);
   if(speed<.001)return {x:0,y:-9.81,z:0};

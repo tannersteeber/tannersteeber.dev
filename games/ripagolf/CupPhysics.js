@@ -1,4 +1,4 @@
-import {clamp} from './rules.js?v=20261025-controls-7';
+import {clamp} from './rules.js?v=20261026-touch-9';
 export const BALL_RADIUS=.04267/2;
 export const CUP_RADIUS=.108/2;
 export const CUP_DEPTH=.1016;

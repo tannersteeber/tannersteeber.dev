@@ -2,15 +2,15 @@ import * as THREE from '../vendor/three.module.js';
 import {GameRenderer,webglAvailable} from '../shared/engine/Renderer.js';
 import {GameEngine} from '../shared/engine/GameEngine.js';
 import {h} from '../shared/ui/dom.js';
-import {Course} from './Course.js?v=20261025-controls-7';
-import {BallPhysics} from './BallPhysics.js?v=20261025-controls-7';
-import {GolfWorld} from './GolfWorld.js?v=20261025-controls-7';
-import {GolfStore} from './Store.js?v=20261025-controls-7';
-import {ThemeAdapter} from './ThemeAdapter.js?v=20261025-controls-7';
-import {GolfControls} from './Controls.js?v=20261025-controls-7';
-import {GolfUI} from './UI.js?v=20261025-controls-7';
-import {GolfAudio} from './Audio.js?v=20261025-controls-7';
-import {CLUBS,predictions,clamp,recommend,yards,puttPower} from './rules.js?v=20261025-controls-7';
+import {Course} from './Course.js?v=20261026-touch-9';
+import {BallPhysics} from './BallPhysics.js?v=20261026-touch-9';
+import {GolfWorld} from './GolfWorld.js?v=20261026-touch-9';
+import {GolfStore} from './Store.js?v=20261026-touch-9';
+import {ThemeAdapter} from './ThemeAdapter.js?v=20261026-touch-9';
+import {GolfControls} from './Controls.js?v=20261026-touch-9';
+import {GolfUI} from './UI.js?v=20261026-touch-9';
+import {GolfAudio} from './Audio.js?v=20261026-touch-9';
+import {CLUBS,predictions,clamp,recommend,yards,puttPower} from './rules.js?v=20261026-touch-9';
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 export default class RipaGolf {
   constructor(){this.phase='title';this.time=0;this.windTime=0;this.club=4;this.aim=0;this.power=.8;this.spin=0;this.shape=0;this.loft=0;this.zoom=1;this.pitch=.2;this.dirty=true;this.previewWait=0;this.saveWait=0;this.playbackRate=1;this.cameraView='main';}

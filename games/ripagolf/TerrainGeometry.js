@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.module.js';
-import {TERRAIN_MATERIALS} from './SurfaceTextures.js?v=20261025-controls-7';
-import {CUP_RADIUS} from './CupPhysics.js?v=20261025-controls-7';
+import {TERRAIN_MATERIALS} from './SurfaceTextures.js?v=20261026-touch-9';
+import {CUP_RADIUS} from './CupPhysics.js?v=20261026-touch-9';
 export function terrainGeometry(course){
   const {xs,zs,heights}=course.heightfield,positions=[],uv=[],index=[],groups=TERRAIN_MATERIALS.map(()=>[]),types=[],shades=[];
   for(let j=0;j<zs.length;j++)for(let i=0;i<xs.length;i++){

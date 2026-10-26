@@ -1,8 +1,8 @@
-import {CLUBS,clamp} from './rules.js?v=20261025-controls-7';
-import {surfacePhysics} from './SurfacePhysics.js?v=20261025-controls-7';
-import {airAcceleration} from './Aerodynamics.js?v=20261025-controls-7';
-import {BALL_RADIUS,CUP_DEPTH,CUP_CLEARANCE,cupContact} from './CupPhysics.js?v=20261025-controls-7';
-export {BALL_RADIUS} from './CupPhysics.js?v=20261025-controls-7';
+import {CLUBS,clamp} from './rules.js?v=20261026-touch-9';
+import {surfacePhysics} from './SurfacePhysics.js?v=20261026-touch-9';
+import {airAcceleration} from './Aerodynamics.js?v=20261026-touch-9';
+import {BALL_RADIUS,CUP_DEPTH,CUP_CLEARANCE,cupContact} from './CupPhysics.js?v=20261026-touch-9';
+export {BALL_RADIUS} from './CupPhysics.js?v=20261026-touch-9';
 const STEP=1/120;
 const contactHeight=(course,x,z)=>{const s=course.slope(x,z);return course.height(x,z)+BALL_RADIUS*Math.hypot(1,s.x,s.z);};
 export class BallPhysics {

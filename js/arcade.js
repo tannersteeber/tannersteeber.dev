@@ -164,13 +164,32 @@
     (game.info.about || []).forEach(paragraph);
     if (game.info.controls) { heading('Controls'); paragraph(game.info.controls); }
     if (game.info.updates?.length) {
-      heading('Updates');
-      game.info.updates.forEach(update => {
-        const title = document.createElement('h5'); title.textContent = update.title; body.append(title);
+      const entry = update => {
+        const section = document.createElement('section'); section.className = 'arcade-update';
+        const title = document.createElement('h5'); title.textContent = update.title; section.append(title);
+        if (update.date) {
+          const date = new Date(update.date + 'T00:00:00Z');
+          if (Number.isFinite(date.getTime())) {
+            const time = document.createElement('time'); time.dateTime = update.date;
+            time.textContent = new Intl.DateTimeFormat('en-US', {month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}).format(date);
+            section.append(time);
+          }
+        }
         const list = document.createElement('ul');
-        update.items.forEach(text => { const item = document.createElement('li'); item.textContent = text; list.append(item); });
-        body.append(list);
-      });
+        update.items.forEach(text => {
+          const item = document.createElement('li'),parts = text.match(/^(Feature|Update|Patch)\s*[—-]\s*(.*)$/);
+          if(parts){const label=document.createElement('strong');label.className='arcade-change-type';label.textContent=parts[1];item.append(label,document.createTextNode(' — '+parts[2]));}
+          else item.textContent=text;
+          list.append(item);
+        });
+        section.append(list); return section;
+      };
+      heading('Recent update'); body.append(entry(game.info.updates[0]));
+      if(game.info.updates.length>1){
+        const history=document.createElement('details'); history.className='arcade-update-history';
+        const toggle=document.createElement('summary');toggle.textContent='Update history';toggle.setAttribute('aria-label','Update history for '+game.title);
+        history.append(toggle,...game.info.updates.slice(1).map(entry));body.append(history);
+      }
     }
     details.append(summary, body);
     return details;
@@ -214,6 +233,7 @@
     list.forEach(g => {
       const card = document.createElement('article');
       card.className = 'project-card project arcade-card';
+      card.dataset.gameId = g.id;
       const h = document.createElement('h3'); h.textContent = g.title;
       if (g.icon) {
         const icon = document.createElement('span'); icon.className = 'arcade-game-icon'; icon.setAttribute('aria-hidden', 'true');

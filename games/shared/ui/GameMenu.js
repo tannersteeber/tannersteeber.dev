@@ -1,5 +1,6 @@
 /* GameMenu — title, pause and game-over screens. */
 import { h } from './dom.js';
+import {gameLogo} from './GameLogo.js?v=20261026-brand-1';
 
 export class GameMenu {
   /**
@@ -39,7 +40,7 @@ export class GameMenu {
     this.screens.title = h('section', { class: 'g-screen g-title', hidden: true },
       h('div', { class: 'g-card' },
         h('p', { class: 'g-eyebrow', text: c.tagline }),
-        h('h1', { class: 'g-h1', text: c.title }),
+        h('div',{class:'g-title-wordmark'},gameLogo(c.id),h('h1', { class: 'g-h1', text: c.title })),
         h('p', { class: 'g-blurb', text: c.blurb || '' }),
         this.titleInfo,
         h('div', { class: 'g-actions' }, this._btn('Play', c.onPlay, true), this._btn('Settings', c.onSettings)),

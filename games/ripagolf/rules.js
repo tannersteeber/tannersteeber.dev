@@ -1,4 +1,4 @@
-import {SURFACE_PHYSICS} from './SurfacePhysics.js?v=20261025-controls-7';
+import {SURFACE_PHYSICS} from './SurfacePhysics.js?v=20261026-touch-9';
 // Scoring is independent of rendering, physics and prediction selection.
 export const CLUBS = [
   { id:'driver', name:'Driver', speed:75, loft:16, spin:2400, accuracy:7, carry:246 },

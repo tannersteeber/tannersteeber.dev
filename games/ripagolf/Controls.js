@@ -1,4 +1,4 @@
-import {SwingGesture} from './SwingGesture.js?v=20261025-controls-7';
+import {SwingGesture} from './SwingGesture.js?v=20261026-touch-9';
 export class GolfControls {
   constructor(canvas,swingZone,hooks,settings){
     this.hooks=hooks;this.settings=settings;this.keys=new Set();this.off=[];

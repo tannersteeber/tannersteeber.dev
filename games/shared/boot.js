@@ -1,11 +1,9 @@
 // One error boundary for module loading and initialization on static hosts.
 import { SiteTheme } from './engine/SettingsManager.js';
+import {installGameTouch} from './ui/GameTouch.js?v=20261026-touch-1';
 SiteTheme.apply();
 const root = document.getElementById('game-root');
-// Long presses belong to game controls rather than browser text/image callouts.
-root.addEventListener('contextmenu', event => event.preventDefault());
-root.addEventListener('selectstart', event => event.preventDefault());
-root.addEventListener('dragstart', event => event.preventDefault());
+installGameTouch(root);
 const game = document.body.dataset.game;
 try {
   const version = document.body.dataset.gameVersion;

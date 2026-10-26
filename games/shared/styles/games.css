@@ -102,3 +102,16 @@
 .g-arcade-back{left:var(--arcade-toolbar-left)}
 .g-pause-toggle{right:var(--arcade-toolbar-right);width:44px}
 .g-pause-screen{padding-top:calc(var(--arcade-toolbar-top) + 60px);padding-right:var(--arcade-toolbar-right)}
+
+/* Each driving game has its own compact mark in the title and persistent header. */
+.g-brandmark{display:inline-flex;flex-shrink:0;color:var(--link);line-height:0}
+.g-brandmark svg{width:52px;height:52px}
+.g-title-wordmark{display:flex;align-items:center;gap:14px;margin:0 0 18px}
+.g-title-wordmark .g-h1{margin:0;font-size:clamp(2.5rem,7vw,5rem)}
+.g-small-brand{position:absolute;z-index:4;top:var(--arcade-toolbar-top);left:calc(var(--arcade-toolbar-left) + 132px);display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 12px;box-sizing:border-box;border:1px solid var(--border);border-radius:50px;background:var(--card-surface);font-size:.8rem;font-weight:800;pointer-events:none;white-space:nowrap}
+.g-small-brand .g-brandmark svg{width:28px;height:28px}
+@media(pointer:coarse),(max-width:900px){
+ .g-small-brand{left:calc(var(--arcade-toolbar-left) + 108px);padding:0 8px;gap:6px;font-size:.7rem}
+ .g-small-brand .g-brandmark svg{width:24px;height:24px}
+ .g-title-wordmark{gap:10px}.g-title-wordmark>.g-brandmark svg{width:42px;height:42px}
+}
