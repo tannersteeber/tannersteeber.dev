@@ -115,3 +115,6 @@
  .g-small-brand .g-brandmark svg{width:24px;height:24px}
  .g-title-wordmark{gap:10px}.g-title-wordmark>.g-brandmark svg{width:42px;height:42px}
 }
+
+/* Network/account failures stay above gameplay and browser chrome. */
+.g-platform-error{position:absolute;inset:20% 8% auto;z-index:10000;padding:1.5rem;border:1px solid var(--text);border-radius:12px;background:var(--bg);color:var(--text);text-align:center;pointer-events:auto}.g-platform-error .g-btn{margin:.4rem}

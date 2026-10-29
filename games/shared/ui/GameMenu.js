@@ -56,6 +56,7 @@ export class GameMenu {
           h('button', { class: 'popup-close', type: 'button', 'aria-label': 'Resume game', text: '✕', onclick: c.onResume })),
         h('div', { class: 'g-actions g-actions-col' },
           this._btn('Resume', c.onResume, true), this._btn('Restart', c.onRestart), this._btn('Settings', c.onSettings),
+          ...(c.onFinish ? [this._btn('Finish & Save Run', c.onFinish)] : []),
           h('a', { class: 'g-btn', href: c.backHref, text: 'Return to Arcade' })
         )));
     // Game over

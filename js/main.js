@@ -260,7 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // mark active links inside popup
     qsa('a', popupNav).forEach(a => {
       try {
-        if (location.pathname === new URL(a.href, location.origin).pathname) a.classList.add('active');
+        const path = new URL(a.href, location.origin).pathname;
+        if (path.endsWith('/resume.html')) a.textContent = 'Résumé';
+        if (location.pathname === path) a.classList.add('active');
       } catch (e) { /* ignore invalid URLs */ }
     });
   }

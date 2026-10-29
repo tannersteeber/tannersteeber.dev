@@ -1,0 +1,35 @@
+{
+  "name": "tannersteeber.dev",
+  "version": "0.9.8",
+  "description": "Personal Portfolio Website - Tanner Steeber",
+  "scripts": {
+    "build": "node scripts/build-arcade.mjs",
+    "test": "node --test games/tests/*.test.mjs tests/arcade/*.test.mjs",
+    "test:ui": "playwright test",
+    "check": "npm run build && npm test",
+    "check:edge": "deno check --config supabase/functions/arcade-api/deno.json --frozen-lockfile supabase/functions/arcade-api/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tannersteeber/tannersteeber.dev.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/tannersteeber/tannersteeber.dev/issues"
+  },
+  "homepage": "https://github.com/tannersteeber/tannersteeber.dev#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.13",
+    "@playwright/test": "1.64.1",
+    "deno": "2.9.6",
+    "esbuild": "0.28.2",
+    "supabase": "2.122.0"
+  },
+  "private": true
+}

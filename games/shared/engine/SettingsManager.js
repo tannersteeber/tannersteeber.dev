@@ -1,7 +1,7 @@
 /* SettingsManager — versioned localStorage settings + personal records for the arcade games.
  * Only values that differ from the defaults are stored. Site theme keys are shared with js/main.js. */
 
-const KEY = 'tsd.arcade.settings.v1';
+const storageKey=()=>globalThis.window?.ArcadePlayer?.id?'tsd.arcade.settings.v1.'+(document.body.dataset.game||'driving')+'.'+window.ArcadePlayer.id:'tsd.arcade.settings.v1';
 const SCHEMA = 1;
 const CHOICES = {
   desktopMode: ['keyboard', 'mouse'], mobileMode: ['touch', 'tilt'],
@@ -63,7 +63,7 @@ export class SettingsManager {
 
   _load() {
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(storageKey());
       if (!raw) return;
       const o = JSON.parse(raw);
       if (!o || o.v !== SCHEMA) return; // future migrations hook in here
@@ -78,7 +78,7 @@ export class SettingsManager {
     try {
       const diff = {};
       for (const k of Object.keys(this.data)) if (this.data[k] !== this.defaults[k]) diff[k] = this.data[k];
-      localStorage.setItem(KEY, JSON.stringify({ v: SCHEMA, data: diff, records: this.records }));
+      localStorage.setItem(storageKey(), JSON.stringify({ v: SCHEMA, data: diff, records: this.records }));
     } catch (e) { /* storage unavailable (private mode) */ }
   }
 

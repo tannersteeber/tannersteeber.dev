@@ -255,7 +255,7 @@ button,a,.btn,.project,.feature-card,.skills-list li{
           mask:url('../assets/signature.png?v=3') center/contain no-repeat;
   transition:background-color .32s ease;
 }
-.theme-dark .display-title.has-signature .signature-img{background:#fff}  /* dark mode: white ink */
+.theme-dark .display-title.has-signature .signature-img{background:var(--text)}  /* match the dark theme text color */
 
 /* Featured project strip */
 .feature-card{

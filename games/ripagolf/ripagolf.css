@@ -271,3 +271,6 @@ html{overflow:hidden;scrollbar-gutter:auto}.rg-game{margin:0;overflow:hidden;ove
 .rg-touch-layout .rg-top>.rg-back{grid-column:1;grid-row:1}
 .rg-touch-layout .rg-top>.rg-camera-tools{grid-column:2;grid-row:1}
 .rg-touch-layout .rg-top>.rg-icon{grid-column:3;grid-row:1;justify-self:end}
+
+/* Account/network recovery is an actual interaction layer, above the golf UI. */
+.g-platform-error{position:absolute;inset:20% 8% auto;z-index:10000;padding:1.5rem;border:1px solid var(--rg-accent);border-radius:12px;background:var(--rg-surface);color:var(--rg-text);text-align:center;pointer-events:auto}.g-platform-error .g-btn{display:inline-flex;align-items:center;justify-content:center;margin:.4rem;padding:.7rem 1rem;min-height:44px;font:inherit;border:1px solid var(--rg-accent);border-radius:8px;background:var(--rg-surface);color:var(--rg-text);text-decoration:none}

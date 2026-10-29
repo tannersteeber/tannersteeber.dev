@@ -3,7 +3,7 @@
  * and runs the state machine: title → playing ⇄ paused → (crashed → over). Games subclass it and
  * provide the road, scenery, rules and HUD content. */
 import * as THREE from '../../vendor/three.module.js';
-import { SettingsManager, SiteTheme } from './SettingsManager.js';
+import { SettingsManager, SiteTheme } from './SettingsManager.js?v=arcade-platform-1';
 import { GameRenderer, QUALITY, webglAvailable } from './Renderer.js';
 import { GameEngine } from './GameEngine.js';
 import { InputManager } from './InputManager.js';
@@ -12,7 +12,7 @@ import { AssetManager } from './AssetManager.js';
 import { VehicleController, VEHICLE_PRESETS } from './VehicleController.js';
 import { CameraController, CAMERA_MODES } from './CameraController.js';
 import { Environment, getPalette } from './Environment.js';
-import { GameMenu } from '../ui/GameMenu.js?v=20261026-brand-1';
+import { GameMenu } from '../ui/GameMenu.js?v=arcade-platform-1';
 import { GameHUD } from '../ui/GameHUD.js?v=20261026-brand-1';
 import { SettingsPanel } from '../ui/SettingsPanel.js?v=20261026-brand-1';
 import { h } from '../ui/dom.js';
@@ -103,6 +103,7 @@ export class DrivingGame {
       onPlay: () => this.startRun(),
       onResume: () => this.resume(),
       onRestart: () => this.startRun(),
+      onFinish: this.platform ? () => this.finishPractice() : null,
       onSettings: () => this.panel.open(),
       onEnableTilt: async () => { await this.input.tilt.enable(); this._showTitle(); this.panel.refresh(); }
     };
@@ -175,7 +176,14 @@ export class DrivingGame {
     this.road.update(this.vehicle.s, this.view, 110, Infinity);
   }
 
-  startRun() {
+  async startRun() {
+    if (this.platform && !this._starting) {
+      this._starting = true;
+      try {
+        if (this.platform.session && this.runMetrics && ['playing','paused','over','crashed'].includes(this.state)) await this.platform.retry(() => this.platform.practice(this.runMetrics()));
+        await this.platform.retry(() => this.platform.start(true));
+      } finally { this._starting = false; }
+    } else if (this._starting) return;
     this.audio.unlock();
     this.panel.close();
     this.restWorld();
@@ -195,6 +203,11 @@ export class DrivingGame {
       else this.hud.toast('Tilt is off — touch steering active', 'info');
     }
     this.onRunStart && this.onRunStart();
+  }
+
+  async finishPractice() {
+    if(this._finishing)return;this._finishing=true;this.pause();
+    try{if(this.platform?.session)await this.platform.retry(()=>this.platform.practice(this.runMetrics()));await this.platform?.retry(()=>this.platform.save());location.assign(this.cfg.backHref);}finally{this._finishing=false;}
   }
 
   pause() {
@@ -228,6 +241,7 @@ export class DrivingGame {
 
   /** Called by subclasses when the run ends. */
   endRun(overInfo, delay = 0) {
+    if (this.platform && this.runMetrics) this.platform.practice(this.runMetrics()).catch(e => this.platform.problem(e, () => this.platform.practice(this.runMetrics())));
     this.state = 'crashed';
     this.input.setEnabled(false);
     this.audio.setRunning(false);

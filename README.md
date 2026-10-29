@@ -27,3 +27,13 @@ Cruise and Cutup are original browser driving games built with a shared vanilla 
 Retro uses locally hosted Pixelify Sans by the Pixelify Sans Project Authors, under the [SIL Open Font License](assets/fonts/PixelifySans-LICENSE.txt). The font is bundled in `assets/fonts/`; no external font service is required.
 
 Digital Rain uses locally hosted Cascadia Code by Microsoft, under the [SIL Open Font License](assets/fonts/CascadiaCode-LICENSE.txt).
+
+## Arcade account platform
+
+The account-based Arcade implementation and its deployment checklist are documented in
+[the platform architecture](docs/arcade-platform/architecture.md) and
+[the release review](docs/arcade-platform/release-review.md).
+Run `npm ci` and `npm run check` for local build/logic/security checks.
+The approved Supabase schema and Edge Function are deployed, and SMTP and CAPTCHA
+are configured. Remaining hosted integration checks and website publication are
+tracked in the release review.

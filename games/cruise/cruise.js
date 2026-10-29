@@ -2,7 +2,7 @@ import { PartPickups } from './PartPickups.js';
 import { mph, miles } from '../shared/engine/Units.js';
 /* Cruise — endless, relaxing drive along winding procedural backroads. */
 import * as THREE from '../vendor/three.module.js';
-import { DrivingGame } from '../shared/engine/DrivingGame.js?v=20261026-brand-1';
+import { DrivingGame } from '../shared/engine/DrivingGame.js?v=arcade-platform-1';
 import { RoadGenerator, smoothstep } from '../shared/engine/RoadGenerator.js';
 import { color } from '../shared/engine/MeshBuilder.js';
 import { addPine, addRound, addBush, addRock, addHouse } from '../shared/engine/Scenery.js';
@@ -155,6 +155,7 @@ class Cruise extends DrivingGame {
   }
 
   resetRun() { this.runTime = 0; this.speedAdj = 0; this.parts = 0; this.score = 0; this.pickups?.reset(this.view); }
+  runMetrics() { return {distance: Math.max(0,this.vehicle.s),seconds:this.runTime,parts:this.parts,score:this.score}; }
   onRunStart() { this.vehicle.speed = Math.max(this.vehicle.speed, 8); }
 
   updateRun(dt, st) {

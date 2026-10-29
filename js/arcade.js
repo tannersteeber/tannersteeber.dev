@@ -130,7 +130,7 @@
 
   function open(id, push) {
     const def = games.find(g => g.id === id);
-    if (!def) return;
+    if (!def || !window.ArcadePlayer) return;
     if (def.href) { location.assign(def.href); return; }
     $('arcade-library').hidden = true;
     $('arcade-player').hidden = false;

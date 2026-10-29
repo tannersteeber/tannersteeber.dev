@@ -1,7 +1,7 @@
 import { mph, miles } from '../shared/engine/Units.js';
 /* Cutup — fast highway traffic weaving with near-miss scoring. */
 import * as THREE from '../vendor/three.module.js';
-import { DrivingGame } from '../shared/engine/DrivingGame.js?v=20261026-brand-1';
+import { DrivingGame } from '../shared/engine/DrivingGame.js?v=arcade-platform-1';
 import { RoadGenerator, smoothstep } from '../shared/engine/RoadGenerator.js';
 import { color } from '../shared/engine/MeshBuilder.js';
 import { addPine, addRound, addBush, addRock, addCactus, addBuilding, addLamp, addSegment } from '../shared/engine/Scenery.js';
@@ -270,6 +270,7 @@ class Cutup extends DrivingGame {
     this.hud.showPedals(this.settings.controlMode() === 'touch' || this.settings.controlMode() === 'tilt');
   }
 
+  runMetrics() { return {score:Math.floor(this.score),seconds:this.t,distance:Math.max(0,this.vehicle.s-this.dist0),passes:this.passes,combo:this.maxCombo}; }
   titleRecord() {
     const b = this.settings.record('cutup.best');
     return b > 0 ? 'Best score: ' + b.toLocaleString() : '';

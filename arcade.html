@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Arcade — Tanner Steeber</title>
   <link rel="stylesheet" href="css/styles.css?v=0.9.8">
+  <link rel="stylesheet" href="css/arcade-platform.css?v=2">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -16,7 +17,7 @@
         <a href="about.html">About</a>
         <a href="arcade.html" class="active" aria-current="page">Arcade</a>
         <a href="projects.html">Projects</a>
-        <a href="resume.html">Resume</a>
+        <a href="resume.html">Résumé</a>
       </nav>
       <div class="header-actions">
         <button class="nav-toggle" aria-label="Open navigation">☰</button>
@@ -25,11 +26,17 @@
   </header>
 
   <main class="container arcade-page">
-    <h1>Arcade</h1>
-    <p class="lead">A library of browser games. Pick one and play — every game follows the site theme.</p>
+    <div class="arcade-heading">
+      <h1>Arcade</h1>
+      <span class="arcade-progress">WORK IN PROGRESS</span>
+    </div>
+    <p class="arcade-beta-notice">Beta stats will be reset on the full release of Arcade.</p>
+    <p class="lead">A library of browser games. Sign in and pick a game — every game follows the site theme.</p>
 
+    <section id="arcade-account" aria-label="Arcade account"><p role="status">Connecting to the Arcade…</p></section>
+    <noscript><p>Enable JavaScript to sign in to the Arcade.</p></noscript>
     <!-- Library: cards are generated from the game registry in js/arcade.js -->
-    <section id="arcade-library" aria-label="Game library">
+    <section id="arcade-library" aria-label="Game library" hidden>
       <div class="project-filters arcade-filters" id="arcade-filters" hidden>
         <div class="filter-types" role="group" aria-label="Game genre" id="arcade-genres"></div>
       </div>
@@ -89,15 +96,16 @@
           <li><a href="about.html">About</a></li>
           <li><a href="arcade.html">Arcade</a></li>
           <li><a href="projects.html">Projects</a></li>
-          <li><a href="resume.html">Resume</a></li>
+          <li><a href="resume.html">Résumé</a></li>
           <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
         </ul>
       </div>
     </div>
   </footer>
 
-  <script src="js/main.js?v=0.9.5"></script>
-  <script src="js/arcade.js?v=0.9.8"></script>
+  <script src="js/main.js?v=0.9.8-resume"></script>
+  <script src="js/arcade.js?v=arcade-platform-1"></script>
   <script src="games/library.js?v=0.9.8"></script>
+  <script type="module" src="js/arcade-platform/account.js?v=1"></script>
 </body>
 </html>

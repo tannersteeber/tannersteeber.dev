@@ -5,7 +5,7 @@ import {h} from '../shared/ui/dom.js';
 import {Course} from './Course.js?v=20261026-touch-9';
 import {BallPhysics} from './BallPhysics.js?v=20261026-touch-9';
 import {GolfWorld} from './GolfWorld.js?v=20261026-touch-9';
-import {GolfStore} from './Store.js?v=20261026-touch-9';
+import {GolfStore} from './Store.js?v=arcade-platform-1';
 import {ThemeAdapter} from './ThemeAdapter.js?v=20261026-touch-9';
 import {GolfControls} from './Controls.js?v=20261026-touch-9';
 import {GolfUI} from './UI.js?v=20261026-touch-9';
@@ -15,7 +15,9 @@ const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 export default class RipaGolf {
   constructor(){this.phase='title';this.time=0;this.windTime=0;this.club=4;this.aim=0;this.power=.8;this.spin=0;this.shape=0;this.loft=0;this.zoom=1;this.pitch=.2;this.dirty=true;this.previewWait=0;this.saveWait=0;this.playbackRate=1;this.cameraView='main';}
   async init(root){
-    this.root=root;this.store=new GolfStore();this.audio=new GolfAudio(this.store);
+    this.root=root;this.store=new GolfStore();
+    if(this.platform?.verifiedStats){const s=this.platform.verifiedStats,map={bestStreak:'streak',highestScore:'score',lifetimePoints:'game_points',holes:'holes',strokes:'strokes',birdies:'birdies',eagles:'eagles',aces:'aces',won:'won',lost:'lost'};for(const [local,remote]of Object.entries(map))this.store.stats[local]=s[remote]||0;this.store.stats.relativeTotal=(s.relative_over||0)-(s.relative_under||0);this.store.stats.achievements=Object.entries({5:'Hot Streak',10:'High Roller',20:'Golden Run',50:'Ripa Legend',100:'Legendary Streak'}).filter(([n])=>s.streak>=Number(n)).map(([,label])=>label);}
+    this.audio=new GolfAudio(this.store);
     if(!webglAvailable()) {this.fatal('This browser does not support the WebGL graphics needed to play RipaGolf.');return;}
     this.viewport=h('div',{class:'rg-viewport'});root.prepend(this.viewport);
     try{this.gr=new GameRenderer(this.viewport,this.store.settings.graphics);}catch(error){this.fatal('The 3D course could not start on this device.');return;}
@@ -32,18 +34,21 @@ export default class RipaGolf {
     this.onHide=()=>this.capture();window.addEventListener('pagehide',this.onHide);
     this.contextLost=e=>{e.preventDefault();this.pause();this.engine.stop();this.fatal('The graphics connection was interrupted. Reload to resume your saved run.');};this.gr.canvas.addEventListener('webglcontextlost',this.contextLost);
     root.classList.toggle('rg-reduced',this.store.settings.reducedMotion);
-    this.ui.title();this.engine.start();root.classList.add('ready');
+    this.restoreCloudRun();this.ui.title();this.engine.start();root.classList.add('ready');
   }
   fatal(message){this.root.classList.add('ready');this.root.append(h('section',{class:'rg-error',role:'alert'},h('h1',{text:'Unable to open the course'}),h('p',{text:message}),h('a',{class:'rg-button',href:'../../arcade.html',text:'Back to Arcade'})));}
-  newRun(){
+  async newRun(){
+    if(this.syncing)return;
+    if(this.platform){this.syncing=true;try{await this.platform.retry(()=>this.platform.start(true));}finally{this.syncing=false;}}
     this.audio.unlock();this.audio.active=true;
     const requested=Number(new URLSearchParams(location.search).get('seed'));
-    const seed=requested>0?requested:crypto.getRandomValues(new Uint32Array(1))[0];
+    const seed=this.platform?Number(this.platform.session.seed):(requested>0?requested:crypto.getRandomValues(new Uint32Array(1))[0]);
     this.run=this.store.start(seed);this.nextHole(true);
   }
-  nextHole(first=false){
+  async nextHole(first=false){
+    if(this.syncing)return;
     if(!this.run||(!first&&!this.hole?.result?.won))return;
-    if(!first)this.run.holeIndex++;
+    if(!first){if(this.platform){this.syncing=true;try{await this.platform.retry(()=>this.platform.golf('next'));}finally{this.syncing=false;}}this.run.holeIndex++;}
     const seed=(this.run.seed+Math.imul(this.run.holeIndex,0x9e3779b9))>>>0;
     this.course=new Course(seed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.onBounce=(impact,lie)=>{if(this.playbackRate===1)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(this.playbackRate===1)this.audio.rim();};
     this.world.build(this.course);
@@ -53,8 +58,10 @@ export default class RipaGolf {
     if(this.store.settings.reducedMotion)this.openPredictions();
   }
   openPredictions(){if(this.phase!=='overview')return;this.phase='prediction';this.ui.predictions(this.selection);this.capture();}
-  lockPrediction(){
+  async lockPrediction(){
+    if(this.syncing)return;
     if(this.phase!=='prediction'||!predictions(this.course.par).some(p=>p.id===this.selection)||this.hole.locked)return;
+    if(this.platform){const selection=this.selection;this.syncing=true;try{await this.platform.retry(()=>this.platform.golf('prediction',{prediction:selection}));}finally{this.syncing=false;}this.selection=selection;}
     this.hole.prediction=this.selection;this.hole.locked=true;this.audio.lock();this.phase='aim';this.ui.ready();this.ui.update();this.capture();
   }
   prepareLie(){
@@ -63,21 +70,24 @@ export default class RipaGolf {
     this.club=recommend(d,lie);this.power=this.club===8?puttPower(d):clamp(d/CLUBS[this.club].carry,.005,1);this.dirty=true;this.previewWait=0;
   }
   relativeAim(){return wrap(this.aim-this.aimBase);}
-  changeAim(delta){if(this.phase!=='aim'||this.controls?.swipe)return;this.aim=wrap(this.aim+delta);this.dirty=true;this.ui.syncShot();}
-  setAim(delta){if(this.phase!=='aim'||this.controls?.swipe)return;this.aim=wrap(this.aimBase+delta);this.dirty=true;this.ui.syncShot();}
-  chooseClub(index){if(this.phase!=='aim'||this.controls?.swipe||!CLUBS[index])return;this.club=index;const d=this.course.distance(this.ball.p.x,this.ball.p.z);this.power=index===8?puttPower(d):clamp(d/CLUBS[index].carry,.005,1);this.dirty=true;this.ui.syncShot();}
-  setPower(value){if(this.phase!=='aim'||this.controls?.swipe)return;this.power=clamp(value,.005,1);this.dirty=true;this.ui.syncShot();}
-  setShotOption(key,value){if(this.phase!=='aim'||this.controls?.swipe)return;if(!['spin','shape','loft'].includes(key)||!Number.isFinite(value))return;this[key]=value;this.dirty=true;this.ui.syncShot();}
+  changeAim(delta){if(this.syncing||this.phase!=='aim'||this.controls?.swipe)return;this.aim=wrap(this.aim+delta);this.dirty=true;this.ui.syncShot();}
+  setAim(delta){if(this.syncing||this.phase!=='aim'||this.controls?.swipe)return;this.aim=wrap(this.aimBase+delta);this.dirty=true;this.ui.syncShot();}
+  chooseClub(index){if(this.syncing||this.phase!=='aim'||this.controls?.swipe||!CLUBS[index])return;this.club=index;const d=this.course.distance(this.ball.p.x,this.ball.p.z);this.power=index===8?puttPower(d):clamp(d/CLUBS[index].carry,.005,1);this.dirty=true;this.ui.syncShot();}
+  setPower(value){if(this.syncing||this.phase!=='aim'||this.controls?.swipe)return;this.power=clamp(value,.005,1);this.dirty=true;this.ui.syncShot();}
+  setShotOption(key,value){if(this.syncing||this.phase!=='aim'||this.controls?.swipe)return;if(!['spin','shape','loft'].includes(key)||!Number.isFinite(value))return;this[key]=value;this.dirty=true;this.ui.syncShot();}
   shotSpec(power=this.power,error=0){return {club:this.club,power,aim:this.aim,error,spin:this.spin,shape:this.shape,loft:this.club===8?0:this.loft};}
   timing(){
     if(this.controls.swipe)return;this.setCameraView('main');
     if(this.phase==='aim'){this.audio.unlock();this.phase='timing';this.timingTime=0;this.timingValue=-1;this.ui.syncShot();}
     else if(this.phase==='timing')this.shoot(this.power,this.timingValue);
   }
-  shoot(power,error){
+  async shoot(power,error){
+    if(this.syncing)return;
     if(!['aim','timing'].includes(this.phase)||!this.hole?.locked||this.ball.status!=='rest')return;
     this.audio.unlock();this.audio.active=true;
-    if(!this.ball.launch(this.shotSpec(power,error)))return;
+    const spec=this.shotSpec(power,error);
+    if(this.platform){this.syncing=true;this.phase='sync';try{this.confirmedShot=await this.platform.retry(()=>this.platform.golf('shot',{spec,wait:Math.min(120,Math.max(0,this.windTime-(this.platform.session.state.windTime||0)))}));this.windTime=this.confirmedShot.lastShot.windStart;}finally{this.syncing=false;}}
+    if(!this.ball.launch(spec))return;
     this.playbackRate=1;this.setCameraView('main');this.hole.strokes++;this.store.stroke();this.phase='flight';this.audio.hit(this.club===8);this.controls.reset();this.ui.inFlight();this.ui.update();this.capture();
   }
   preview(){
@@ -90,7 +100,7 @@ export default class RipaGolf {
   }
   update(dt){
     this.time+=dt;
-    if(this.phase==='paused'||this.ui.kind==='settings')return;
+    if(this.syncing||this.phase==='paused'||this.ui.kind==='settings')return;
     this.controls.update(dt);
     if(this.phase!=='title'){if(this.phase!=='flight')this.windTime+=dt;this.audio.update(dt);}
     if(this.phase==='overview'){this.overviewTime+=dt;if(this.overviewTime>2.3)this.openPredictions();}
@@ -101,8 +111,8 @@ export default class RipaGolf {
       if(rate===1&&this.ball.status==='rolling')this.audio.roll(Math.hypot(this.ball.v.x,this.ball.v.z),this.course.surface(this.ball.p.x,this.ball.p.z),dt);
       if(event?.type==='cup-entry')this.audio.cup();
       if(event?.type==='penalty'){this.hole.strokes+=event.penalty;this.store.stroke(event.penalty);this.ui.announce(event.reason);this.readyAfterShot(event.summary);}
-      else if(event?.type==='rest'){this.readyAfterShot();}
-      else if(event?.type==='holed'){this.finishHole();}
+      else if(event?.type==='rest'){if(this.confirmedShot?.ball.status==='holed')this.finishHole();else this.readyAfterShot();}
+      else if(event?.type==='holed'){if(this.confirmedShot&&this.confirmedShot.ball.status!=='holed')this.readyAfterShot();else this.finishHole();}
     }
     this.previewWait-=dt;
     if(this.dirty&&this.phase==='aim'&&this.previewWait<=0){this.preview();this.dirty=false;this.previewWait=.18;}
@@ -110,7 +120,7 @@ export default class RipaGolf {
     this.hudTime=(this.hudTime||0)+dt;if(this.hudTime>.1){this.hudTime=0;this.ui.update();}
     this.saveWait+=dt;if(this.saveWait>2){this.saveWait=0;this.capture();}
   }
-  readyAfterShot(summary=this.ball.summary()){this.playbackRate=1;this.cameraView='main';this.phase='aim';this.prepareLie();this.ui.ready();this.ui.shotSummary(summary);this.ui.update();this.capture();}
+  readyAfterShot(summary=this.ball.summary()){this.reconcileShot();this.playbackRate=1;this.cameraView='main';this.phase='aim';this.prepareLie();this.ui.ready();this.ui.shotSummary(summary);this.ui.update();this.capture();}
   speedUpShot(){
     if(this.phase!=='flight')return;this.playbackRate=this.playbackRate===1?8:1;this.ui.syncPlayback();
   }
@@ -120,7 +130,20 @@ export default class RipaGolf {
   }
   finishHole(){
     if(this.hole.result)return;
-    this.playbackRate=1;const result=this.store.settle(this.hole);this.phase=result.won?'result':'lost';this.ui.result(result);this.ui.update();this.audio.result(result.won,result.milestone);this.capture();
+    this.reconcileShot();this.playbackRate=1;const result=this.store.settle(this.hole);this.phase=result.won?'result':'lost';this.ui.result(result);this.ui.update();this.audio.result(result.won,result.milestone);this.capture();
+  }
+  reconcileShot(){
+    if(!this.confirmedShot)return;
+    this.ball.restore(this.confirmedShot.ball);this.windTime=this.confirmedShot.windTime;this.hole.strokes=this.confirmedShot.strokes;this.confirmedShot=null;
+  }
+  restoreCloudRun(){
+    const session=this.platform?.session;if(!session)return;
+    const s=session.state,seed=Number(session.seed),index=s.holeIndex;
+    // The server snapshot owns ball position and outcomes; cloud/local saves only hold preferences and presentation.
+    this.store.run={seed,holeIndex:index,streak:s.streak,score:s.score,status:s.result&&!s.result.won?'lost':'active',hole:{courseSeed:(seed+Math.imul(index,0x9e3779b9))>>>0,par:0,strokes:s.strokes,prediction:s.prediction,selection:s.prediction,locked:!!s.prediction,result:s.result||null,ball:s.ball,windTime:s.windTime,phase:s.result?'result':s.prediction?'aim':'prediction'}};
+    this.store.run.hole.par=new Course(this.store.run.hole.courseSeed,index).par;
+    if(!s.ball)this.store.run.hole.ball=new BallPhysics(new Course(this.store.run.hole.courseSeed,index)).snapshot();
+    this.store.save();
   }
   capture(){
     if(!this.run||!this.hole||this.run.hole!==this.hole)return;
@@ -129,7 +152,7 @@ export default class RipaGolf {
     this.hole.spin=this.spin;this.hole.shape=this.shape;this.hole.loft=this.loft;this.hole.windTime=this.windTime;this.hole.selection=this.selection;this.store.save();
   }
   resumeSaved(){
-    this.playbackRate=1;this.cameraView='main';this.run=this.store.run;this.hole=this.run?.hole;if(!this.hole)return;
+    this.restoreCloudRun();this.playbackRate=1;this.cameraView='main';this.run=this.store.run;this.hole=this.run?.hole;if(!this.hole)return;
     this.course=new Course(this.hole.courseSeed,this.run.holeIndex);this.ball=new BallPhysics(this.course);this.ball.restore(this.hole.ball);this.ball.onBounce=(impact,lie)=>{if(this.playbackRate===1)this.audio.bounce(impact,lie);};this.ball.onRim=()=>{if(this.playbackRate===1)this.audio.rim();};this.world.build(this.course);
     this.prepareLie();this.aim=Number.isFinite(this.hole.aim)?this.hole.aim:this.aim;this.club=CLUBS[this.hole.club]?this.hole.club:this.club;this.power=this.hole.power||this.power;
     this.spin=this.hole.spin||0;this.shape=this.hole.shape||0;this.loft=this.hole.loft||0;this.windTime=this.hole.windTime||0;this.selection=this.hole.selection||this.hole.prediction;this.audio.unlock();this.audio.active=true;this.ui.hud.hidden=false;
@@ -147,6 +170,7 @@ export default class RipaGolf {
     if(this.phase==='prediction')this.ui.predictions(this.selection);else if(this.phase==='overview')this.ui.overview();else if(this.phase==='flight'){this.ui.close();this.ui.inFlight();}else this.ui.ready();
   }
   togglePause(){
+    if(this.syncing)return;
     if(this.ui.kind==='settings'){this.closeSettings();return;}
     if(this.phase==='title'){if(this.ui.kind==='title-menu')this.ui.title();else this.ui.titleMenu();return;}
     if(this.phase==='paused')this.resume();else this.pause();
@@ -162,7 +186,7 @@ export default class RipaGolf {
   }
   setting(key,value){this.store.set(key,value);this.audio.volume();if(key==='graphics')this.gr.setQuality(this.store.settings.graphics);this.root.classList.toggle('rg-reduced',this.store.settings.reducedMotion);this.ui.syncCamera();}
   returnScreen(){if(this.phase==='title')this.ui.title();else if(this.phase==='paused')this.ui.pause();else if(this.hole?.result)this.ui.result(this.hole.result);else this.ui.ready();}
-  abandon(){if(this.run)this.run.status='abandoned';this.capture();this.mainMenu();}
+  async abandon(){if(this.syncing)return;if(this.platform)await this.platform.retry(()=>this.platform.abandon());if(this.run)this.run.status='abandoned';this.capture();this.mainMenu();}
   mainMenu(){this.capture();this.phase='title';this.ui.flight.hidden=true;this.ui.shot.hidden=true;this.ui.title();this.audio.active=false;}
   destroy(){
     this.capture();window.removeEventListener('pagehide',this.onHide);this.gr?.canvas.removeEventListener('webglcontextlost',this.contextLost);this.engine?.destroy();this.controls?.destroy();this.theme?.destroy();this.ui?.destroy();this.audio?.destroy();this.world?.destroy();this.gr?.dispose();this.viewport?.remove();

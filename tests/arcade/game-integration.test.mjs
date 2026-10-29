@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+globalThis.document={documentElement:{}};
+const {default:RipaGolf}=await import('../../games/ripagolf/ripagolf.js');
+import {validateGolf,golfCourse} from '../../games/shared/services/golf-validator.js';
+import {BallPhysics} from '../../games/ripagolf/BallPhysics.js';
+import {GolfStore} from '../../games/ripagolf/Store.js';
+const memory=new Map();globalThis.localStorage={getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)};
+function game(){const g=new RipaGolf();g.store=new GolfStore();const seed=14279;g.run=g.store.start(seed);g.course=golfCourse(seed,1);g.ball=new BallPhysics(g.course);g.hole=g.run.hole={courseSeed:g.course.seed,par:g.course.par,strokes:0,prediction:'par',locked:true,result:null};g.phase='aim';g.audio={unlock(){},hit(){},click(){}};g.ui={syncCamera(){},inFlight(){},update(){},ready(){},shotSummary(){}};g.controls={reset(){}};g.platform={session:{seed,state:{holeIndex:1,streak:0,score:0,strokes:0,prediction:'par',ball:null,windTime:0}},retry:task=>task(),async golf(operation,extra){const result=validateGolf(this.session,{operation,...extra});this.session.state=result.state;return result.state;}};return g;}
+test('RipaGolf waits for authoritative shot, animates, and reconciles with cloud state',async()=>{const g=game();g.aim=0;g.club=4;g.power=.6;await g.shoot(.6,0);assert.equal(g.phase,'flight');assert.equal(g.hole.strokes,1);assert.ok(g.confirmedShot.ball);g.readyAfterShot();assert.equal(g.phase,'aim');assert.deepEqual(g.ball.snapshot(),g.platform.session.state.ball);assert.equal(g.confirmedShot,null);});
+test('input cannot create a second shot while synchronization is pending',async()=>{const g=game();let finish;g.platform.retry=()=>new Promise(resolve=>{finish=resolve;});const pending=g.shoot(.6,0);assert.equal(g.syncing,true);await g.shoot(.6,0);assert.equal(g.hole.strokes,0);finish({ball:g.ball.snapshot(),strokes:1,windTime:0,lastShot:{windStart:0}});await pending;assert.equal(g.hole.strokes,1);});
