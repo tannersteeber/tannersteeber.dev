@@ -263,6 +263,17 @@ a,
   background: linear-gradient(135deg,var(--accent),var(--accent-2));
   transform: rotate(45deg);
 }
+/* My illustrated brand mark keeps its white outline in both Signature modes. */
+:root:not([data-page-theme]) .brand::before {
+  flex: 0 0 auto;
+  width: 1.5em;
+  height: 1em;
+  border-radius: 0;
+  background: url('../assets/brand-group.png') center / contain no-repeat;
+  transform: none;
+  filter: drop-shadow(0 0 1px var(--text));
+}
+
 .brand:hover {
   color: var(--text);
   text-decoration: none;
