@@ -1,132 +1,148 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <!-- ------------------ about.html — About page ------------------
-       Purpose: Personal background, skills, interests
-  ---------------------------------------------------------------- -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>About — Tanner Steeber</title>
-  <link rel="stylesheet" href="css/styles.css?v=0.9.8">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-</head>
-<body>
-  <!-- ------------------ Site header / navigation (shared) ------------------ -->
-  <header class="site-header">
-    <div class="container header-inner">
-  <a class="brand" href="index.html">tannersteeber.dev</a>
-      <nav class="nav" aria-label="Primary navigation">
-        <a href="index.html">Home</a>
-        <a href="about.html" class="active" aria-current="page">About</a>
-        <a href="arcade.html">Arcade</a>
-        <a href="projects.html">Projects</a>
-        <a href="resume.html">Résumé</a>
-      </nav>
-      <div class="header-actions">
-        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+  <head>
+    <!-- ------------------ about.html — About page ------------------
+         Purpose: Personal background, skills, interests
+    ---------------------------------------------------------------- -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About — Tanner Steeber</title>
+    <link rel="stylesheet" href="css/styles.css?v=0.9.8">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  </head>
+  <body>
+    <!-- ------------------ Site header / navigation (shared) ------------------ -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html">tannersteeber.dev</a>
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="index.html">Home</a>
+          <a href="about.html" class="active" aria-current="page">About</a>
+          <a href="arcade.html">Arcade</a>
+          <a href="projects.html">Projects</a>
+          <a href="resume.html">Résumé</a>
+        </nav>
+        <div class="header-actions">
+          <button class="nav-toggle" aria-label="Open navigation">☰</button>
+        </div>
       </div>
-    </div>
-  </header>
-
-  <!-- Main: About page content (profile, background, interests, skills) -->
-  <main class="container about-page">
-    <header class="about-intro">
-      <h1>About Me</h1>
-      <p class="lead">I am a Computer Science student at Robert Morris University with a strong interest in software development and game design. I enjoy building applications, learning new technologies, and exploring how complex systems are designed and implemented.</p>
     </header>
 
-    <section class="about-hero">
-      <article class="about-panel about-content">
-        <h2>Background</h2>
-        <p>I am currently pursuing a Bachelor’s degree in Computer Science at Robert Morris University. My primary interests are software development and game design, where I enjoy solving problems through programming and building systems that people can interact with.</p>
-      </article>
+    <!-- Main: About page content (profile, background, interests, skills) -->
+    <main class="container about-page">
+      <header class="about-intro">
+        <h1>About Me</h1>
+        <p
+          class="lead">I am a Computer Science student at Robert Morris University with a strong interest in software development and game design. I enjoy building applications, learning new technologies, and exploring how complex systems are designed and implemented.</p>
+      </header>
 
-      <aside class="about-side-hero">
-        <div class="about-callout">
-          <h4>Current focus</h4>
-          <p>Building interactive systems, game prototypes in Unreal Engine, and clean web tooling.</p>
+      <section class="about-hero">
+        <article class="about-panel about-content">
+          <h2>Background</h2>
+          <p>I am currently pursuing a Bachelor’s degree in Computer Science at Robert Morris University. My primary interests are software development and game design, where I enjoy solving problems through programming and building systems that people can interact with.</p>
+        </article>
+
+        <aside class="about-side-hero">
+          <div class="about-callout">
+            <h4>Current focus</h4>
+            <p>Building interactive systems, game prototypes in Unreal Engine, and clean web tooling.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Quick facts</h4>
+            <ul>
+              <li>Pittsburgh, PA</li>
+              <li>Computer Science Student</li>
+              <li>Open to collaboration</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <section class="about-panel about-interests">
+        <h2>Interests</h2>
+        <p>Outside of coursework, I enjoy exploring different areas of technology and development. My main interests include software development, game development, and learning how complex systems are built and optimized. Game design is particularly interesting to me because it combines technical programming challenges with creativity and system design.</p>
+      </section>
+
+      <section class="about-panel about-skills-panel">
+        <h2>Skills</h2>
+        <ul class="skills-list about-skills">
+          <li>Git</li>
+          <li>GitHub</li>
+          <li>VS Code</li>
+          <li>Unreal Engine 5</li>
+          <li>Node.js</li>
+          <li>C++</li>
+          <li>HTML</li>
+          <li>CSS</li>
+          <li>JavaScript</li>
+          <li>Python</li>
+          <li>SQL</li>
+          <li>AWS</li>
+          <li>Wireshark</li>
+          <li>Windows</li>
+          <li>macOS</li>
+          <li>Linux</li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- Popup menu: anchored top-right on desktop, beside the floating button on mobile -->
+    <div id="popup-menu" class="popup-menu" aria-hidden="true">
+      <div class="popup-inner">
+        <nav class="popup-nav" aria-label="Popup Navigation"></nav>
+        <div class="popup-settings">
+          <h4>Settings</h4>
+          <div class="popup-theme">
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <g class="icon-moon">
+                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor" />
+                </g>
+                <g class="icon-sun">
+                  <circle cx="12" cy="12" r="4" fill="currentColor" />
+                  <g stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="M4.93 4.93l1.41 1.41" />
+                    <path d="M17.66 17.66l1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                    <path d="M4.93 19.07l1.41-1.41" />
+                    <path d="M17.66 6.34l1.41-1.41" />
+                  </g>
+                </g>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="mini-card">
-          <h4>Quick facts</h4>
-          <ul>
-            <li>Pittsburgh, PA</li>
-            <li>Computer Science Student</li>
-            <li>Open to collaboration</li>
-          </ul>
-        </div>
-      </aside>
-    </section>
-
-    <section class="about-panel about-interests">
-      <h2>Interests</h2>
-      <p>Outside of coursework, I enjoy exploring different areas of technology and development. My main interests include software development, game development, and learning how complex systems are built and optimized. Game design is particularly interesting to me because it combines technical programming challenges with creativity and system design.</p>
-    </section>
-
-    <section class="about-panel about-skills-panel">
-      <h2>Skills</h2>
-      <ul class="skills-list about-skills">
-        <li>Git</li>
-        <li>GitHub</li>
-        <li>VS Code</li>
-        <li>Unreal Engine 5</li>
-        <li>Node.js</li>
-        <li>C++</li>
-        <li>HTML</li>
-        <li>CSS</li>
-        <li>JavaScript</li>
-        <li>Python</li>
-        <li>SQL</li>
-        <li>AWS</li>
-        <li>Wireshark</li>
-        <li>Windows</li>
-        <li>macOS</li>
-        <li>Linux</li>
-      </ul>
-    </section>
-  </main>
-
-  <!-- Popup menu: anchored top-right on desktop, beside the floating button on mobile -->
-  <div id="popup-menu" class="popup-menu" aria-hidden="true">
-    <div class="popup-inner">
-      <nav class="popup-nav" aria-label="Popup Navigation"></nav>
-      <div class="popup-settings">
-        <h4>Settings</h4>
-        <div class="popup-theme">
-          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <g class="icon-moon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></g>
-              <g class="icon-sun"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></g></g>
-            </svg>
-          </button>
-        </div>
+        <button class="popup-close" aria-label="Close menu">✕</button>
       </div>
-      <button class="popup-close" aria-label="Close menu">✕</button>
     </div>
-  </div>
 
-  <!-- Mobile-only floating menu button (drag to any corner) -->
-  <button class="mobile-nav-toggle" aria-label="Open navigation">☰</button>
+    <!-- Mobile-only floating menu button (drag to any corner) -->
+    <button class="mobile-nav-toggle" aria-label="Open navigation">☰</button>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-left">
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
         © Tanner Steeber <span data-year></span>
         <p class="muted small">Computer Science Student — Robert Morris University</p>
       </div>
-      <div class="footer-right">
-  <div class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
-        <ul class="footer-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="arcade.html">Arcade</a></li>
-          <li><a href="projects.html">Projects</a></li>
-          <li><a href="resume.html">Résumé</a></li>
-          <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
-        </ul>
+        <div class="footer-right">
+          <div
+            class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="arcade.html">Arcade</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="resume.html">Résumé</a></li>
+            <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <script src="js/main.js?v=0.9.8-resume"></script>
-</body>
+    <script src="js/main.js?v=0.9.8-resume"></script>
+  </body>
 </html>

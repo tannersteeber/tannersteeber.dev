@@ -9,40 +9,73 @@ import * as THREE from '../../vendor/three.module.js';
 import { CAR_TYPES } from './AssetManager.js';
 
 const TYPES = [['sedan', 5], ['suv', 3], ['van', 1.6], ['truck', 1.4]];
-const COLORS = [0xc0392b, 0x2c5fa8, 0xe0b020, 0xf2f2f2, 0x2b2d31, 0x7a838c, 0x2f8f5b, 0xd9702a, 0x8e5aa8, 0x9aa5b1];
+const COLORS = [
+  0xc0392b,
+  0x2c5fa8,
+  0xe0b020,
+  0xf2f2f2,
+  0x2b2d31,
+  0x7a838c,
+  0x2f8f5b,
+  0xd9702a,
+  0x8e5aa8,
+  0x9aa5b1,
+];
 const TRUCK_COLORS = [0xf2f2f2, 0xd9702a, 0x2c5fa8, 0x2f8f5b, 0x9aa5b1];
-const LANE_SPEED = [[23, 27], [19, 23], [15, 19], [12, 15]];  // m/s, lane 0 = far left (fast)
+const LANE_SPEED = [[23, 27], [19, 23], [15, 19], [12, 15]]; // m/s, lane 0 = far left (fast)
 
 export class TrafficSystem {
   constructor(scene, assets, road, opts) {
-    this.assets = assets; this.road = road;
-    this.lanes = opts.lanes; this.laneW = opts.laneWidth;
+    this.assets = assets;
+    this.road = road;
+    this.lanes = opts.lanes;
+    this.laneW = opts.laneWidth;
     this.max = opts.max || 28;
     this.cars = [];
     this._tmp = {};
     for (let i = 0; i < this.max; i++) {
       const mesh = new THREE.Mesh(assets.carGeometry('sedan', 0xffffff), assets.material);
-      mesh.visible = false; mesh.rotation.order = 'YXZ'; mesh.frustumCulled = true;
+      mesh.visible = false;
+      mesh.rotation.order = 'YXZ';
+      mesh.frustumCulled = true;
       scene.add(mesh);
-      this.cars.push({ mesh, active: false, s: 0, d: 0, lane: 0, speed: 0, pref: 0, L: 4.6, W: 1.84, type: 'sedan', minGap: 99, inZone: false });
+      this.cars.push({
+        mesh,
+        active: false,
+        s: 0,
+        d: 0,
+        lane: 0,
+        speed: 0,
+        pref: 0,
+        L: 4.6,
+        W: 1.84,
+        type: 'sedan',
+        minGap: 99,
+        inZone: false,
+      });
     }
     this.reset();
   }
 
   reset() {
-    this.cars.forEach(c => { c.active = false; c.mesh.visible = false; });
-    this.spawnDist = 0; this.nextGap = 40; this.wallT = 0;
+    this.cars.forEach((c) => {
+      c.active = false;
+      c.mesh.visible = false;
+    });
+    this.spawnDist = 0;
+    this.nextGap = 40;
+    this.wallT = 0;
   }
 
   _pickType() {
     let r = Math.random() * TYPES.reduce((a, t) => a + t[1], 0);
-    for (const [t, w] of TYPES) { if ((r -= w) <= 0) return t; }
+    for (const [t, w] of TYPES) if ((r -= w) <= 0) return t;
     return 'sedan';
   }
 
   /** Try to place one car at distance s. Returns true when spawned. */
   spawnAt(s, playerS) {
-    const free = this.cars.find(c => !c.active);
+    const free = this.cars.find((c) => !c.active);
     if (!free) return false;
     const type = this._pickType(), dims = CAR_TYPES[type];
     const order = Array.from({ length: this.lanes }, (_, i) => i).sort(() => Math.random() - 0.5);
@@ -53,7 +86,10 @@ export class TrafficSystem {
         if (!c.active) continue;
         const ds = c.s - s;
         if (c.lane === lane) {
-          if (Math.abs(ds) < (c.L + dims.L) / 2 + 16) { blocked = true; break; }
+          if (Math.abs(ds) < (c.L + dims.L) / 2 + 16) {
+            blocked = true;
+            break;
+          }
           if (ds > 0 && ds < 90) aheadSpeed = Math.min(aheadSpeed, c.speed);
         } else if (Math.abs(ds) < 24) rowCount++;
       }
@@ -64,9 +100,22 @@ export class TrafficSystem {
       pref = Math.min(pref, aheadSpeed);
       const colors = type === 'truck' ? TRUCK_COLORS : COLORS;
       Object.assign(free, {
-        active: true, s, lane, d: (lane - (this.lanes - 1) / 2) * this.laneW, speed: pref, pref, type, L: dims.L, W: dims.W, minGap: 99, inZone: false
+        active: true,
+        s,
+        lane,
+        d: (lane - (this.lanes - 1) / 2) * this.laneW,
+        speed: pref,
+        pref,
+        type,
+        L: dims.L,
+        W: dims.W,
+        minGap: 99,
+        inZone: false,
       });
-      free.mesh.geometry = this.assets.carGeometry(type, colors[Math.floor(Math.random() * colors.length)]);
+      free.mesh.geometry = this.assets.carGeometry(
+        type,
+        colors[Math.floor(Math.random() * colors.length)],
+      );
       free.mesh.visible = true;
       this._place(free);
       return true;
@@ -76,7 +125,11 @@ export class TrafficSystem {
 
   /** Fill the road ahead so a run never starts on an empty highway. */
   prefill(playerS, viewDist, density) {
-    for (let s = playerS + 110; s < playerS + viewDist * 0.85; s += (55 + Math.random() * 40) / density) this.spawnAt(s, playerS);
+    for (
+      let s = playerS + 110;
+      s < playerS + viewDist * 0.85;
+      s += (55 + Math.random() * 40) / density
+    ) this.spawnAt(s, playerS);
   }
 
   _place(c) {
@@ -94,12 +147,15 @@ export class TrafficSystem {
       this.nextGap = (62 / density) * (0.6 + Math.random() * 0.8);
     }
 
-    const act = this.cars.filter(c => c.active);
+    const act = this.cars.filter((c) => c.active);
     for (const c of act) {
       let target = c.pref, ahead = null, best = Infinity;
       for (const o of act) {
         if (o === c || o.lane !== c.lane || o.s <= c.s) continue;
-        if (o.s - c.s < best) { best = o.s - c.s; ahead = o; }
+        if (o.s - c.s < best) {
+          best = o.s - c.s;
+          ahead = o;
+        }
       }
       if (ahead) {
         const gap = best - (c.L + ahead.L) / 2;
@@ -116,7 +172,12 @@ export class TrafficSystem {
       for (const a of act) {
         if (a.s < playerS + 45) continue;
         const lanes = new Set(), group = [];
-        for (const o of act) if (Math.abs(o.s - a.s) < 14) { lanes.add(o.lane); group.push(o); }
+        for (const o of act) {
+          if (Math.abs(o.s - a.s) < 14) {
+            lanes.add(o.lane);
+            group.push(o);
+          }
+        }
         if (lanes.size >= this.lanes) {
           const victim = group[Math.floor(Math.random() * group.length)];
           victim.pref = Math.max(9, victim.pref - 6);
@@ -126,10 +187,17 @@ export class TrafficSystem {
     }
 
     for (const c of act) {
-      if (c.s < playerS - 70 || c.s > playerS + viewDist + 140) { c.active = false; c.mesh.visible = false; continue; }
+      if (c.s < playerS - 70 || c.s > playerS + viewDist + 140) {
+        c.active = false;
+        c.mesh.visible = false;
+        continue;
+      }
       this._place(c);
     }
   }
 
-  dispose(scene) { this.cars.forEach(c => scene.remove(c.mesh)); this.cars = []; }
+  dispose(scene) {
+    this.cars.forEach((c) => scene.remove(c.mesh));
+    this.cars = [];
+  }
 }

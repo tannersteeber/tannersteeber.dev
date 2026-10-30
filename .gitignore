@@ -7,3 +7,8 @@ supabase/.branches/
 playwright-report/
 test-results/
 .DS_Store
+
+# Local development notes, checks, installed agent skills, and design sources.
+.local-dev/
+.agents/
+skills-lock.json

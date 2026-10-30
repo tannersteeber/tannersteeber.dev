@@ -1,159 +1,178 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <!-- ------------------ index.html — Landing page ------------------
-    Purpose: Main landing page for tannersteeber.dev
-    Loads: /css/styles.css and /js/main.js
-  ---------------------------------------------------------------- -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tanner Steeber — tannersteeber.dev</title>
-  <link rel="stylesheet" href="css/styles.css?v=0.9.8-signature">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-</head>
-<body>
-  <!-- ------------------ Site header / navigation (shared) ------------------ -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <!-- Brand: site identity / home link -->
-  <a class="brand" href="index.html">tannersteeber.dev</a>
+  <head>
+    <!-- ------------------ index.html — Landing page ------------------
+      Purpose: Main landing page for tannersteeber.dev
+      Loads: /css/styles.css and /js/main.js
+    ---------------------------------------------------------------- -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tanner Steeber — tannersteeber.dev</title>
+    <link rel="stylesheet" href="css/styles.css?v=0.9.8-signature">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  </head>
+  <body>
+    <!-- ------------------ Site header / navigation (shared) ------------------ -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <!-- Brand: site identity / home link -->
+        <a class="brand" href="index.html">tannersteeber.dev</a>
 
-      <!-- Primary navigation: links to main pages (About, Projects, Resume) -->
-      <nav class="nav" aria-label="Primary navigation">
-        <a href="index.html" class="active" aria-current="page">Home</a>
-        <a href="about.html">About</a>
-        <a href="arcade.html">Arcade</a>
-        <a href="projects.html">Projects</a>
-        <a href="resume.html">Résumé</a>
-      </nav>
+        <!-- Primary navigation: links to main pages (About, Projects, Resume) -->
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="index.html" class="active" aria-current="page">Home</a>
+          <a href="about.html">About</a>
+          <a href="arcade.html">Arcade</a>
+          <a href="projects.html">Projects</a>
+          <a href="resume.html">Résumé</a>
+        </nav>
 
-      <!-- Header actions: theme toggle and mobile nav toggle
-           - Theme toggle (id=theme-toggle) controls light/dark theme system
-           - Nav toggle controls mobile navigation visibility
-      -->
-      <div class="header-actions">
-        <button class="nav-toggle" aria-label="Open navigation">☰</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Navigation Overlay System
-       - Fullscreen frosted glass overlay that displays navigation links centered vertically
-       - Filled dynamically by cloning the header .nav content at runtime
-  -->
-  <!-- Popup menu: anchored top-right on desktop, beside the floating button on mobile -->
-  <div id="popup-menu" class="popup-menu" aria-hidden="true">
-    <div class="popup-inner">
-      <nav class="popup-nav" aria-label="Popup Navigation"></nav>
-      <div class="popup-settings">
-        <h4>Settings</h4>
-        <div class="popup-theme">
-          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <g class="icon-moon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></g>
-              <g class="icon-sun"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></g></g>
-            </svg>
-          </button>
+        <!-- Header actions: theme toggle and mobile nav toggle
+             - Theme toggle (id=theme-toggle) controls light/dark theme system
+             - Nav toggle controls mobile navigation visibility
+        -->
+        <div class="header-actions">
+          <button class="nav-toggle" aria-label="Open navigation">☰</button>
         </div>
       </div>
-      <button class="popup-close" aria-label="Close menu">✕</button>
+    </header>
+
+    <!-- Navigation Overlay System
+         - Fullscreen frosted glass overlay that displays navigation links centered vertically
+         - Filled dynamically by cloning the header .nav content at runtime
+    -->
+    <!-- Popup menu: anchored top-right on desktop, beside the floating button on mobile -->
+    <div id="popup-menu" class="popup-menu" aria-hidden="true">
+      <div class="popup-inner">
+        <nav class="popup-nav" aria-label="Popup Navigation"></nav>
+        <div class="popup-settings">
+          <h4>Settings</h4>
+          <div class="popup-theme">
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <g class="icon-moon">
+                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor" />
+                </g>
+                <g class="icon-sun">
+                  <circle cx="12" cy="12" r="4" fill="currentColor" />
+                  <g stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="M4.93 4.93l1.41 1.41" />
+                    <path d="M17.66 17.66l1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                    <path d="M4.93 19.07l1.41-1.41" />
+                    <path d="M17.66 6.34l1.41-1.41" />
+                  </g>
+                </g>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="popup-close" aria-label="Close menu">✕</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Mobile-only floating menu button (drag to any corner) -->
-  <button class="mobile-nav-toggle" aria-label="Open navigation">☰</button>
+    <!-- Mobile-only floating menu button (drag to any corner) -->
+    <button class="mobile-nav-toggle" aria-label="Open navigation">☰</button>
 
-  <!-- Main content: hero, features, skills
-       - Hero is the primary visual area; includes a decorative background (.hero-bg)
-       - Aside feature-card highlights a single featured item
-  -->
-  <main>
-  <section class="hero hero--large">
-      <!-- Hero inner layout: main content and side feature card -->
-      <div class="container hero-inner">
-        <!-- Hero content: signature name, intro, and calls to action -->
-        <div class="hero-content">
-          <div class="hero-card">
-            <div class="hero-profile">
-              <div class="name-block">
-                <h1 class="display-title">
+    <!-- Main content: hero, features, skills
+         - Hero is the primary visual area; includes a decorative background (.hero-bg)
+         - Aside feature-card highlights a single featured item
+    -->
+    <main>
+      <section class="hero hero--large">
+        <!-- Hero inner layout: main content and side feature card -->
+        <div class="container hero-inner">
+          <!-- Hero content: signature name, intro, and calls to action -->
+          <div class="hero-content">
+            <div class="hero-card">
+              <div class="hero-profile">
+                <div class="name-block">
+                  <h1 class="display-title">
                   <span class="signature-img" aria-hidden="true"></span>
                   <span class="first">Tanner</span> <span class="accent">Steeber</span>
                 </h1>
-                <p class="subtitle">Computer Science Student — Software Development &amp; Game Design</p>
+                  <p
+                    class="subtitle">Computer Science Student — Software Development &amp; Game Design</p>
+                </div>
+              </div>
+
+              <p
+                class="lead">I build applications, explore systems design, and create interactive experiences — with a focus on game design and user experience.</p>
+
+              <!-- Calls to action: entry points to Arcade, Projects and Resume -->
+              <div class="cta">
+                <a class="btn btn-primary" href="arcade.html">Arcade</a>
+                <a class="btn btn-primary" href="projects.html">Explore Projects</a>
+                <a class="btn btn-primary" href="resume.html">Résumé</a>
               </div>
             </div>
+          </div>
 
-            <p class="lead">I build applications, explore systems design, and create interactive experiences — with a focus on game design and user experience.</p>
-
-            <!-- Calls to action: entry points to Arcade, Projects and Resume -->
-            <div class="cta">
-              <a class="btn btn-primary" href="arcade.html">Arcade</a>
-              <a class="btn btn-primary" href="projects.html">Explore Projects</a>
-              <a class="btn btn-primary" href="resume.html">Résumé</a>
+          <!-- Hero side: small card for highlighting an important project or demo -->
+          <aside class="hero-side">
+            <!-- Featured project will be populated by JS with the latest public project -->
+            <div class="feature-card" id="featured-project" role="button" tabindex="0"
+              aria-label="Open featured project" data-target="project-tannersteeber-dev">
+              <h4>Featured</h4>
+              <h3 class="featured-title">tannersteeber.dev v0.9.10</h3>
+              <p class="muted featured-meta">Personal portfolio — HTML, CSS, JavaScript</p>
+              <p
+                class="small featured-desc">Portfolio with projects, an arcade, résumé and contact details.</p>
             </div>
-          </div>
+          </aside>
         </div>
+      </section>
 
-        <!-- Hero side: small card for highlighting an important project or demo -->
-        <aside class="hero-side">
-          <!-- Featured project will be populated by JS with the latest public project -->
-          <div class="feature-card" id="featured-project" role="button" tabindex="0" aria-label="Open featured project" data-target="project-tannersteeber-dev">
-            <h4>Featured</h4>
-            <h3 class="featured-title">tannersteeber.dev v0.9.8</h3>
-            <p class="muted featured-meta">Personal portfolio — HTML, CSS, JavaScript</p>
-            <p class="small featured-desc">Portfolio with projects, an arcade, résumé and contact details.</p>
-          </div>
-        </aside>
-      </div>
-    </section>
+      <!-- Skills system: simple list of core tools and technologies -->
+      <section class="container" id="skills">
+        <h2>Skills &amp; Tools</h2>
+        <ul class="skills-list">
+          <li>Git</li>
+          <li>GitHub</li>
+          <li>VS Code</li>
+          <li>Unreal Engine 5</li>
+          <li>Node.js</li>
+          <li>C++</li>
+          <li>HTML</li>
+          <li>CSS</li>
+          <li>JavaScript</li>
+          <li>Python</li>
+          <li>SQL</li>
+          <li>AWS</li>
+          <li>Wireshark</li>
+          <li>Windows</li>
+          <li>macOS</li>
+          <li>Linux</li>
+        </ul>
+      </section>
+    </main>
 
-    <!-- Skills system: simple list of core tools and technologies -->
-  <section class="container" id="skills">
-      <h2>Skills &amp; Tools</h2>
-      <ul class="skills-list">
-        <li>Git</li>
-        <li>GitHub</li>
-        <li>VS Code</li>
-        <li>Unreal Engine 5</li>
-        <li>Node.js</li>
-        <li>C++</li>
-        <li>HTML</li>
-        <li>CSS</li>
-        <li>JavaScript</li>
-        <li>Python</li>
-        <li>SQL</li>
-        <li>AWS</li>
-        <li>Wireshark</li>
-        <li>Windows</li>
-        <li>macOS</li>
-        <li>Linux</li>
-      </ul>
-    </section>
-  </main>
-
-  <!-- Footer: unified site footer -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-left">
+    <!-- Footer: unified site footer -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
         © Tanner Steeber <span data-year></span>
         <p class="muted small">Computer Science Student — Robert Morris University</p>
       </div>
-      <div class="footer-right">
-  <div class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
-        <ul class="footer-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="arcade.html">Arcade</a></li>
-          <li><a href="projects.html">Projects</a></li>
-          <li><a href="resume.html">Résumé</a></li>
-          <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
-        </ul>
+        <div class="footer-right">
+          <div
+            class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="arcade.html">Arcade</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="resume.html">Résumé</a></li>
+            <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <!-- Client script: main behavior (theme system, nav toggle, year injection) -->
-  <script src="js/main.js?v=0.9.8-resume"></script>
-</body>
+    <!-- Client script: main behavior (theme system, nav toggle, year injection) -->
+    <script src="js/main.js?v=0.9.8-resume"></script>
+  </body>
 </html>

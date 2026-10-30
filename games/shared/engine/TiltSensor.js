@@ -10,23 +10,32 @@
  * Positive twist = counter-clockwise as seen by the player = steer left.
  */
 const D2R = Math.PI / 180;
-const wrap = (a) => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
+const wrap = (a) => {
+  while (a > Math.PI) a -= 2 * Math.PI;
+  while (a < -Math.PI) a += 2 * Math.PI;
+  return a;
+};
 
 export class TiltSensor {
   constructor() {
     this.supported = typeof window !== 'undefined' && 'DeviceOrientationEvent' in window;
-    this.needsPermission = this.supported && typeof window.DeviceOrientationEvent.requestPermission === 'function';
+    this.needsPermission = this.supported &&
+      typeof window.DeviceOrientationEvent.requestPermission === 'function';
     this.status = this.supported ? 'idle' : 'unavailable'; // idle | requesting | active | denied | unavailable
-    this.message = this.supported ? 'Tilt steering is off.' : 'This device or browser does not expose motion sensors.';
+    this.message = this.supported
+      ? 'Tilt steering is off.'
+      : 'This device or browser does not expose motion sensors.';
     this.posture = null;
     this.neutral = 0;
-    this.twist = 0;          // latest raw twist (rad)
+    this.twist = 0; // latest raw twist (rad)
     this.hasSample = false;
     this._handler = (e) => this._onOrientation(e);
     this._timer = 0;
     this._permissionAsked = false;
     this.onStatus = null;
-    this._onRotate = () => { setTimeout(() => this.calibrate(), 350); };
+    this._onRotate = () => {
+      setTimeout(() => this.calibrate(), 350);
+    };
   }
 
   get active() {
@@ -38,13 +47,20 @@ export class TiltSensor {
   }
 
   _set(status, message) {
-    this.status = status; this.message = message;
+    this.status = status;
+    this.message = message;
     if (this.onStatus) this.onStatus(status, message);
   }
 
   /** Must be called directly from a user gesture (click/tap). */
   async enable() {
-    if (!this.supported) { this._set('unavailable', 'This device or browser does not expose motion sensors. Use touch steering.'); return false; }
+    if (!this.supported) {
+      this._set(
+        'unavailable',
+        'This device or browser does not expose motion sensors. Use touch steering.',
+      );
+      return false;
+    }
     if (this.status === 'active') return true;
     if (this.needsPermission && !this._permissionAsked) {
       this._permissionAsked = true;
@@ -52,7 +68,10 @@ export class TiltSensor {
       try {
         const res = await window.DeviceOrientationEvent.requestPermission();
         if (res !== 'granted') {
-          this._set('denied', 'Motion access was denied. Enable it for this site in Safari settings, or use touch steering.');
+          this._set(
+            'denied',
+            'Motion access was denied. Enable it for this site in Safari settings, or use touch steering.',
+          );
           return false;
         }
       } catch (err) {
@@ -60,7 +79,10 @@ export class TiltSensor {
         return false;
       }
     } else if (this.needsPermission && this._permissionAsked && this.status === 'denied') {
-      this._set('denied', 'Motion access was denied earlier. Enable it for this site in your browser settings, then reload, or use touch steering.');
+      this._set(
+        'denied',
+        'Motion access was denied earlier. Enable it for this site in your browser settings, then reload, or use touch steering.',
+      );
       return false;
     }
     return this._start();
@@ -70,14 +92,19 @@ export class TiltSensor {
     this.hasSample = false;
     window.addEventListener('deviceorientation', this._handler);
     window.addEventListener('orientationchange', this._onRotate);
-    if (window.screen && window.screen.orientation) window.screen.orientation.addEventListener('change', this._onRotate);
+    if (window.screen && window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', this._onRotate);
+    }
     this._set('requesting', 'Reading sensors…');
     return new Promise((resolve) => {
       clearTimeout(this._timer);
       this._timer = setTimeout(() => {
         if (!this.hasSample) {
           this.disable();
-          this._set('unavailable', 'No usable orientation data was received. Use touch steering instead.');
+          this._set(
+            'unavailable',
+            'No usable orientation data was received. Use touch steering instead.',
+          );
           resolve(false);
         } else resolve(true);
       }, 1600);
@@ -88,8 +115,12 @@ export class TiltSensor {
     clearTimeout(this._timer);
     window.removeEventListener('deviceorientation', this._handler);
     window.removeEventListener('orientationchange', this._onRotate);
-    if (window.screen && window.screen.orientation) window.screen.orientation.removeEventListener('change', this._onRotate);
-    if (this.status === 'active' || this.status === 'requesting') this._set('idle', 'Tilt steering is off.');
+    if (window.screen && window.screen.orientation) {
+      window.screen.orientation.removeEventListener('change', this._onRotate);
+    }
+    if (this.status === 'active' || this.status === 'requesting') {
+      this._set('idle', 'Tilt steering is off.');
+    }
     this.hasSample = false;
     this.posture = null;
   }
@@ -97,7 +128,12 @@ export class TiltSensor {
   _onOrientation(e) {
     if (!Number.isFinite(e.beta) || !Number.isFinite(e.gamma)) return; // desktop browsers fire empty events
     const a = (e.alpha || 0) * D2R, b = e.beta * D2R, g = e.gamma * D2R;
-    const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b), cg = Math.cos(g), sg = Math.sin(g);
+    const ca = Math.cos(a),
+      sa = Math.sin(a),
+      cb = Math.cos(b),
+      sb = Math.sin(b),
+      cg = Math.cos(g),
+      sg = Math.sin(g);
     // Third row of R = Rz(a)·Rx(b)·Ry(g): world-up expressed in device axes
     const ux = -cb * sg, uy = sb, uz = cb * cg;
     const flatness = Math.abs(uz);
@@ -114,7 +150,10 @@ export class TiltSensor {
     if (posture === 'flat' && !Number.isFinite(e.alpha)) return;
     this._lastSample = performance.now();
     const twist = posture === 'flat' ? flatTwist : uprightTwist;
-    if (posture !== this.posture) { this.posture = posture; this.neutral = twist; }
+    if (posture !== this.posture) {
+      this.posture = posture;
+      this.neutral = twist;
+    }
     this.twist = twist;
     if (!this.hasSample) {
       this.hasSample = true;
@@ -130,5 +169,7 @@ export class TiltSensor {
   }
 
   /** Signed angle from neutral in radians; positive = rotated left. */
-  angle() { return this.hasSample ? wrap(this.twist - this.neutral) : 0; }
+  angle() {
+    return this.hasSample ? wrap(this.twist - this.neutral) : 0;
+  }
 }

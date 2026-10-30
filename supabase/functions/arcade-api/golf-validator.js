@@ -1,4 +1,4 @@
-// golf-math:math
+// games/shared/engine/MathUtils.js
 function mulberry32(a) {
   return function() {
     a |= 0;
@@ -15,11 +15,39 @@ var smoothstep = (a, b, x) => {
 
 // games/ripagolf/SurfacePhysics.js?v=20261026-touch-9
 var SURFACE_PHYSICS = Object.freeze({
-  green: { restitution: 0.16, contactFriction: 0.38, landingDrag: 0.035, rolling: 0.22, grip: 0.25, launch: 1 },
-  fairway: { restitution: 0.34, contactFriction: 0.11, rolling: 0.85, speedDrag: 0.02, grip: 1.05, launch: 1 },
+  green: {
+    restitution: 0.16,
+    contactFriction: 0.38,
+    landingDrag: 0.035,
+    rolling: 0.22,
+    grip: 0.25,
+    launch: 1
+  },
+  fairway: {
+    restitution: 0.34,
+    contactFriction: 0.11,
+    rolling: 0.85,
+    speedDrag: 0.02,
+    grip: 1.05,
+    launch: 1
+  },
   tee: { restitution: 0.32, contactFriction: 0.1, rolling: 0.8, speedDrag: 0.02, grip: 1, launch: 1 },
-  rough: { restitution: 0.13, contactFriction: 0.36, rolling: 2.25, speedDrag: 0.03, grip: 2.7, launch: 0.8 },
-  sand: { restitution: 0.04, contactFriction: 0.72, rolling: 4.8, speedDrag: 0.04, grip: 5.5, launch: 0.65 },
+  rough: {
+    restitution: 0.13,
+    contactFriction: 0.36,
+    rolling: 2.25,
+    speedDrag: 0.03,
+    grip: 2.7,
+    launch: 0.8
+  },
+  sand: {
+    restitution: 0.04,
+    contactFriction: 0.72,
+    rolling: 4.8,
+    speedDrag: 0.04,
+    grip: 5.5,
+    launch: 0.65
+  },
   water: { restitution: 0, contactFriction: 1, rolling: 8, grip: 8, launch: 0 }
 });
 var surfacePhysics = (lie) => SURFACE_PHYSICS[lie] || SURFACE_PHYSICS.rough;
@@ -59,9 +87,21 @@ var Course = class {
     this.hazards = [];
     for (let i = 0; i < 2 + (this.par > 3 ? 2 : 0); i++) {
       const z = 35 + r() * Math.max(15, this.length - 75), side = r() < 0.5 ? -1 : 1, water = i === 0 && this.par > 3;
-      this.hazards.push({ x: this.center(z) + side * (this.width + 10 + r() * 9), z, rx: water ? 9 + r() * 5 : 5 + r() * 4, rz: water ? 16 + r() * 9 : 7 + r() * 7, type: water ? "water" : "sand" });
+      this.hazards.push({
+        x: this.center(z) + side * (this.width + 10 + r() * 9),
+        z,
+        rx: water ? 9 + r() * 5 : 5 + r() * 4,
+        rz: water ? 16 + r() * 9 : 7 + r() * 7,
+        type: water ? "water" : "sand"
+      });
     }
-    this.hazards.push({ x: this.pin.x + (r() < 0.5 ? -1 : 1) * (this.greenRadius + 6), z: this.length - 6, rx: 5, rz: 9, type: "sand" });
+    this.hazards.push({
+      x: this.pin.x + (r() < 0.5 ? -1 : 1) * (this.greenRadius + 6),
+      z: this.length - 6,
+      rx: 5,
+      rz: 9,
+      type: "sand"
+    });
     for (const h of this.hazards) if (h.type === "water") h.level = this.baseHeight(h.x, h.z) - 0.65;
     const angle = r() * Math.PI * 2, speed = 1.5 + r() * (3.2 + Math.min(index, 20) * 0.08);
     this.wind = { x: Math.sin(angle) * speed, z: Math.cos(angle) * speed, speed, angle };
@@ -87,7 +127,11 @@ var Course = class {
   }
   rawHeight(x, z) {
     let y = this.baseHeight(x, z), t = this.terrainStrength ?? 1;
-    const g = 1 - smoothstep(this.greenRadius - 3, this.greenRadius + 12, Math.hypot(x - this.pin.x, z - this.pin.z));
+    const g = 1 - smoothstep(
+      this.greenRadius - 3,
+      this.greenRadius + 12,
+      Math.hypot(x - this.pin.x, z - this.pin.z)
+    );
     const green = this.baseHeight(this.pin.x, this.pin.z) + 2.4 * t + (x - this.pin.x) * this.greenX + (z - this.pin.z) * this.greenZ;
     y = y * (1 - g) + green * g;
     const tee = 1 - smoothstep(5, 23, Math.hypot(x, z));
@@ -100,10 +144,22 @@ var Course = class {
     return y;
   }
   rebuildTerrain() {
-    const step = 1.5, sorted = (min, max, extra) => [.../* @__PURE__ */ new Set([...Array.from({ length: Math.ceil((max - min) / step) + 1 }, (_, i) => Math.min(max, min + i * step)), ...extra])].sort((a, b) => a - b);
+    const step = 1.5, sorted = (min, max, extra) => [
+      .../* @__PURE__ */ new Set([
+        ...Array.from(
+          { length: Math.ceil((max - min) / step) + 1 },
+          (_, i) => Math.min(max, min + i * step)
+        ),
+        ...extra
+      ])
+    ].sort((a, b) => a - b);
     const xs = sorted(-91, 91, [this.pin.x - 0.25, this.pin.x + 0.25]), zs = sorted(-30, this.length + 70, [this.pin.z - 0.25, this.pin.z + 0.25]);
     const heights = new Float32Array(xs.length * zs.length);
-    for (let j = 0; j < zs.length; j++) for (let i = 0; i < xs.length; i++) heights[j * xs.length + i] = this.rawHeight(xs[i], zs[j]);
+    for (let j = 0; j < zs.length; j++) {
+      for (let i = 0; i < xs.length; i++) {
+        heights[j * xs.length + i] = this.rawHeight(xs[i], zs[j]);
+      }
+    }
     this.heightfield = { xs, zs, heights };
     this.validation = this.validate();
   }
@@ -118,10 +174,15 @@ var Course = class {
   }
   sample(x, z) {
     const f = this.heightfield;
-    if (!f || x < f.xs[0] || x > f.xs.at(-1) || z < f.zs[0] || z > f.zs.at(-1)) return { height: this.rawHeight(x, z), slope: null };
+    if (!f || x < f.xs[0] || x > f.xs.at(-1) || z < f.zs[0] || z > f.zs.at(-1)) {
+      return { height: this.rawHeight(x, z), slope: null };
+    }
     const i = this.cell(f.xs, x), j = this.cell(f.zs, z), dx = f.xs[i + 1] - f.xs[i], dz = f.zs[j + 1] - f.zs[j], u = (x - f.xs[i]) / dx, v = (z - f.zs[j]) / dz, k = j * f.xs.length + i;
     const a = f.heights[k], b = f.heights[k + f.xs.length], c = f.heights[k + 1], d = f.heights[k + f.xs.length + 1];
-    return u + v <= 1 ? { height: a + u * (c - a) + v * (b - a), slope: { x: (c - a) / dx, z: (b - a) / dz } } : { height: d + (1 - u) * (b - d) + (1 - v) * (c - d), slope: { x: (d - b) / dx, z: (d - c) / dz } };
+    return u + v <= 1 ? { height: a + u * (c - a) + v * (b - a), slope: { x: (c - a) / dx, z: (b - a) / dz } } : {
+      height: d + (1 - u) * (b - d) + (1 - v) * (c - d),
+      slope: { x: (d - b) / dx, z: (d - c) / dz }
+    };
   }
   height(x, z) {
     return this.sample(x, z).height;
@@ -130,10 +191,15 @@ var Course = class {
     const value = this.sample(x, z);
     if (value.slope) return value.slope;
     const e = 0.05;
-    return { x: (this.rawHeight(x + e, z) - this.rawHeight(x - e, z)) / (2 * e), z: (this.rawHeight(x, z + e) - this.rawHeight(x, z - e)) / (2 * e) };
+    return {
+      x: (this.rawHeight(x + e, z) - this.rawHeight(x - e, z)) / (2 * e),
+      z: (this.rawHeight(x, z + e) - this.rawHeight(x, z - e)) / (2 * e)
+    };
   }
   waterAt(x, z) {
-    const h = this.hazards.find((h2) => h2.type === "water" && ((x - h2.x) / h2.rx) ** 2 + ((z - h2.z) / h2.rz) ** 2 < 1);
+    const h = this.hazards.find(
+      (h2) => h2.type === "water" && ((x - h2.x) / h2.rx) ** 2 + ((z - h2.z) / h2.rz) ** 2 < 1
+    );
     return h ? { level: h.level } : null;
   }
   validate() {
@@ -155,7 +221,9 @@ var Course = class {
   surface(x, z) {
     if (Math.hypot(x - this.pin.x, z - this.pin.z) < this.greenRadius) return "green";
     if (Math.hypot(x, z) < 7) return "tee";
-    for (const h of this.hazards) if (((x - h.x) / h.rx) ** 2 + ((z - h.z) / h.rz) ** 2 < 1) return h.type;
+    for (const h of this.hazards) {
+      if (((x - h.x) / h.rx) ** 2 + ((z - h.z) / h.rz) ** 2 < 1) return h.type;
+    }
     if (z >= 0 && z <= this.length && Math.abs(x - this.center(z)) < this.width * (0.9 + 0.1 * Math.sin(z / 30))) return "fairway";
     return "rough";
   }
@@ -204,7 +272,9 @@ function cupContact(before, after, velocity, course, rolling) {
     if (rolling && slow || !rolling && crossing && (slow || steep)) {
       const t = rolling ? hit.closest : clamp((before.y - level - BALL_RADIUS) / (before.y - after.y || 1), 0, 1);
       const x = before.x + (after.x - before.x) * t, z = before.z + (after.z - before.z) * t;
-      if (Math.hypot(x - pin.x, z - pin.z) <= CUP_CLEARANCE + 1e-5) return { type: "entry", x, z, level };
+      if (Math.hypot(x - pin.x, z - pin.z) <= CUP_CLEARANCE + 1e-5) {
+        return { type: "entry", x, z, level };
+      }
     }
   }
   const dx = after.x - before.x, dz = after.z - before.z, travel = Math.hypot(dx, dz);
@@ -266,7 +336,11 @@ var BallPhysics = class {
     const resistance = lie === "sand" && club === 7 ? 0.9 : surface.launch;
     const speed = c.speed * Math.pow(clamp(power, 2e-3, 1), club === 8 ? 0.7 : 0.5) * resistance;
     const theta = (club === 8 ? 0 : clamp(c.loft + loft, 5, 70)) * Math.PI / 180, yaw = aim + clamp(error, -1, 1) * c.accuracy * Math.PI / 180;
-    this.v = { x: Math.sin(yaw) * speed * Math.cos(theta), y: club === 8 ? 0 : speed * Math.sin(theta), z: Math.cos(yaw) * speed * Math.cos(theta) };
+    this.v = {
+      x: Math.sin(yaw) * speed * Math.cos(theta),
+      y: club === 8 ? 0 : speed * Math.sin(theta),
+      z: Math.cos(yaw) * speed * Math.cos(theta)
+    };
     this.spin = club === 8 ? 0 : c.spin * (1 + clamp(spin, -1, 1) * (spin < 0 ? 1.25 : 0.55));
     this.sideSpin = clamp(shape + error * 0.18, -1, 1);
     this.status = club === 8 ? "rolling" : "flight";
@@ -275,14 +349,37 @@ var BallPhysics = class {
     this.accumulator = 0;
     this.windClock = null;
     this.cupTime = 0;
-    this.shot = { club, power: clamp(power, 2e-3, 1), carry: club === 8 ? 0 : null, total: 0, lie, launchSpeed: speed };
+    this.shot = {
+      club,
+      power: clamp(power, 2e-3, 1),
+      carry: club === 8 ? 0 : null,
+      total: 0,
+      lie,
+      launchSpeed: speed
+    };
     return true;
   }
   snapshot() {
-    return { version: 2, p: { ...this.p }, v: { ...this.v }, status: this.status, spin: this.spin, sideSpin: this.sideSpin, age: this.age, origin: { ...this.origin }, restTime: this.restTime, accumulator: this.accumulator, windClock: this.windClock, cupTime: this.cupTime, shot: this.shot ? { ...this.shot } : null };
+    return {
+      version: 2,
+      p: { ...this.p },
+      v: { ...this.v },
+      status: this.status,
+      spin: this.spin,
+      sideSpin: this.sideSpin,
+      age: this.age,
+      origin: { ...this.origin },
+      restTime: this.restTime,
+      accumulator: this.accumulator,
+      windClock: this.windClock,
+      cupTime: this.cupTime,
+      shot: this.shot ? { ...this.shot } : null
+    };
   }
   restore(s) {
-    if (!s?.p || !s?.v || ![s.p.x, s.p.y, s.p.z, s.v.x, s.v.y, s.v.z].every(Number.isFinite)) return;
+    if (!s?.p || !s?.v || ![s.p.x, s.p.y, s.p.z, s.v.x, s.v.y, s.v.z].every(Number.isFinite)) {
+      return;
+    }
     this.p = { ...s.p };
     this.previous = { ...this.p };
     this.v = { ...s.v };
@@ -304,10 +401,19 @@ var BallPhysics = class {
   }
   renderedPosition() {
     const a = clamp(this.accumulator / STEP, 0, 1);
-    return this.status === "rest" || this.status === "holed" ? this.p : { x: this.previous.x + (this.p.x - this.previous.x) * a, y: this.previous.y + (this.p.y - this.previous.y) * a, z: this.previous.z + (this.p.z - this.previous.z) * a };
+    return this.status === "rest" || this.status === "holed" ? this.p : {
+      x: this.previous.x + (this.p.x - this.previous.x) * a,
+      y: this.previous.y + (this.p.y - this.previous.y) * a,
+      z: this.previous.z + (this.p.z - this.previous.z) * a
+    };
   }
   summary() {
-    return this.shot ? { ...this.shot, total: Math.hypot(this.p.x - this.origin.x, this.p.z - this.origin.z), lie: this.status === "holed" ? "cup" : this.course.surface(this.p.x, this.p.z), remaining: this.course.distance?.(this.p.x, this.p.z) ?? Math.hypot(this.p.x - this.course.pin.x, this.p.z - this.course.pin.z) } : null;
+    return this.shot ? {
+      ...this.shot,
+      total: Math.hypot(this.p.x - this.origin.x, this.p.z - this.origin.z),
+      lie: this.status === "holed" ? "cup" : this.course.surface(this.p.x, this.p.z),
+      remaining: this.course.distance?.(this.p.x, this.p.z) ?? Math.hypot(this.p.x - this.course.pin.x, this.p.z - this.course.pin.z)
+    } : null;
   }
   update(dt, windTime = 0) {
     if (this.status === "rest" || this.status === "holed") return null;
@@ -392,16 +498,28 @@ var BallPhysics = class {
     if (water && p.y - BALL_RADIUS <= water.level || c.surface(p.x, p.z) === "water" && p.y - BALL_RADIUS <= c.height(p.x, p.z) + 5e-3) {
       const summary = this.summary(), drop = c.relief(p.x, p.z);
       this.reset(drop);
-      return { type: "penalty", reason: "Water \xB7 one penalty stroke and fairway relief", penalty: 1, summary };
+      return {
+        type: "penalty",
+        reason: "Water \xB7 one penalty stroke and fairway relief",
+        penalty: 1,
+        summary
+      };
     }
     if (!c.inBounds(p.x, p.z)) {
       const summary = this.summary();
       this.reset(this.origin);
-      return { type: "penalty", reason: "Out of bounds \xB7 stroke and distance", penalty: 1, summary };
+      return {
+        type: "penalty",
+        reason: "Out of bounds \xB7 stroke and distance",
+        penalty: 1,
+        summary
+      };
     }
     const cup = cupContact(before, p, v, c, rolling);
     if (cup?.type === "entry") {
-      if (this.shot?.carry === null) this.shot.carry = Math.hypot(cup.x - this.origin.x, cup.z - this.origin.z);
+      if (this.shot?.carry === null) {
+        this.shot.carry = Math.hypot(cup.x - this.origin.x, cup.z - this.origin.z);
+      }
       p.x = cup.x;
       p.z = cup.z;
       p.y = Math.min(p.y, cup.level + BALL_RADIUS);
@@ -434,7 +552,9 @@ var BallPhysics = class {
       p.y = contactHeight(c, x, z);
       const lie = c.surface(x, z), mat = surfacePhysics(lie), s = c.slope(x, z), len = Math.hypot(s.x, 1, s.z), n = { x: -s.x / len, y: 1 / len, z: -s.z / len };
       const normal = v.x * n.x + v.y * n.y + v.z * n.z, impact = Math.max(0, -normal);
-      if (this.shot?.carry === null) this.shot.carry = Math.hypot(p.x - this.origin.x, p.z - this.origin.z);
+      if (this.shot?.carry === null) {
+        this.shot.carry = Math.hypot(p.x - this.origin.x, p.z - this.origin.z);
+      }
       if (normal < 0) {
         const tx = v.x - normal * n.x, ty = v.y - normal * n.y, tz = v.z - normal * n.z;
         const spinBrake = clamp(this.spin / 1e4, 0, 0.6), retain = Math.max(0.05, 1 - mat.contactFriction - spinBrake * impact / 24);
@@ -477,7 +597,9 @@ var PREDICTIONS = [
   { id: "ace", name: "Hole-in-one", mult: 20, strokes: 1, exact: true }
 ];
 function predictions(par) {
-  return PREDICTIONS.filter((p) => par === 3 ? !["eagle", "exact-eagle"].includes(p.id) : p.id !== "ace");
+  return PREDICTIONS.filter(
+    (p) => par === 3 ? !["eagle", "exact-eagle"].includes(p.id) : p.id !== "ace"
+  );
 }
 function predictionWon(id, par, strokes) {
   const p = predictions(par).find((p2) => p2.id === id);
@@ -488,7 +610,15 @@ function predictionWon(id, par, strokes) {
 function scoreName(par, strokes) {
   if (strokes === 1) return "Hole-in-one";
   const relative = strokes - par;
-  return { "-3": "Albatross", "-2": "Eagle", "-1": "Birdie", 0: "Par", 1: "Bogey", 2: "Double bogey", 3: "Triple bogey" }[relative] ?? (relative < 0 ? `${-relative} under par` : `${relative} over par`);
+  return {
+    "-3": "Albatross",
+    "-2": "Eagle",
+    "-1": "Birdie",
+    0: "Par",
+    1: "Bogey",
+    2: "Double bogey",
+    3: "Triple bogey"
+  }[relative] ?? (relative < 0 ? `${-relative} under par` : `${relative} over par`);
 }
 function reward(id, streak) {
   const p = PREDICTIONS.find((p2) => p2.id === id);
@@ -502,11 +632,15 @@ function golfCourse(seed, index) {
 }
 function validateGolf(session, request) {
   const state = structuredClone(session.state), metrics = {};
-  if (!Number.isInteger(state.holeIndex) || state.holeIndex < 1 || state.holeIndex > 1e4) throw new Error("Invalid course state");
+  if (!Number.isInteger(state.holeIndex) || state.holeIndex < 1 || state.holeIndex > 1e4) {
+    throw new Error("Invalid course state");
+  }
   const course = golfCourse(session.seed, state.holeIndex);
   if (request.operation === "prediction") {
     if (state.prediction || state.result) throw new Error("Prediction is already locked");
-    if (!predictions(course.par).some((p) => p.id === request.prediction)) throw new Error("Invalid prediction");
+    if (!predictions(course.par).some((p) => p.id === request.prediction)) {
+      throw new Error("Invalid prediction");
+    }
     state.prediction = request.prediction;
   } else if (request.operation === "next") {
     if (!state.result?.won) throw new Error("Win the current hole before continuing");
@@ -520,8 +654,21 @@ function validateGolf(session, request) {
     if (!state.prediction || state.result) throw new Error("Lock a prediction before shooting");
     if (state.strokes >= 30) throw new Error("Stroke limit reached. Start a new run.");
     const spec = request.spec;
-    if (!spec || !Number.isInteger(spec.club) || spec.club < 0 || spec.club > 8) throw new Error("Invalid club");
-    for (const [key, lo, hi] of [["power", 5e-3, 1], ["aim", -Math.PI, Math.PI], ["error", -1, 1], ["spin", -1, 1], ["shape", -1, 1], ["loft", -10, 10]]) if (!Number.isFinite(spec[key]) || spec[key] < lo || spec[key] > hi) throw new Error("Invalid " + key);
+    if (!spec || !Number.isInteger(spec.club) || spec.club < 0 || spec.club > 8) {
+      throw new Error("Invalid club");
+    }
+    for (const [key, lo, hi] of [
+      ["power", 5e-3, 1],
+      ["aim", -Math.PI, Math.PI],
+      ["error", -1, 1],
+      ["spin", -1, 1],
+      ["shape", -1, 1],
+      ["loft", -10, 10]
+    ]) {
+      if (!Number.isFinite(spec[key]) || spec[key] < lo || spec[key] > hi) {
+        throw new Error("Invalid " + key);
+      }
+    }
     const wait = request.wait ?? 0;
     if (!Number.isFinite(wait) || wait < 0 || wait > 120) throw new Error("Invalid shot timing");
     const ball = new BallPhysics(course);
@@ -546,8 +693,26 @@ function validateGolf(session, request) {
       state.streak = won ? state.streak + 1 : 0;
       const points = won ? reward(state.prediction, state.streak) : 0;
       state.score += points;
-      state.result = { won, points, streak: state.streak, score: state.score, name: scoreName(course.par, state.strokes) };
-      Object.assign(metrics, { holes: 1, game_points: points, relative_over: Math.max(0, state.strokes - course.par), relative_under: Math.max(0, course.par - state.strokes), birdies: Number(state.strokes - course.par === -1), eagles: Number(state.strokes - course.par === -2), aces: Number(state.strokes === 1), won: Number(won), lost: Number(!won), streak: state.streak, score: state.score });
+      state.result = {
+        won,
+        points,
+        streak: state.streak,
+        score: state.score,
+        name: scoreName(course.par, state.strokes)
+      };
+      Object.assign(metrics, {
+        holes: 1,
+        game_points: points,
+        relative_over: Math.max(0, state.strokes - course.par),
+        relative_under: Math.max(0, course.par - state.strokes),
+        birdies: Number(state.strokes - course.par === -1),
+        eagles: Number(state.strokes - course.par === -2),
+        aces: Number(state.strokes === 1),
+        won: Number(won),
+        lost: Number(!won),
+        streak: state.streak,
+        score: state.score
+      });
     }
   } else throw new Error("Unknown golf operation");
   return { state, metrics, finished: !!state.result && !state.result.won };

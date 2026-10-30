@@ -27,10 +27,12 @@
   const Arcade = window.Arcade = {
     register(def) {
       if (!def || !def.id || (typeof def.create !== 'function' && !def.href)) return;
-      if (games.some(g => g.id === def.id)) return;
-      games.push(Object.assign({ width: 640, height: 480, genre: '', controls: '', description: '' }, def));
+      if (games.some((g) => g.id === def.id)) return;
+      games.push(
+        Object.assign({ width: 640, height: 480, genre: '', controls: '', description: '' }, def),
+      );
       if (ready) renderLibrary();
-    }
+    },
   };
 
   /* ---------- Theme bridge ---------- */
@@ -49,25 +51,30 @@
       border: v('--border-strong', '#444'),
       font: getComputedStyle(document.body).fontFamily,
       themeId: root.getAttribute('data-page-theme') || 'signature',
-      dark: root.classList.contains('theme-dark') || !!root.getAttribute('data-page-theme')
+      dark: root.classList.contains('theme-dark') || !!root.getAttribute('data-page-theme'),
     };
   }
   let themeCache = readTheme();
   const themeListeners = new Set();
   new MutationObserver(() => {
     // wait a frame so CSS variables (and rain hue) have settled
-    requestAnimationFrame(() => { themeCache = readTheme(); themeListeners.forEach(cb => cb(themeCache)); });
+    requestAnimationFrame(() => {
+      themeCache = readTheme();
+      themeListeners.forEach((cb) => cb(themeCache));
+    });
   }).observe(root, { attributes: true, attributeFilter: ['class', 'data-page-theme', 'style'] });
 
   /* ---------- Player ---------- */
-  let current = null;   // { def, instance, raf, off[] }
+  let current = null; // { def, instance, raf, off[] }
   let ready = false;
 
   function stop() {
     if (!current) return;
     cancelAnimationFrame(current.raf);
-    current.off.forEach(fn => fn());
-    try { current.instance && current.instance.destroy && current.instance.destroy(); } catch (e) { /* ignore */ }
+    current.off.forEach((fn) => fn());
+    try {
+      current.instance && current.instance.destroy && current.instance.destroy();
+    } catch (e) { /* ignore */ }
     current = null;
   }
 
@@ -76,13 +83,15 @@
     const canvas = $('arcade-canvas');
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const maxW = stage.clientWidth;
-    const maxH = document.fullscreenElement === stage ? window.innerHeight : Math.max(280, window.innerHeight * 0.72);
+    const maxH = document.fullscreenElement === stage
+      ? window.innerHeight
+      : Math.max(280, window.innerHeight * 0.72);
     const s = Math.min(maxW / def.width, maxH / def.height);
     const cssW = Math.floor(def.width * s), cssH = Math.floor(def.height * s);
     canvas.style.width = cssW + 'px';
     canvas.style.height = cssH + 'px';
-    canvas.width = Math.floor(def.width * dpr * (s));
-    canvas.height = Math.floor(def.height * dpr * (s));
+    canvas.width = Math.floor(def.width * dpr * s);
+    canvas.height = Math.floor(def.height * dpr * s);
     const ctx = canvas.getContext('2d');
     ctx.setTransform(canvas.width / def.width, 0, 0, canvas.height / def.height, 0, 0);
     return ctx;
@@ -94,23 +103,34 @@
     let ctx = fit(def);
     const keys = new Set();
     const off = [];
-    const on = (t, e, fn, o) => { t.addEventListener(e, fn, o); off.push(() => t.removeEventListener(e, fn, o)); };
+    const on = (t, e, fn, o) => {
+      t.addEventListener(e, fn, o);
+      off.push(() => t.removeEventListener(e, fn, o));
+    };
 
     const game = {
-      canvas, width: def.width, height: def.height,
-      get ctx() { return ctx; },
+      canvas,
+      width: def.width,
+      height: def.height,
+      get ctx() {
+        return ctx;
+      },
       input: { keys, isDown: (k) => keys.has(k) },
       theme: () => themeCache,
-      onTheme(cb) { themeListeners.add(cb); off.push(() => themeListeners.delete(cb)); },
+      onTheme(cb) {
+        themeListeners.add(cb);
+        off.push(() => themeListeners.delete(cb));
+      },
       loop(fn) {
         let last = performance.now();
         const tick = (t) => {
-          const dt = Math.min(0.05, (t - last) / 1000); last = t;
+          const dt = Math.min(0.05, (t - last) / 1000);
+          last = t;
           if (!document.hidden) fn(dt);
           current && (current.raf = requestAnimationFrame(tick));
         };
         current.raf = requestAnimationFrame(tick);
-      }
+      },
     };
 
     current = { def, instance: null, raf: 0, off };
@@ -121,17 +141,24 @@
     });
     on(window, 'keyup', (e) => keys.delete(e.key));
     on(window, 'blur', () => keys.clear());
-    on(window, 'resize', () => { ctx = fit(def); });
-    on(document, 'fullscreenchange', () => { ctx = fit(def); });
+    on(window, 'resize', () => {
+      ctx = fit(def);
+    });
+    on(document, 'fullscreenchange', () => {
+      ctx = fit(def);
+    });
 
     current.instance = def.create(game) || null;
     canvas.focus({ preventScroll: true });
   }
 
   function open(id, push) {
-    const def = games.find(g => g.id === id);
+    const def = games.find((g) => g.id === id);
     if (!def || !window.ArcadePlayer) return;
-    if (def.href) { location.assign(def.href); return; }
+    if (def.href) {
+      location.assign(def.href);
+      return;
+    }
     $('arcade-library').hidden = true;
     $('arcade-player').hidden = false;
     $('arcade-title').textContent = def.title;
@@ -157,38 +184,70 @@
     const summary = document.createElement('summary');
     summary.textContent = 'Info & updates';
     summary.setAttribute('aria-label', 'Info and updates for ' + game.title);
-    const body = document.createElement('div'); body.className = 'arcade-info-body';
-    const heading = text => { const el = document.createElement('h4'); el.textContent = text; body.append(el); };
-    const paragraph = text => { const el = document.createElement('p'); el.textContent = text; body.append(el); };
+    const body = document.createElement('div');
+    body.className = 'arcade-info-body';
+    const heading = (text) => {
+      const el = document.createElement('h4');
+      el.textContent = text;
+      body.append(el);
+    };
+    const paragraph = (text) => {
+      const el = document.createElement('p');
+      el.textContent = text;
+      body.append(el);
+    };
     heading('About ' + game.title);
     (game.info.about || []).forEach(paragraph);
-    if (game.info.controls) { heading('Controls'); paragraph(game.info.controls); }
+    if (game.info.controls) {
+      heading('Controls');
+      paragraph(game.info.controls);
+    }
     if (game.info.updates?.length) {
-      const entry = update => {
-        const section = document.createElement('section'); section.className = 'arcade-update';
-        const title = document.createElement('h5'); title.textContent = update.title; section.append(title);
+      const entry = (update) => {
+        const section = document.createElement('section');
+        section.className = 'arcade-update';
+        const title = document.createElement('h5');
+        title.textContent = update.title;
+        section.append(title);
         if (update.date) {
           const date = new Date(update.date + 'T00:00:00Z');
           if (Number.isFinite(date.getTime())) {
-            const time = document.createElement('time'); time.dateTime = update.date;
-            time.textContent = new Intl.DateTimeFormat('en-US', {month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}).format(date);
+            const time = document.createElement('time');
+            time.dateTime = update.date;
+            time.textContent = new Intl.DateTimeFormat('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+              timeZone: 'UTC',
+            }).format(date);
             section.append(time);
           }
         }
         const list = document.createElement('ul');
-        update.items.forEach(text => {
-          const item = document.createElement('li'),parts = text.match(/^(Feature|Update|Patch)\s*[—-]\s*(.*)$/);
-          if(parts){const label=document.createElement('strong');label.className='arcade-change-type';label.textContent=parts[1];item.append(label,document.createTextNode(' — '+parts[2]));}
-          else item.textContent=text;
+        update.items.forEach((text) => {
+          const item = document.createElement('li'),
+            parts = text.match(/^(Feature|Update|Patch)\s*[—-]\s*(.*)$/);
+          if (parts) {
+            const label = document.createElement('strong');
+            label.className = 'arcade-change-type';
+            label.textContent = parts[1];
+            item.append(label, document.createTextNode(' — ' + parts[2]));
+          } else item.textContent = text;
           list.append(item);
         });
-        section.append(list); return section;
+        section.append(list);
+        return section;
       };
-      heading('Recent update'); body.append(entry(game.info.updates[0]));
-      if(game.info.updates.length>1){
-        const history=document.createElement('details'); history.className='arcade-update-history';
-        const toggle=document.createElement('summary');toggle.textContent='Update history';toggle.setAttribute('aria-label','Update history for '+game.title);
-        history.append(toggle,...game.info.updates.slice(1).map(entry));body.append(history);
+      heading('Recent update');
+      body.append(entry(game.info.updates[0]));
+      if (game.info.updates.length > 1) {
+        const history = document.createElement('details');
+        history.className = 'arcade-update-history';
+        const toggle = document.createElement('summary');
+        toggle.textContent = 'Update history';
+        toggle.setAttribute('aria-label', 'Update history for ' + game.title);
+        history.append(toggle, ...game.info.updates.slice(1).map(entry));
+        body.append(history);
       }
     }
     details.append(summary, body);
@@ -199,11 +258,15 @@
   function layoutLibrary() {
     const grid = $('arcade-grid');
     if (!grid.clientWidth) return;
-    const count = window.matchMedia('(max-width:600px)').matches ? 1 : Math.max(1, Math.floor((grid.clientWidth + 24) / 284));
+    const count = window.matchMedia('(max-width:600px)').matches
+      ? 1
+      : Math.max(1, Math.floor((grid.clientWidth + 24) / 284));
     if (count === libraryColumns) return;
     libraryColumns = count;
     const columns = Array.from({ length: count }, () => {
-      const col = document.createElement('div'); col.className = 'arcade-column'; return col;
+      const col = document.createElement('div');
+      col.className = 'arcade-column';
+      return col;
     });
     libraryCards.forEach((card, i) => columns[i % count].append(card));
     grid.replaceChildren(...columns);
@@ -212,37 +275,49 @@
   let genre = 'all';
   function renderLibrary() {
     const grid = $('arcade-grid');
-    const genres = Array.from(new Set(games.map(g => g.genre).filter(Boolean)));
+    const genres = Array.from(new Set(games.map((g) => g.genre).filter(Boolean)));
     const bar = $('arcade-filters');
     const chips = $('arcade-genres');
     bar.hidden = genres.length < 2;
     chips.innerHTML = '';
-    ['all'].concat(genres).forEach(gn => {
+    ['all'].concat(genres).forEach((gn) => {
       const b = document.createElement('button');
       b.className = 'filter-chip' + (gn === genre ? ' active' : '');
       b.type = 'button';
       b.textContent = gn === 'all' ? 'All' : gn;
       b.setAttribute('aria-pressed', String(gn === genre));
-      b.addEventListener('click', () => { genre = gn; renderLibrary(); });
+      b.addEventListener('click', () => {
+        genre = gn;
+        renderLibrary();
+      });
       chips.appendChild(b);
     });
 
     grid.innerHTML = '';
-    libraryCards = []; libraryColumns = 0;
-    const list = games.filter(g => genre === 'all' || g.genre === genre);
-    list.forEach(g => {
+    libraryCards = [];
+    libraryColumns = 0;
+    const list = games.filter((g) => genre === 'all' || g.genre === genre);
+    list.forEach((g) => {
       const card = document.createElement('article');
       card.className = 'project-card project arcade-card';
       card.dataset.gameId = g.id;
-      const h = document.createElement('h3'); h.textContent = g.title;
+      const h = document.createElement('h3');
+      h.textContent = g.title;
       if (g.icon) {
-        const icon = document.createElement('span'); icon.className = 'arcade-game-icon'; icon.setAttribute('aria-hidden', 'true');
-        icon.style.maskImage = icon.style.webkitMaskImage = 'url("' + g.icon + '")'; h.prepend(icon);
+        const icon = document.createElement('span');
+        icon.className = 'arcade-game-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.style.maskImage = icon.style.webkitMaskImage = 'url("' + g.icon + '")';
+        h.prepend(icon);
       }
-      const p = document.createElement('p'); p.textContent = g.description;
-      const a = document.createElement('p'); a.className = 'repo-link';
+      const p = document.createElement('p');
+      p.textContent = g.description;
+      const a = document.createElement('p');
+      a.className = 'repo-link';
       const btn = document.createElement(g.href ? 'a' : 'button');
-      btn.className = 'btn btn-primary'; btn.type = 'button'; btn.textContent = 'Play';
+      btn.className = 'btn btn-primary';
+      btn.type = 'button';
+      btn.textContent = 'Play';
       if (g.href) btn.href = g.href;
       else btn.addEventListener('click', () => open(g.id, true));
       a.appendChild(btn);
@@ -251,9 +326,13 @@
         const date = new Date(g.releaseDate + 'T00:00:00Z');
         if (Number.isFinite(date.getTime())) {
           const released = document.createElement('time');
-          released.className = 'arcade-release'; released.dateTime = g.releaseDate;
+          released.className = 'arcade-release';
+          released.dateTime = g.releaseDate;
           released.textContent = 'Released ' + new Intl.DateTimeFormat('en-US', {
-            month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            timeZone: 'UTC',
           }).format(date);
           card.append(released);
         }
@@ -280,7 +359,8 @@
     });
     window.addEventListener('popstate', () => {
       const id = location.hash.slice(1);
-      if (id) open(id, false); else close(false);
+      if (id) open(id, false);
+      else close(false);
     });
     if (location.hash.length > 1) open(location.hash.slice(1), false);
   }

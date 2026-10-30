@@ -1,198 +1,235 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <!-- ------------------ projects.html — Projects index ------------------
-       Purpose: List of projects, prototypes, and experiments
-  ---------------------------------------------------------------- -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Projects — Tanner Steeber</title>
-  <link rel="stylesheet" href="css/styles.css?v=0.9.8">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-</head>
-<body>
-  <!-- ------------------ Site header / navigation (shared) ------------------ -->
-  <header class="site-header">
-    <div class="container header-inner">
-  <a class="brand" href="index.html">tannersteeber.dev</a>
-      <nav class="nav" aria-label="Primary navigation">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="arcade.html">Arcade</a>
-        <a href="projects.html" class="active" aria-current="page">Projects</a>
-        <a href="resume.html">Résumé</a>
-      </nav>
-      <div class="header-actions">
-        <button class="nav-toggle" aria-label="Open navigation">☰</button>
+  <head>
+    <!-- ------------------ projects.html — Projects index ------------------
+         Purpose: List of projects, prototypes, and experiments
+    ---------------------------------------------------------------- -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Projects — Tanner Steeber</title>
+    <link rel="stylesheet" href="css/styles.css?v=0.9.8">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  </head>
+  <body>
+    <!-- ------------------ Site header / navigation (shared) ------------------ -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html">tannersteeber.dev</a>
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="index.html">Home</a>
+          <a href="about.html">About</a>
+          <a href="arcade.html">Arcade</a>
+          <a href="projects.html" class="active" aria-current="page">Projects</a>
+          <a href="resume.html">Résumé</a>
+        </nav>
+        <div class="header-actions">
+          <button class="nav-toggle" aria-label="Open navigation">☰</button>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- Projects main: list/grid of project cards
-       - Each project card represents a project object (title, description, meta)
-       - Add real project entries by replacing placeholder articles
-  -->
-  <main class="container projects-page">
-    <h1>Projects</h1>
-    <p class="lead">A selection of public and in-progress projects. Expand a section to view project cards; expand a card to see updates and images.</p>
+    <!-- Projects main: list/grid of project cards
+         - Each project card represents a project object (title, description, meta)
+         - Add real project entries by replacing placeholder articles
+    -->
+    <main class="container projects-page">
+      <h1>Projects</h1>
+      <p
+        class="lead">A selection of public and in-progress projects. Expand a section to view project cards; expand a card to see updates and images.</p>
 
-    <!-- Filters: status tabs + type switch. To add a project, copy a card into #project-grid and set data-status / data-type.
-         data-status: deployed | progress | course     data-type: software | games -->
-    <div class="project-filters">
-      <div class="filter-tabs" role="tablist" aria-label="Project status">
-        <button class="filter-tab active" role="tab" aria-selected="true" data-filter-status="all">All</button>
-        <button class="filter-tab" role="tab" aria-selected="false" data-filter-status="deployed">Deployed</button>
-        <button class="filter-tab" role="tab" aria-selected="false" data-filter-status="progress">In Progress</button>
-        <button class="filter-tab" role="tab" aria-selected="false" data-filter-status="course">Coursework</button>
+      <!-- Filters: status tabs + type switch. To add a project, copy a card into #project-grid and set data-status / data-type.
+           data-status: deployed | progress | course     data-type: software | games -->
+      <div class="project-filters">
+        <div class="filter-tabs" role="tablist" aria-label="Project status">
+          <button class="filter-tab active" role="tab" aria-selected="true"
+            data-filter-status="all">All</button>
+          <button class="filter-tab" role="tab" aria-selected="false"
+            data-filter-status="deployed">Deployed</button>
+          <button class="filter-tab" role="tab" aria-selected="false"
+            data-filter-status="progress">In Progress</button>
+          <button class="filter-tab" role="tab" aria-selected="false"
+            data-filter-status="course">Coursework</button>
+        </div>
+        <div class="filter-types" role="group" aria-label="Project type">
+          <button class="filter-chip active" aria-pressed="true" data-filter-type="all">All</button>
+          <button class="filter-chip" aria-pressed="false"
+            data-filter-type="software">Software</button>
+          <button class="filter-chip" aria-pressed="false" data-filter-type="games">Games</button>
+        </div>
       </div>
-      <div class="filter-types" role="group" aria-label="Project type">
-        <button class="filter-chip active" aria-pressed="true" data-filter-type="all">All</button>
-        <button class="filter-chip" aria-pressed="false" data-filter-type="software">Software</button>
-        <button class="filter-chip" aria-pressed="false" data-filter-type="games">Games</button>
-      </div>
-    </div>
 
-    <div class="project-grid" id="project-grid">
-          <!-- tannersteeber.dev (deployed) -->
-          <article id="project-tannersteeber-dev" class="project-card project" data-status="deployed" data-type="software">
-            <span class="status-badge">Deployed</span>
-            <h3>tannersteeber.dev</h3>
-            <p>Portfolio with projects, an arcade, résumé and contact details.</p>
-            <p class="meta">Tech: HTML, CSS, JavaScript</p>
-            <p class="repo-link"><a class="btn btn-primary" href="https://github.com/tannersteeber/tannersteeber.dev" target="_blank" rel="noopener">View repository on GitHub</a></p>
+      <div class="project-grid" id="project-grid">
+        <!-- tannersteeber.dev (deployed) -->
+        <article id="project-tannersteeber-dev" class="project-card project" data-status="deployed"
+          data-type="software">
+          <span class="status-badge">Deployed</span>
+          <h3>tannersteeber.dev</h3>
+          <p>Portfolio with projects, an arcade, résumé and contact details.</p>
+          <p class="meta">Tech: HTML, CSS, JavaScript</p>
+          <p
+            class="repo-link"><a class="btn btn-primary" href="https://github.com/tannersteeber/tannersteeber.dev" target="_blank" rel="noopener">View repository on GitHub</a></p>
 
-            <details class="card-details">
-              <summary>Details &amp; Updates</summary>
-              <div class="card-body">
-                <div class="card-updates">
-                  <details class="recent-update" open>
-                    <summary><strong>Recent update</strong> — v0.9.8</summary>
-                    <div class="update-body">
-                      <ul>
-                        <li><strong>v0.9.8</strong>
+          <details class="card-details">
+            <summary>Details &amp; Updates</summary>
+            <div class="card-body">
+              <div class="card-updates">
+                <details class="recent-update" open>
+                  <summary><strong>Recent update</strong> — v0.9.10</summary>
+                  <div class="update-body">
+                    <ul>
+                      <li><strong>v0.9.10</strong>
+                        <ul>
+                          <li>Update - Cleaned and organized site code, dependencies and project files.</li>
+                          <li>Patch - Fixed the missing site icon and removed unused assets.</li>
+                          <li>Update - Retired my permanent v0.9.x plan. v1.0 is planned; v0.9.10 is my current release.</li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </details>
+
+                <details class="update-history">
+                  <summary><strong>Update history</strong></summary>
+                  <div class="update-body">
+                    <ul>
+                      <li><strong>v0.9.9.1</strong>
+                        <ul>
+                          <li>Update - Matched account screens to Signature, Retro and Digital Rain.</li>
+                          <li>Patch - Improved verification prompts, password recovery and mobile account layouts.</li>
+                        </ul>
+                      </li>
+                      <li><strong>v0.9.9</strong>
+                        <ul>
+                          <li>Feature - Added Arcade accounts with email verification and private player profiles.</li>
+                          <li>Feature - Added account statistics, achievements and wallet views.</li>
+                        </ul>
+                      </li>
+                      <li><strong>v0.9.8</strong>
                           <ul>
                             <li>Feature - Added recent updates and collapsible history to each Arcade card.</li>
                             <li>Update - Added matching logos to the Arcade library cards.</li>
                             <li>Update - Separated website release notes from each game's changelog.</li>
                           </ul>
                         </li>
-                      </ul>
-                    </div>
-                  </details>
 
-                  <details class="update-history">
-                    <summary><strong>Update history</strong></summary>
-                    <div class="update-body">
-                      <ul>
-                        <li><strong>v0.9.7</strong>
+                      <li><strong>v0.9.7</strong>
                           <ul>
                             <li>Update - Refreshed project release notes and the homepage featured version.</li>
                           </ul>
                         </li>
-                        <li><strong>v0.9.6</strong>
+                      <li><strong>v0.9.6</strong>
                           <ul>
                             <li>Update - Expanded the Arcade library with themed cards, controls and game information.</li>
                           </ul>
                         </li>
-                        <li><strong>v0.9.5</strong>
+                      <li><strong>v0.9.5</strong>
                           <ul>
                             <li>Update - Added a homepage Arcade button and consistent, compact page titles and intro text.</li>
                           </ul>
                         </li>
-                        <li><strong>v0.9.4</strong>
+                      <li><strong>v0.9.4</strong>
                           <ul>
                             <li>Feature - Added game information, controls and update sections to the Arcade library.</li>
                             <li>Update - Unified navigation: Home, About, Arcade, Projects, Résumé; every tab stays visible and highlights the current page.</li>
                             <li>Patch - Made Arcade cards expand independently, restored full descriptions and removed temporary categories.</li>
                           </ul>
                         </li>
-                        <li><strong>v0.9.3</strong>
+                      <li><strong>v0.9.3</strong>
                           <ul>
                             <li>Patch - Anchored menus to their buttons without overlap or opening flicker.</li>
                             <li>Patch - Corrected mobile project-filter spacing and theme-matched résumé links.</li>
                             <li>Patch - Added the homepage featured-project version.</li>
                           </ul>
                         </li>
-                        <li><strong>v0.9.2</strong>
+                      <li><strong>v0.9.2</strong>
                           <ul>
                             <li>Feature - Added saved Signature, Retro and Digital Rain themes, including a rain color slider.</li>
                             <li>Update - Anchored menu popups and added a draggable mobile menu button with corner snapping.</li>
                             <li>Update - Added project filters and hover-responsive résumé links.</li>
                           </ul>
                         </li>
-                        <li><strong>v0.9.1 — first release on the new versioning scheme</strong>
+                      <li><strong>v0.9.1 — first release on the new versioning scheme</strong>
                           <ul>
                             <li>Update - Restyled every page and improved layouts, including filterable project cards.</li>
                             <li>Update - Adopted ongoing v0.9.x releases instead of v1.0; each release increments the final number.</li>
                           </ul>
                         </li>
-                        <li><strong>Version 0.9.3 — early access</strong>
+                      <li><strong>Version 0.9.3 — early access</strong>
                           <ul>
                             <li>Update - Split Details &amp; Updates into Recent update and Update history.</li>
                           </ul>
                         </li>
-                        <li><strong>Version 0.9.2 — early access</strong>
+                      <li><strong>Version 0.9.2 — early access</strong>
                           <ul>
                             <li>Feature - Added accessible hamburger navigation with a menu-side toggle.</li>
                           </ul>
                         </li>
-                        <li><strong>Version 0.9.1 — early access</strong>
+                      <li><strong>Version 0.9.1 — early access</strong>
                           <ul>
                             <li>Update - Refined project-image layouts.</li>
                           </ul>
                         </li>
-                        <li><strong>Version 0.9 — early access</strong>
+                      <li><strong>Version 0.9 — early access</strong>
                           <ul>
                             <li>Feature - Added project images, previews and gallery controls.</li>
                           </ul>
                         </li>
-                        <li><strong>Version 0.8 — alpha</strong>
+                      <li><strong>Version 0.8 — alpha</strong>
                           <ul>
                             <li>Update - Improved Skills &amp; Tools, repository buttons and page layouts.</li>
                           </ul>
                         </li>
-                        <li><strong>Version 0.7 — alpha</strong>
+                      <li><strong>Version 0.7 — alpha</strong>
                           <ul>
                             <li>Update - Improved mobile layout and styling.</li>
                           </ul>
                         </li>
-                        <li><strong>Version 0.6 — alpha</strong>
+                      <li><strong>Version 0.6 — alpha</strong>
                           <ul>
                             <li>Feature - Initial public deployment.</li>
                           </ul>
                         </li>
-                      </ul>
-                    </div>
-                  </details>
-                </div>
+                    </ul>
+                  </div>
+                </details>
+              </div>
 
-                <div class="card-gallery">
-                  <h4>Screenshots</h4>
-                  <div class="thumbs">
-                    <div class="thumb">
-                      <!-- Dark and light variants: place matching files in assets/screens/ -->
-                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-1.png" alt="tannersteeber site - dark mode screenshot 1">
-                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-1.png" alt="tannersteeber site - light mode screenshot 1">
-                    </div>
-                    <div class="thumb">
-                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-2.png" alt="tannersteeber site - dark mode screenshot 2">
-                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-2.png" alt="tannersteeber site - light mode screenshot 2">
-                    </div>
-                    <div class="thumb">
-                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-3.png" alt="tannersteeber site - dark mode screenshot 3">
-                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-3.png" alt="tannersteeber site - light mode screenshot 3">
-                    </div>
-                    <div class="thumb">
-                      <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-4.png" alt="tannersteeber site - dark mode screenshot 4">
-                      <img class="proj-img img-light" src="assets/screens/tannersteeber-light-4.png" alt="tannersteeber site - light mode screenshot 4">
-                    </div>
+              <div class="card-gallery">
+                <h4>Screenshots</h4>
+                <div class="thumbs">
+                  <div class="thumb">
+                    <!-- Dark and light variants: place matching files in assets/screens/ -->
+                    <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-1.png"
+                      alt="tannersteeber site - dark mode screenshot 1">
+                    <img class="proj-img img-light" src="assets/screens/tannersteeber-light-1.png"
+                      alt="tannersteeber site - light mode screenshot 1">
+                  </div>
+                  <div class="thumb">
+                    <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-2.png"
+                      alt="tannersteeber site - dark mode screenshot 2">
+                    <img class="proj-img img-light" src="assets/screens/tannersteeber-light-2.png"
+                      alt="tannersteeber site - light mode screenshot 2">
+                  </div>
+                  <div class="thumb">
+                    <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-3.png"
+                      alt="tannersteeber site - dark mode screenshot 3">
+                    <img class="proj-img img-light" src="assets/screens/tannersteeber-light-3.png"
+                      alt="tannersteeber site - light mode screenshot 3">
+                  </div>
+                  <div class="thumb">
+                    <img class="proj-img img-dark" src="assets/screens/tannersteeber-dark-4.png"
+                      alt="tannersteeber site - dark mode screenshot 4">
+                    <img class="proj-img img-light" src="assets/screens/tannersteeber-light-4.png"
+                      alt="tannersteeber site - light mode screenshot 4">
                   </div>
                 </div>
               </div>
-            </details>
-          </article>
+            </div>
+          </details>
+        </article>
 
-          <article id="project-on-the-line" class="project-card project" data-status="progress" data-type="software">
+        <article id="project-on-the-line" class="project-card project" data-status="progress"
+          data-type="software">
             <span class="status-badge">In Progress</span>            <h3>On-the-Line</h3>
             <p>Progression-focused social app concept (private).</p>
             <p class="meta">Tech: HTML, CSS, JavaScript</p>
@@ -222,7 +259,8 @@
             </details>
           </article>
 
-          <article id="project-battlefield-6-ui-concept" class="project-card project" data-status="progress" data-type="games">
+        <article id="project-battlefield-6-ui-concept" class="project-card project"
+          data-status="progress" data-type="games">
             <span class="status-badge">In Progress</span>            <h3>Battlefield-6-UI-Concept</h3>
             <p>An upgraded UI concept for Battlefield 6 (private).</p>
             <p class="meta">Tech: HTML, CSS, JavaScript</p>
@@ -244,7 +282,8 @@
             </details>
           </article>
 
-          <article id="project-bonzai" class="project-card project" data-status="progress" data-type="games">
+        <article id="project-bonzai" class="project-card project" data-status="progress"
+          data-type="games">
             <span class="status-badge">In Progress</span>            <h3>Bonzai</h3>
             <p>Open world car game prototype (private).</p>
             <p class="meta">Tech: Unreal Engine, C++</p>
@@ -266,7 +305,8 @@
             </details>
           </article>
 
-          <article id="project-ball-knowledge" class="project-card project" data-status="course" data-type="software">
+        <article id="project-ball-knowledge" class="project-card project" data-status="course"
+          data-type="software">
             <span class="status-badge">Coursework</span>            <h3>Ball-Knowledge</h3>
             <p>Course project: sports prediction web app prototype where users vote on upcoming games and compete on leaderboards. Built to explore authentication, state management, and scoring logic.</p>
             <p class="meta">Tech: HTML, CSS, JavaScript</p>
@@ -292,79 +332,100 @@
             </details>
           </article>
 
-          <p class="project-empty" hidden>No projects in this category yet.</p>
-    </div>
-      
-  </main>
-
-  <!-- Popup menu: anchored top-right on desktop, beside the floating button on mobile -->
-  <div id="popup-menu" class="popup-menu" aria-hidden="true">
-    <div class="popup-inner">
-      <nav class="popup-nav" aria-label="Popup Navigation"></nav>
-      <div class="popup-settings">
-        <h4>Settings</h4>
-        <div class="popup-theme">
-          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <g class="icon-moon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></g>
-              <g class="icon-sun"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></g></g>
-            </svg>
-          </button>
-        </div>
+        <p class="project-empty" hidden>No projects in this category yet.</p>
       </div>
-      <button class="popup-close" aria-label="Close menu">✕</button>
+    </main>
+
+    <!-- Popup menu: anchored top-right on desktop, beside the floating button on mobile -->
+    <div id="popup-menu" class="popup-menu" aria-hidden="true">
+      <div class="popup-inner">
+        <nav class="popup-nav" aria-label="Popup Navigation"></nav>
+        <div class="popup-settings">
+          <h4>Settings</h4>
+          <div class="popup-theme">
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <g class="icon-moon">
+                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor" />
+                </g>
+                <g class="icon-sun">
+                  <circle cx="12" cy="12" r="4" fill="currentColor" />
+                  <g stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="M4.93 4.93l1.41 1.41" />
+                    <path d="M17.66 17.66l1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                    <path d="M4.93 19.07l1.41-1.41" />
+                    <path d="M17.66 6.34l1.41-1.41" />
+                  </g>
+                </g>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="popup-close" aria-label="Close menu">✕</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Mobile-only floating menu button (drag to any corner) -->
-  <button class="mobile-nav-toggle" aria-label="Open navigation">☰</button>
+    <!-- Mobile-only floating menu button (drag to any corner) -->
+    <button class="mobile-nav-toggle" aria-label="Open navigation">☰</button>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-left">
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
         © Tanner Steeber <span data-year></span>
         <p class="muted small">Projects, prototypes, and tooling</p>
       </div>
-      <div class="footer-right">
-  <div class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
-        <ul class="footer-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="arcade.html">Arcade</a></li>
-          <li><a href="projects.html">Projects</a></li>
-          <li><a href="resume.html">Résumé</a></li>
-          <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
-        </ul>
+        <div class="footer-right">
+          <div
+            class="footer-email"><a href="mailto:tanner.steeber@icloud.com">tanner.steeber@icloud.com</a></div>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="arcade.html">Arcade</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="resume.html">Résumé</a></li>
+            <li><a href="https://github.com/tannersteeber" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <script src="js/main.js?v=0.9.8-resume"></script>
-  <!-- Lightbox for project screenshots -->
-  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
-    <div class="lightbox-backdrop" data-action="close"></div>
-    <div class="lightbox-inner">
-      <button class="lb-close" aria-label="Close viewer">
-        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-      <button class="lb-prev" aria-label="Previous image">
-        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-      <div class="lb-media">
-        <img class="lb-img" src="" alt="" />
+    <script src="js/main.js?v=0.9.8-resume"></script>
+    <!-- Lightbox for project screenshots -->
+    <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
+      <div class="lightbox-backdrop" data-action="close"></div>
+      <div class="lightbox-inner">
+        <button class="lb-close" aria-label="Close viewer">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button class="lb-prev" aria-label="Previous image">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="lb-media">
+          <img class="lb-img" src="" alt="" />
+        </div>
+        <button class="lb-next" aria-label="Next image">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="lb-counter" aria-hidden="true"></div>
       </div>
-      <button class="lb-next" aria-label="Next image">
-        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-      <div class="lb-counter" aria-hidden="true"></div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

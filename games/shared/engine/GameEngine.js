@@ -3,8 +3,8 @@
 export class GameEngine {
   constructor(gameRenderer) {
     this.gr = gameRenderer;
-    this.update = null;          // (dt) => void
-    this.onHidden = null;        // called when the tab is hidden
+    this.update = null; // (dt) => void
+    this.onHidden = null; // called when the tab is hidden
     this.running = false;
     this.avg = 1 / 60;
     this._raf = 0;
@@ -24,15 +24,21 @@ export class GameEngine {
     this._raf = requestAnimationFrame(this._tick);
   }
 
-  stop() { this.running = false; cancelAnimationFrame(this._raf); }
+  stop() {
+    this.running = false;
+    cancelAnimationFrame(this._raf);
+  }
 
   _frame(now) {
     if (!this.running) return;
     this._raf = requestAnimationFrame(this._tick);
-    if (document.hidden) { this._last = now; return; }
+    if (document.hidden) {
+      this._last = now;
+      return;
+    }
     const raw = (now - this._last) / 1000;
     this._last = now;
-    const dt = Math.min(0.05, Math.max(0, raw));      // clamp so a hitch never teleports the car
+    const dt = Math.min(0.05, Math.max(0, raw)); // clamp so a hitch never teleports the car
     this.avg += (Math.min(raw, 0.2) - this.avg) * 0.05;
     this.gr.adapt(this.avg, now);
     if (this.update) this.update(dt);
